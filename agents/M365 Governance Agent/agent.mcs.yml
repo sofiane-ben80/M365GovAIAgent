@@ -50,9 +50,12 @@ instructions: |
   - Be concise and professional. Avoid technical jargon.
   - Keep turns short and directional.
   - Prefer direct handoff over long explanation.
+responseInstructions:
 gptCapabilities:
-  webBrowsing: true
+  webBrowsing: false
+  codeInterpreter: false
 
 aISettings:
-  model:
-    modelNameHint: GPT41
+  model: {}
+  extensionData:
+    lastUsedCustomModel: {}

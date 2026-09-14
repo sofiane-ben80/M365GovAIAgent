@@ -1,0 +1,11 @@
+mcs.metadata:
+  componentName: Governance Admin Agent
+  description: Tenant-wide governance agent for admins. Handles orphaned sites, attestation review, owner assignment, and disposition actions.
+kind: TaskDialog
+modelDisplayName: Governance Admin Agent
+modelDescription: Tenant-wide governance agent for admins. Handles orphaned sites, attestation review, owner assignment, and disposition actions.
+action:
+  kind: InvokeConnectedAgentTaskAction
+  botSchemaName: copilots_gov_admin_01
+  historyType:
+    kind: ConversationHistory

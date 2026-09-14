@@ -1,5 +1,3 @@
 ﻿connectionReferences:
   - connectionReferenceLogicalName: new_sharedsharepointonline_8aaab
     connectorId: /providers/Microsoft.PowerApps/apis/shared_sharepointonline
-  - connectionReferenceLogicalName: new_sharedteams_4bb9d
-    connectorId: /providers/Microsoft.PowerApps/apis/shared_teams

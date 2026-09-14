@@ -1,4 +1,4 @@
-displayName: M365 Governance Agent
+displayName: Governor M365
 schemaName: copilots_header_04c70
 accessControlPolicy: GroupMembership
 authenticationMode: Integrated
@@ -20,13 +20,12 @@ configuration:
   isLightweightBot: false
   aISettings:
     useModelKnowledge: true
-    isFileAnalysisEnabled: true
+    isFileAnalysisEnabled: false
     isSemanticSearchEnabled: true
+    contentModeration: High
     optInUseLatestModels: false
 
   recognizer:
     kind: GenerativeAIRecognizer
 
 publishedOn: 2026-07-25T22:38:14.0000000Z
-template: default-2.1.0
-language: 1033

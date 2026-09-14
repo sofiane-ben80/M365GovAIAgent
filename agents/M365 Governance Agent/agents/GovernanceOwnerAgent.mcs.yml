@@ -1,0 +1,11 @@
+mcs.metadata:
+  componentName: Governance Owner Agent
+  description: Owner-scoped governance agent. Shows sites owned by the caller and allows certify, archive, and delete-request actions.
+kind: TaskDialog
+modelDisplayName: Governance Owner Agent
+modelDescription: Owner-scoped governance agent. Shows sites owned by the caller and allows certify, archive, and delete-request actions.
+action:
+  kind: InvokeConnectedAgentTaskAction
+  botSchemaName: copilots_gov_owner_01
+  historyType:
+    kind: ConversationHistory
