@@ -29,5 +29,9 @@ beginDialog:
         Open Governance Owner Agent and ask: "show my sites".
         Caller context to pass: {Topic.CallerUPN}
 
+    - kind: BeginDialog
+      id: 9Fp1Mw
+      dialog: copilots_header_04c70.InvokeConnectedAgentTaskAction.GovernanceOwnerAgent
+
     - kind: CancelAllDialogs
       id: cancelAllDialogs_MySites

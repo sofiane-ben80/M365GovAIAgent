@@ -29,5 +29,9 @@ beginDialog:
         Open Governance Admin Agent and ask: "admin dashboard".
         Caller context to pass: {Topic.CallerUPN}
 
+    - kind: BeginDialog
+      id: JUZb17
+      dialog: copilots_header_04c70.InvokeConnectedAgentTaskAction.GovernanceAdminAgent
+
     - kind: CancelAllDialogs
       id: cancelAllDialogs_AdminDashboard

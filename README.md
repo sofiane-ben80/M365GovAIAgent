@@ -15,6 +15,8 @@ This repository intentionally contains only agent-related material. The remediat
 | `flows` | Power Automate flow contracts and implementation notes used by the agents |
 | `new-agents` | Instructions for the skills-based Copilot Studio agent experience |
 | `skills` | Reusable governance skill definitions |
+| `docs/architecture.md` | Target architecture, responsibilities, and security invariants |
+| `docs/live-baseline-2026-09-14.md` | Verified local-to-live orchestrator comparison |
 
 The local `agents/exports` directory is ignored because it contains timestamped backups and generated packages rather than source of record.
 
@@ -51,6 +53,8 @@ To deploy one project only:
 ## Export and sync
 
 Use `agents/export-copilot-agent.ps1` to pull and package an agent into the ignored `agents/exports` directory. Use `agents/sync-copilot-agent.ps1` or `agents/sync-copilot-agent-full.ps1` for the guarded pull, publish, pull, and commit workflow.
+
+Always pull and review the live agent before pushing. Copilot Studio stores connected-agent declarations and invocation actions in generated source files; a stale local push can remove working handoffs even when the launcher instructions look correct.
 
 The checked-in `.mcs.yml` and workflow files are Copilot Studio source exports. They include environment resource identifiers and connection references required by the packages, but must never contain passwords, client secrets, access tokens, or exported connection credentials.
 
