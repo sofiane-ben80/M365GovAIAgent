@@ -1,0 +1,30 @@
+jsonFileName: workflows/GovernanceAgent-AdaptiveCardResponse-c4d5e7b1-fbc8-4b31-b9d2-5d1a9a9a83b4/workflow.json
+workflowId: c4d5e7b1-fbc8-4b31-b9d2-5d1a9a9a83b4
+name: GovernanceAgent-AdaptiveCardResponse
+type: 1
+description: Adaptive card response workflow contract
+subprocess: false
+category: 5
+mode: 0
+scope: 4
+onDemand: false
+triggerOnCreate: false
+triggerOnDelete: false
+asyncAutodelete: false
+syncWorkflowLogOnFailure: false
+stateCode: 0
+statusCode: 1
+runAs: 1
+isTransacted: true
+introducedVersion: 1.0
+isCustomizable:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: iscustomizableanddeletable
+businessProcessType: 0
+isCustomProcessingStepAllowedForOtherPublishers:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: canbedeleted
+modernFlowType: 0
+primaryEntity: none

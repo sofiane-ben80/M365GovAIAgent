@@ -1,0 +1,3 @@
+﻿connectionReferences:
+  - connectionReferenceLogicalName: craa5_sharepointonline_03aeb841ed
+    connectorId: /providers/Microsoft.PowerApps/apis/shared_sharepointonline

@@ -1,0 +1,32 @@
+mcs.metadata:
+  componentName: Certify Site
+  description: Owner certify flow scaffold with confirmation and attestation-ready write placeholders.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Certify a Site
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - certify
+      - certify site
+      - certify a site
+      - certify my site
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_CallerUPN
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_CertifyHandoff
+      activity: |
+        Routing intent: Certify Site.
+
+        Open Governance Owner Agent and ask: "certify [site name]".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_CertifySite

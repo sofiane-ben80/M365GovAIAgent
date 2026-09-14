@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: Conversation Start
+  description: This system topic triggers when the agent receives an Activity indicating the beginning of a new conversation. If you do not want the agent to initiate the conversation, disable this topic.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnConversationStart
+  id: main
+  actions:
+    - kind: SetVariable
+      id: setVariable_ConversationStartCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendMessage_M0LuhV
+      activity:
+        text:
+          - Hi {System.User.DisplayName}, I am {System.Bot.Name}. I handle tenant-wide governance for admins.
+        speak:
+          - Hello {System.User.DisplayName}. I handle tenant-wide governance for admins.
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_zzR7lN
+      input:
+        binding:
+          text: =System.User.PrincipalName
+
+      output:
+        binding:
+          isadmin: Topic.IsAdmin
+
+      flowId: 996d7633-871e-f111-8341-6045bd088c4f
+
+    - kind: ConditionGroup
+      id: conditionGroup_NV0KU5
+      conditions:
+        - id: conditionItem_Yad5CL
+          condition: =Topic.IsAdmin = true
+          actions:
+            - kind: SendActivity
+              id: sendActivity_AdminMenu
+              activity: |
+                Admin access confirmed.
+
+                You can ask for:
+                - admin dashboard
+                - orphaned sites
+                - not attested sites
+                - assign owner
+
+                What would you like to review?
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_AdminDenied
+          activity: |
+            I could not verify admin access for this account.
+
+            Tenant-wide governance actions are only available to admins.
+            Use Governance Owner Agent for owner-scoped tasks, or request admin access.
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_ConversationStart

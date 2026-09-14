@@ -1,0 +1,67 @@
+mcs.metadata:
+  componentName: Conversation Start
+  description: This system topic triggers when the agent receives an Activity indicating the beginning of a new conversation. If you do not want the agent to initiate the conversation, disable this topic.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnConversationStart
+  id: main
+  actions:
+    - kind: SetVariable
+      id: setVariable_ConversationStartCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendMessage_M0LuhV
+      activity:
+        text:
+          - Hi {System.User.DisplayName}, I am {System.Bot.Name}. I am a launcher that routes you to the right governance agent.
+        speak:
+          - Hello {System.User.DisplayName}. I am a launcher that routes you to the right governance agent.
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_zzR7lN
+      input:
+        binding:
+          text: =System.User.PrincipalName
+
+      output:
+        binding:
+          isadmin: Topic.IsAdmin
+
+      flowId: 996d7633-871e-f111-8341-6045bd088c4f
+
+    - kind: ConditionGroup
+      id: conditionGroup_NV0KU5
+      conditions:
+        - id: conditionItem_Yad5CL
+          condition: =Topic.IsAdmin = true
+          actions:
+            - kind: SendActivity
+              id: sendActivity_AdminMenu
+              activity: |
+                You have admin access.
+
+                Open Governance Admin Agent for tenant-wide operations:
+                - admin dashboard
+                - orphaned sites
+                - not attested sites
+                - assign owner
+
+                You can also open Governance Owner Agent for owner-scoped actions.
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_OwnerMenu
+          activity: |
+            Open Governance Owner Agent for owner-scoped actions:
+            - show my sites
+            - sites needing attention
+            - certify a site
+            - request archival
+            - flag for deletion
+
+            If you need tenant-wide governance, request Governance Admin access.
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_ConversationStart

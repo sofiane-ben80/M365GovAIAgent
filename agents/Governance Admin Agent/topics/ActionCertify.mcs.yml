@@ -1,0 +1,63 @@
+mcs.metadata:
+  componentName: Action Certify
+  description: Action Agent scaffold for confirming and executing a certify request.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Action Certify
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - execute certify
+      - action certify
+      - confirm certify
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_ActionCertifyCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionType
+      variable: Topic.ActionType
+      value: CERTIFY
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionStatus
+      variable: Topic.ActionStatus
+      value: READY
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionCertifySiteUrl
+      variable: Topic.SelectedSiteUrl
+      value: <selected-site-url>
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionCertifySiteTitle
+      variable: Topic.SelectedSiteTitle
+      value: <selected-site-title>
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionCertifySiteItemId
+      variable: Topic.SelectedSiteItemId
+      value: <selected-site-item-id>
+
+    - kind: SendActivity
+      id: sendActivity_ActionCertifyIntro
+      activity: |
+        This topic is reserved for the Action Agent handoff.
+        It will verify the selected site, update the governance record, and write the audit log entry.
+
+    - kind: SendActivity
+      id: sendActivity_ActionCertifyPending
+      activity: |
+        Planned inputs:
+        - Caller UPN: {Topic.CallerUPN}
+        - Site URL: {Topic.SelectedSiteUrl}
+        - Site Title: {Topic.SelectedSiteTitle}
+        - Site Item ID: {Topic.SelectedSiteItemId}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_ActionCertify

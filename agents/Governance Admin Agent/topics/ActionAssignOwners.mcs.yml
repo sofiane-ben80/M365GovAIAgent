@@ -1,0 +1,31 @@
+mcs.metadata:
+  componentName: Action Assign Owners
+  description: Action Agent scaffold for assigning site owners from the admin path.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Action Assign Owners
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - execute assign owners
+      - action assign owners
+      - assign owner
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_ActionAssignCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_ActionAssignHandoff
+      activity: |
+        Routing intent: Assign Owner.
+
+        Open Governance Admin Agent and ask: "assign owner for [site name]".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_ActionAssignOwners

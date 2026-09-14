@@ -1,0 +1,33 @@
+mcs.metadata:
+  componentName: Sites Needing Attention
+  description: Returns only the signed-in user's sites that need a governance action.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Sites Needing Attention
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - show sites needing attention
+      - sites needing attention
+      - show my non-compliant sites
+      - what needs attention
+      - at risk sites
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_AttentionCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_AttentionHandoff
+      activity: |
+        Routing intent: Sites Needing Attention.
+
+        Open Governance Owner Agent and ask: "show sites needing attention".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_Attention

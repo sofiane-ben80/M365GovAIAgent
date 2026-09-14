@@ -1,0 +1,59 @@
+mcs.metadata:
+  componentName: Action Status
+  description: Action Agent scaffold for checking the result of a previous governance action.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Action Status
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - action status
+      - did my archive go through
+      - what is the status of my deletion request
+      - what is the status of my support request
+      - check my action status
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_ActionStatusCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionType
+      variable: Topic.ActionType
+      value: ACTION-STATUS
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionStatus
+      variable: Topic.ActionStatus
+      value: LOOKUP-REQUESTED
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionStatusSiteUrl
+      variable: Topic.SelectedSiteUrl
+      value: <selected-site-url>
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionStatusSiteTitle
+      variable: Topic.SelectedSiteTitle
+      value: <selected-site-title>
+
+    - kind: SendActivity
+      id: sendActivity_ActionStatusIntro
+      activity: |
+        This topic is reserved for the Action Agent handoff.
+        It will query the latest governance action log entries for the caller.
+
+    - kind: SendActivity
+      id: sendActivity_ActionStatusPending
+      activity: |
+        Planned inputs:
+        - Caller UPN: {Topic.CallerUPN}
+        - Site URL: {Topic.SelectedSiteUrl}
+        - Site Title: {Topic.SelectedSiteTitle}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_ActionStatus

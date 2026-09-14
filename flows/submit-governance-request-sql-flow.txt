@@ -1,0 +1,86 @@
+================================================================================
+  FLOW CONTRACT — GovernanceAgent-SubmitRequest (Azure SQL)
+  Purpose : Submit archive, deletion-review, or support requests from the owner agent.
+  Trigger : Microsoft Copilot Studio > When an agent calls the flow
+================================================================================
+
+INPUTS
+
+  UserUPN          Text, required; bind only to System.User.PrincipalName
+  RequestType      Text, required; ARCHIVE | DELETE-REQUESTED | SUPPORT
+  GovernID         Number, optional for SUPPORT only
+  Reason           Text, required for SUPPORT; optional for site disposition
+  ConfirmationText Text, must equal CONFIRM for DELETE-REQUESTED
+
+OUTPUTS
+
+  success       Boolean
+  requestId     Text
+  requestType   Text
+  requestStatus Text
+  siteUrl       Text
+  siteTitle     Text
+  message       Text
+
+POWER AUTOMATE BUILD STEPS
+
+1. Trigger — When an agent calls the flow
+
+   Add the inputs above. UserUPN must be supplied from the signed-in system
+   identity and must not be fillable by generative orchestration.
+
+2. Condition — Validate request input
+
+   Allow only ARCHIVE, DELETE-REQUESTED, or SUPPORT. Require GovernID for archive
+   and deletion review. Require non-empty Reason for support. Require the exact
+   current-turn value CONFIRM for deletion review.
+
+3. SQL Server — Execute stored procedure (V2)
+
+   Procedure: [ECS_M365].[SubmitGovernanceRequest]
+
+   Bind each trigger input to the matching procedure parameter. The procedure
+   performs the authoritative exact-token ownership check for every supplied
+   GovernID. Give the flow connection only SELECT on the inventory table and
+   EXECUTE on this procedure; do not grant direct request-table writes.
+
+4. Respond to the agent
+
+   Map the first procedure result row to the outputs above and return
+   success=true. Keep requestStatus as PENDING. Never describe submission as the
+   site having already been archived or deleted.
+
+5. Catch scope
+
+   Run after failure, timeout, or skip. Return success=false, blank requestId,
+   requestStatus=FAILED, and a generic user-facing message. Log connector details
+   outside the agent response. Enable Secure Inputs and Secure Outputs.
+
+6. Optional support routing
+
+   After a successful SUPPORT insert, create the work item in the organization's
+   approved support system or notify the Governance Support Teams channel. Store
+   the external ticket ID in a future ExternalTicketId column. Failure to notify
+   must update the request to FAILED or leave it PENDING with an operational alert;
+   it must not return a false success.
+
+COPILOT STUDIO TOOL SETTINGS
+
+- Tool description: "Submits an archive, deletion-review, or governance support
+  request for the signed-in user. Site requests are allowed only for a site the
+  user owns. Returns a tracking ID and pending status."
+- Bind UserUPN to System.User.PrincipalName.
+- Do not expose UserUPN as a model-generated input.
+- Require confirmation before the tool call for ARCHIVE and DELETE-REQUESTED.
+- For SUPPORT, collect a concise issue description and an optional owned site.
+- Use Copilot Studio human handoff only when a supported engagement hub is
+  configured. Otherwise this request flow is the reliable asynchronous escalation.
+
+ACCEPTANCE TESTS
+
+1. An owner can submit ARCHIVE for an exact owned GovernID and receives a request ID.
+2. An owner can submit DELETE-REQUESTED only after typing CONFIRM.
+3. Another user's site and a partial UPN are rejected without disclosing site data.
+4. SUPPORT succeeds without a site when Reason is present.
+5. SUPPORT with a GovernID still enforces ownership.
+6. Every successful response is PENDING; no flow directly archives or deletes a site.

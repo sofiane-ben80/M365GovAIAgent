@@ -1,0 +1,33 @@
+mcs.metadata:
+  componentName: My Sites
+  description: Returns the signed-in user's SharePoint sites and their governance status.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: My Sites
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - show my sites
+      - my sites
+      - what sites do i own
+      - what do i own
+      - list my sharepoint sites
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_MySitesCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_MySitesHandoff
+      activity: |
+        Routing intent: My Sites.
+
+        Open Governance Owner Agent and ask: "show my sites".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_MySites

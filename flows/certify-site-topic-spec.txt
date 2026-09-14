@@ -1,0 +1,226 @@
+================================================================================
+  COPILOT STUDIO TOPIC: Certify Site
+  Purpose : Confirm user intent, update SPO list, write audit log entry.
+  Agent   : Site Owner Agent (topic invoked from Site List or Site Detail card)
+  P1 Task : P1-10
+  Approach: Delegate write operations to GovernanceAgent-ActionCallback flow.
+            The topic handles intent confirmation and response rendering only.
+================================================================================
+
+TOPIC TRIGGER
+─────────────
+  Phrases:
+    - "certify"
+    - "certify site"
+    - "certify [site name]"
+  OR: Action.Submit data with intent = "certifySite" (from Adaptive Card button)
+
+INPUT VARIABLES (set before this topic runs, by calling topic)
+───────────────────────────────────────────────────────────────
+  Topic.SelectedSiteUrl    — full URL of the site to certify
+  Topic.SelectedSiteTitle  — display name of the site
+  Topic.SelectedSiteItemId — SPO list item ID (integer) of the Contoso Sites record
+  Topic.CallerUPN          — UPN of the user performing the action
+
+  Note: If SelectedSiteItemId is not already set (e.g. user typed "certify"),
+  the topic must first GET the item by SiteURL (see Step 1b below).
+
+================================================================================
+TOPIC FLOW — STEP BY STEP
+================================================================================
+
+── STEP 0: Input guard ──────────────────────────────────────────────────────────
+  Condition: Is Topic.SelectedSiteUrl blank?
+    YES → Send message: "Which site would you like to certify? Please tell me
+           the site name or URL, or go back to [My Sites] to pick from the list."
+           → Ask question: store answer in Topic.SelectedSiteUrl
+           → Continue to Step 1b
+
+    NO  → Skip to Step 1a (we already have the URL from card context)
+
+── STEP 1a: Verify ownership (security check) ──────────────────────────────────
+  Action: SharePoint > Get items
+    Site Address: https://mngenvmcap733570.sharepoint.com/sites/M365Governance
+    List Name:    Contoso Sites
+    Filter Query: SiteURL eq '@{Topic.SelectedSiteUrl}'
+                  and substringof('@{Topic.CallerUPN}', SiteOwners)
+    Top Count:    1
+
+  Condition: Did the query return at least 1 item?
+    YES → Set Topic.SelectedSiteItemId = first item's ID
+           Set Topic.SiteOwners = first item's SiteOwners field
+           → Continue to Step 2
+    NO  → Send adaptive card OR message:
+           "You are not listed as an owner of '[Topic.SelectedSiteTitle]'.
+            Only owners can certify a site. If you believe this is an error,
+            please contact your IT admin."
+           → End topic
+
+── STEP 1b: Resolve item ID when URL was typed by user ──────────────────────────
+  Action: SharePoint > Get items
+    Site Address: https://mngenvmcap733570.sharepoint.com/sites/M365Governance
+    List Name:    Contoso Sites
+    Filter Query: SiteURL eq '@{Topic.SelectedSiteUrl}'
+    Top Count:    1
+
+  Condition: Item found?
+    YES → Set Topic.SelectedSiteItemId = first item's ID
+           Set Topic.SelectedSiteTitle  = first item's Title field
+           → Continue to Step 1a (ownership check)
+    NO  → "I couldn't find a site with that URL in the governance list.
+           Please check the URL and try again."
+           → End topic
+
+── STEP 2: Confirmation card ────────────────────────────────────────────────────
+  Send Adaptive Card (inline confirmation card):
+
+  {
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.4",
+    "body": [
+      {
+        "type": "Container",
+        "style": "emphasis",
+        "items": [
+          {
+            "type": "TextBlock",
+            "text": "Confirm Certification",
+            "weight": "Bolder",
+            "size": "Large"
+          }
+        ]
+      },
+      {
+        "type": "TextBlock",
+        "text": "You are about to certify the following site:",
+        "wrap": true,
+        "spacing": "Medium"
+      },
+      {
+        "type": "FactSet",
+        "facts": [
+          { "title": "Site", "value": "${Topic.SelectedSiteTitle}" },
+          { "title": "URL",  "value": "${Topic.SelectedSiteUrl}" },
+          { "title": "Certified by", "value": "${Topic.CallerUPN}" },
+          { "title": "Certification date", "value": "Today (${utcNow()})" }
+        ]
+      },
+      {
+        "type": "TextBlock",
+        "text": "By certifying this site, you confirm that:\n• The site is still needed and actively used\n• The ownership information is accurate\n• The content complies with your organisation's information policies",
+        "wrap": true,
+        "spacing": "Small"
+      }
+    ],
+    "actions": [
+      {
+        "type": "Action.Submit",
+        "title": "✓ Yes, Certify This Site",
+        "style": "positive",
+        "data": { "intent": "confirmCertify" }
+      },
+      {
+        "type": "Action.Submit",
+        "title": "✗ Cancel",
+        "data": { "intent": "cancelCertify" }
+      }
+    ]
+  }
+
+  Wait for response.
+
+  Condition: response.intent = "cancelCertify"?
+    YES → "No problem — no changes were made."  → End topic
+
+── STEP 3: Execute action via Action Callback flow ──────────────────────────────
+  Action: Run flow > GovernanceAgent-ActionCallback
+    Inputs:
+      callerUPN                 = Topic.CallerUPN
+      actionType                = "CERTIFY"
+      siteUrl                   = Topic.SelectedSiteUrl
+      siteTitle                 = Topic.SelectedSiteTitle
+      siteItemId                = Topic.SelectedSiteItemId
+      previousComplianceStatus  = Topic.PreviousComplianceStatus
+      previousComplianceAction  = Topic.PreviousComplianceAction
+
+  Expected outputs:
+      success
+      actionStatus
+      message
+
+── STEP 4: Handle flow response ──────────────────────────────────────────────────
+  Condition: success = true and actionStatus = "COMPLETED"?
+    YES → Continue to Step 5
+    NO  → Send message: "I couldn't complete certification right now. ${message}"
+           Set Topic.ActionCompleted = false
+           End topic
+
+── STEP 5: Confirmation message to user ─────────────────────────────────────────
+  Send Adaptive Card (success card):
+
+  {
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "type": "AdaptiveCard",
+    "version": "1.4",
+    "body": [
+      {
+        "type": "Container",
+        "style": "good",
+        "bleed": true,
+        "items": [
+          {
+            "type": "TextBlock",
+            "text": "✅ Site Certified Successfully",
+            "weight": "Bolder",
+            "size": "Large",
+            "color": "Good"
+          }
+        ]
+      },
+      {
+        "type": "FactSet",
+        "facts": [
+          { "title": "Site",             "value": "${Topic.SelectedSiteTitle}" },
+          { "title": "Certified by",     "value": "${Topic.CallerUPN}" },
+          { "title": "Date",             "value": "Today" },
+          { "title": "Next cert due",    "value": "In 365 days" }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "type": "Action.Submit",
+        "title": "Back to My Sites",
+        "data": { "intent": "backToList" }
+      }
+    ]
+  }
+
+── STEP 6: Return to calling topic ──────────────────────────────────────────────
+  End topic with output:
+    Topic.ActionCompleted = true
+    Topic.ActionType      = "CERTIFY"
+    Topic.ActionSiteUrl   = Topic.SelectedSiteUrl
+
+================================================================================
+NOTES FOR IMPLEMENTATION
+================================================================================
+
+1. SharePoint OData filter for "contains" on SiteOwners multi-value field:
+   Use: substringof('upn@domain.com', SiteOwners)
+   This works because SiteOwners is stored as a semicolon-delimited text field.
+
+2. utcNow() in SharePoint connector:
+   Use the expression: utcNow('yyyy-MM-ddTHH:mm:ssZ') for ISO 8601 datetime format.
+   In Power Fx (Copilot Studio): Now() converts to UTC automatically.
+
+3. Reading the "previous" compliance values before overwriting:
+   In Step 1a, save them to Topic variables before Step 3:
+     Topic.PreviousComplianceStatus = first item's ComplianceStatus
+     Topic.PreviousComplianceAction = first item's ComplianceAction
+   Then use these in the Action Log entry in Step 4.
+
+4. Canonical write-path note: All write operations should go through
+  GovernanceAgent-ActionCallback so list updates and Governance Action Log
+  writes remain centralized and consistent.

@@ -1,0 +1,456 @@
+﻿{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "api": {
+          "name": "shared_sharepointonline"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_8aaab"
+        },
+        "runtimeSource": "invoker"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "type": "SecureObject",
+          "defaultValue": {}
+        },
+        "$connections": {
+          "type": "Object",
+          "defaultValue": {}
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "title": "callerUPN",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "actionType": {
+                  "title": "actionType",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "siteUrl": {
+                  "title": "siteUrl",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "siteTitle": {
+                  "title": "siteTitle",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "siteItemId": {
+                  "title": "siteItemId",
+                  "type": "number",
+                  "x-ms-content-hint": "NUMBER",
+                  "x-ms-dynamically-added": true
+                },
+                "previousComplianceStatus": {
+                  "title": "previousComplianceStatus",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "previousComplianceAction": {
+                  "title": "previousComplianceAction",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "targetOwnerUPN": {
+                  "title": "targetOwnerUPN",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "confirmationText": {
+                  "title": "confirmationText",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "required": [
+                "text",
+                "actionType",
+                "siteUrl",
+                "siteItemId"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Initialize_ActionResult": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "actionResult",
+                "value": "COMPLETED",
+                "type": "string"
+              }
+            ]
+          },
+          "runAfter": {}
+        },
+        "Switch_ActionType": {
+          "type": "Switch",
+          "expression": "@{triggerBody()?['actionType']}",
+          "cases": {
+            "Case_CERTIFY": {
+              "case": "CERTIFY",
+              "actions": {
+                "Update_Site_CERTIFY": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+                      "table": "44dfbf52-8434-42d6-95c5-8ecf7614351d",
+                      "id": "@{triggerBody()?['siteItemId']}",
+                      "item": {
+                        "LastActionType": "CERTIFY",
+                        "AttestationExpiresAt": "@{addDays(utcNow(), 365)}",
+                        "LastActionBy": "@{triggerBody()?['text']}",
+                        "AttestationStatus": "ATTESTED",
+                        "ComplianceAction": "NONE",
+                        "AttestedBy": "@{triggerBody()?['text']}",
+                        "AttestationSource": "AGENT",
+                        "ComplianceStatus": "COMPLIANT",
+                        "AttestedAt": "@{utcNow()}",
+                        "LastActionDate": "@{utcNow()}"
+                      }
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "connectionName": "shared_sharepointonline"
+                    }
+                  },
+                  "runAfter": {}
+                },
+                "Create_Audit_CERTIFY": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+                      "table": "b26a45a6-a5c4-47c5-8e57-121d604340c6",
+                      "item": {
+                        "Title": "@{triggerBody()?['siteTitle']} - CERTIFY",
+                        "SiteURL": "@{triggerBody()?['siteUrl']}",
+                        "SiteTitle": "@{triggerBody()?['siteTitle']}",
+                        "ActionType": "CERTIFY",
+                        "RequestedBy": "@{triggerBody()?['text']}",
+                        "RequestedAt": "@{utcNow()}",
+                        "ActionStatus": "COMPLETED",
+                        "PreviousComplianceStatus": "@{triggerBody()?['previousComplianceStatus']}",
+                        "PreviousComplianceAction": "@{triggerBody()?['previousComplianceAction']}",
+                        "Notes": "@{triggerBody()?['confirmationText']}"
+                      }
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PostItem",
+                      "connectionName": "shared_sharepointonline"
+                    }
+                  },
+                  "runAfter": {
+                    "Update_Site_CERTIFY": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              }
+            },
+            "Case_ARCHIVE": {
+              "case": "ARCHIVE",
+              "actions": {
+                "Update_Site_ARCHIVE": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+                      "table": "44dfbf52-8434-42d6-95c5-8ecf7614351d",
+                      "id": "@{triggerBody()?['siteItemId']}",
+                      "item": {
+                        "ComplianceAction": "ARCHIVE-INITIATED",
+                        "LastActionDate": "@{utcNow()}",
+                        "LastActionType": "ARCHIVE",
+                        "LastActionBy": "@{triggerBody()?['text']}"
+                      }
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "connectionName": "shared_sharepointonline"
+                    }
+                  },
+                  "runAfter": {}
+                },
+                "Set_Result_ARCHIVE": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "actionResult",
+                    "value": "PENDING"
+                  },
+                  "runAfter": {}
+                },
+                "Create_Audit_ARCHIVE": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+                      "table": "b26a45a6-a5c4-47c5-8e57-121d604340c6",
+                      "item": {
+                        "Title": "@{triggerBody()?['siteTitle']} - ARCHIVE-INITIATED",
+                        "SiteURL": "@{triggerBody()?['siteUrl']}",
+                        "SiteTitle": "@{triggerBody()?['siteTitle']}",
+                        "ActionType": "ARCHIVE-INITIATED",
+                        "RequestedBy": "@{triggerBody()?['text']}",
+                        "RequestedAt": "@{utcNow()}",
+                        "ActionStatus": "PENDING",
+                        "PreviousComplianceStatus": "@{triggerBody()?['previousComplianceStatus']}",
+                        "PreviousComplianceAction": "@{triggerBody()?['previousComplianceAction']}",
+                        "Notes": "@{triggerBody()?['confirmationText']}"
+                      }
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PostItem",
+                      "connectionName": "shared_sharepointonline"
+                    }
+                  },
+                  "runAfter": {
+                    "Update_Site_ARCHIVE": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              }
+            },
+            "Case_DELETE_REQUESTED": {
+              "case": "DELETE-REQUESTED",
+              "actions": {
+                "Update_Site_DELETE": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+                      "table": "44dfbf52-8434-42d6-95c5-8ecf7614351d",
+                      "id": "@{triggerBody()?['siteItemId']}",
+                      "item": {
+                        "ComplianceAction": "DELETE-REQUESTED",
+                        "LastActionDate": "@{utcNow()}",
+                        "LastActionType": "DELETE",
+                        "LastActionBy": "@{triggerBody()?['text']}"
+                      }
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "connectionName": "shared_sharepointonline"
+                    }
+                  },
+                  "runAfter": {}
+                },
+                "Set_Result_DELETE": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "actionResult",
+                    "value": "PENDING"
+                  },
+                  "runAfter": {}
+                },
+                "Create_Audit_DELETE": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+                      "table": "b26a45a6-a5c4-47c5-8e57-121d604340c6",
+                      "item": {
+                        "Title": "@{triggerBody()?['siteTitle']} - DELETE-REQUESTED",
+                        "SiteURL": "@{triggerBody()?['siteUrl']}",
+                        "SiteTitle": "@{triggerBody()?['siteTitle']}",
+                        "ActionType": "DELETE-REQUESTED",
+                        "RequestedBy": "@{triggerBody()?['text']}",
+                        "RequestedAt": "@{utcNow()}",
+                        "ActionStatus": "PENDING",
+                        "PreviousComplianceStatus": "@{triggerBody()?['previousComplianceStatus']}",
+                        "PreviousComplianceAction": "@{triggerBody()?['previousComplianceAction']}",
+                        "Notes": "@{triggerBody()?['confirmationText']}"
+                      }
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PostItem",
+                      "connectionName": "shared_sharepointonline"
+                    }
+                  },
+                  "runAfter": {
+                    "Update_Site_DELETE": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              }
+            },
+            "Case_ASSIGN_OWNERS": {
+              "case": "ASSIGN-OWNERS",
+              "actions": {
+                "Update_Site_ASSIGN": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+                      "table": "44dfbf52-8434-42d6-95c5-8ecf7614351d",
+                      "id": "@{triggerBody()?['siteItemId']}",
+                      "item": {
+                        "SiteOwnersCount": 1,
+                        "ComplianceAction": "NONE",
+                        "LastActionBy": "@{triggerBody()?['text']}",
+                        "LastActionDate": "@{utcNow()}",
+                        "LastActionType": "ASSIGN-OWNERS",
+                        "OwnersStr": "@{triggerBody()?['targetOwnerUPN']}"
+                      }
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PatchItem",
+                      "connectionName": "shared_sharepointonline"
+                    }
+                  },
+                  "runAfter": {}
+                },
+                "Create_Audit_ASSIGN": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+                      "table": "b26a45a6-a5c4-47c5-8e57-121d604340c6",
+                      "item": {
+                        "Title": "@{triggerBody()?['siteTitle']} - ASSIGN-OWNERS",
+                        "SiteURL": "@{triggerBody()?['siteUrl']}",
+                        "SiteTitle": "@{triggerBody()?['siteTitle']}",
+                        "ActionType": "ASSIGN-OWNERS",
+                        "RequestedBy": "@{triggerBody()?['text']}",
+                        "RequestedAt": "@{utcNow()}",
+                        "ActionStatus": "COMPLETED",
+                        "PreviousComplianceStatus": "@{triggerBody()?['previousComplianceStatus']}",
+                        "PreviousComplianceAction": "@{triggerBody()?['previousComplianceAction']}",
+                        "Notes": "@{triggerBody()?['confirmationText']}"
+                      }
+                    },
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                      "operationId": "PostItem",
+                      "connectionName": "shared_sharepointonline"
+                    }
+                  },
+                  "runAfter": {
+                    "Update_Site_ASSIGN": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "actions": {
+              "Set_Result_Unknown": {
+                "type": "SetVariable",
+                "inputs": {
+                  "name": "actionResult",
+                  "value": "FAILED"
+                },
+                "runAfter": {}
+              }
+            }
+          },
+          "runAfter": {
+            "Initialize_ActionResult": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Respond_to_agent": {
+          "type": "Response",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "title": "success",
+                  "type": "boolean",
+                  "x-ms-content-hint": "BOOLEAN",
+                  "x-ms-dynamically-added": true
+                },
+                "actionStatus": {
+                  "title": "actionStatus",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "actionType": {
+                  "title": "actionType",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "siteUrl": {
+                  "title": "siteUrl",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "message": {
+                  "title": "message",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "additionalProperties": {}
+            },
+            "statusCode": 200,
+            "body": {
+              "success": "@{equals(variables('actionResult'), 'COMPLETED')}",
+              "actionStatus": "@variables('actionResult')",
+              "actionType": "@{triggerBody()?['actionType']}",
+              "siteUrl": "@{triggerBody()?['siteUrl']}",
+              "message": "Action @{triggerBody()?['actionType']} — status: @{variables('actionResult')}"
+            }
+          },
+          "runAfter": {
+            "Switch_ActionType": [
+              "Succeeded",
+              "Failed",
+              "Skipped",
+              "TimedOut"
+            ]
+          }
+        }
+      },
+      "outputs": {}
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

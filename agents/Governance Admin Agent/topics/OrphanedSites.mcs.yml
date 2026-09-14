@@ -1,0 +1,65 @@
+mcs.metadata:
+  componentName: Orphaned Sites
+  description: Returns sites with no owners so admins can decide whether to assign, archive, or delete.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Orphaned Sites
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - orphaned sites
+      - show orphaned sites
+      - sites with no owners
+      - missing owners
+      - sites needing owners
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_OrphanedCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SetVariable
+      id: setVariable_OrphanedPageNumber
+      variable: Topic.PageNumber
+      value: "1"
+
+    - kind: SetVariable
+      id: setVariable_OrphanedPageSize
+      variable: Topic.PageSize
+      value: "10"
+
+    - kind: SendActivity
+      id: sendActivity_OrphanedLoading
+      activity: "Loading orphaned sites..."
+
+    - kind: SendActivity
+      id: sendActivity_OrphanedList
+      activity: |
+        **👥 Orphaned Sites (No Owners)**
+        These sites have no owners assigned. As an admin, you can assign a new owner, archive, or mark for deletion.
+        **Total Orphaned:** [count]
+        **Sites:**
+        1. **Site Title 1** — [SiteURL]
+           - Created: [CreatedDate]
+           - Last Activity: [LastActivityDate]
+           - Type: [SiteType]
+           - Storage: [SiteStorageUsageMB] MB
+           **Actions:** [Assign Owner] [Archive] [View Details]
+        2. **Site Title 2** — [SiteURL]
+           - Created: [CreatedDate]
+           - Last Activity: [LastActivityDate]
+           - Type: [SiteType]
+           - Storage: [SiteStorageUsageMB] MB
+           **Actions:** [Assign Owner] [Archive] [View Details]
+        (Additional sites...)
+        **What would you like to do?**
+        - "Assign owner to [site name]" → ActionAssignOwners topic
+        - "Archive [site name]" → ActionArchive topic
+        - "Details for [site name]" → SiteDetail topic
+        - "Back" → Return to dashboard
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_OrphanedSites

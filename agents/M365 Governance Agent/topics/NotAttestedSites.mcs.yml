@@ -1,0 +1,33 @@
+mcs.metadata:
+  componentName: Not Attested Sites
+  description: Returns sites whose attestation is missing, expired, or otherwise needs admin review.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Not Attested Sites
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - not attested sites
+      - show not attested sites
+      - attestation overdue
+      - sites not attested
+      - attested sites missing
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_NotAttestedCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_NotAttestedHandoff
+      activity: |
+        Routing intent: Not Attested Sites.
+
+        Open Governance Admin Agent and ask: "show not attested sites".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_NotAttestedSites

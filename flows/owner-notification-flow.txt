@@ -1,0 +1,54 @@
+================================================================================
+  POWER AUTOMATE FLOW: Owner Notification Flow
+  Purpose : Send weekly or on-demand Teams notifications to site owners whose
+            sites require action.
+  Trigger : Recurrence or called from Weekly Site Scan Flow
+  Returns : Notification summary and delivery results
+================================================================================
+
+INPUTS
+  - notificationRunId: text
+  - runMode: WEEKLY | ON-DEMAND
+  - optionalOwnerUPN: text
+
+OUTPUTS
+  - ownersNotified: number
+  - sitesIncluded: number
+  - suppressedSites: number
+
+FLOW STEPS
+──────────
+
+STEP 0 — Read Contoso Sites
+  1. Query sites where ComplianceStatus = NON-COMPLIANT.
+  2. Filter to rows where SiteOwners contains the owner UPN.
+  3. Exclude rows with DisableNotifyUntil in the future.
+  4. Group by owner UPN.
+
+STEP 1 — Build per-owner card payload
+  1. Limit to top priority sites first.
+  2. Include Title, SiteURL, ComplianceAction, LastActivityDate, LastCertificationDate, AttestationStatus.
+  3. Include quick actions for Certify, Archive, and Dismiss.
+
+STEP 2 — Send Teams message
+  1. Use the Teams connector or Power Automate Teams action.
+  2. Send one adaptive card per owner.
+  3. Ensure the card contains a clear list of affected sites and the reason for action.
+
+STEP 3 — Log delivery outcome
+  1. Store delivery metadata in flow run history or a lightweight tracking list if needed.
+  2. Record suppressedSites for visibility.
+
+STEP 4 — Return summary
+  1. Return a small status object for the calling scan process.
+
+CARD CONTENT REQUIREMENTS
+  - Owner greeting
+  - Count of affected sites
+  - Site rows with recommended action badges
+  - Buttons for Certify, Archive, and Dismiss
+  - Optional link back to the Copilot conversation
+
+IMPLEMENTATION NOTES
+  1. This flow is the proactive counterpart to the owner chat topics.
+  2. The card should reuse the same action semantics as the Certify and Action topics.

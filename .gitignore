@@ -1,0 +1,16 @@
+# Local Copilot Studio exports and packaged solutions
+agents/exports/
+*.zip
+
+# Local configuration and editor state
+.env
+.env.*
+!.env.example
+.vscode/
+*.user
+
+# Temporary files
+*.bak
+*.tmp
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,120 @@
+================================================================================
+  POWER AUTOMATE FLOW: Check-AdminRole
+  Purpose : Determine whether a given UPN is a member of the Governance Admin
+            M365 Group. Called by the Orchestrator Agent at conversation start.
+  Trigger : Copilot Studio (Copilot Studio action / HTTP request from topic)
+  Returns : { "isAdmin": true/false }
+  P1 task : P1-02
+================================================================================
+
+HOW TO BUILD IN POWER AUTOMATE
+───────────────────────────────
+
+STEP 0 — Create the Flow
+  1. Go to https://make.powerautomate.com
+  2. Create > Automated cloud flow > Skip (no trigger yet)
+  3. Name it: "GovernanceAgent-CheckAdminRole"
+  4. Change the trigger to: Copilot Studio > When Copilot Studio calls a flow
+
+STEP 1 — Define Input Parameters (in the trigger node)
+  Add the following input:
+    Name: callerUPN
+    Type: Text
+    Description: UPN of the user to check (e.g. sofianeb@mngenvmcap733570.onmicrosoft.com)
+
+STEP 2 — Initialize Variables
+  Action: Initialize variable
+    Name:  adminGroupId
+    Type:  String
+    Value: (leave blank for now — populated in Step 3)
+
+STEP 3 — Read AdminGroupId from Governance Config SPO list
+  Action: SharePoint > Get items
+    Site Address: https://mngenvmcap733570.sharepoint.com/sites/M365Governance
+    List Name:    Governance Config
+    Filter Query: Title eq 'AdminGroupId'
+    Top Count:    1
+
+  Action: Set variable
+    Name:  adminGroupId
+    Value: first(outputs('Get_items')?['body/value'])?['SettingValue']
+
+  Action: Condition — Is AdminGroupId configured?
+    Condition: length(variables('adminGroupId')) is greater than 0
+
+    [IF NO]:
+      → Respond to Copilot Studio:
+          isAdmin: false
+          (log warning: AdminGroupId not configured in Governance Config list)
+        → Terminate
+
+STEP 4 — Call Microsoft Graph: Check Group Membership
+  Action: HTTP
+    Method: GET
+    URI:    https://graph.microsoft.com/v1.0/groups/@{variables('adminGroupId')}/members?$filter=userPrincipalName eq '@{triggerBody()?['text']}'&$count=true
+    Headers:
+      ConsistencyLevel: eventual
+    Authentication:
+      Type: Active Directory OAuth
+      Tenant: [your tenant ID]
+      Audience: https://graph.microsoft.com
+      Client ID: 2f9da231-4384-4850-a8ae-7b6cc7d2e3f6
+      Credential Type: Secret
+      Secret: [app secret — store in Azure Key Vault or PA environment variable]
+
+  ─── IMPORTANT: The app registration (2f9da231...) needs these Graph API permissions ───
+    GroupMember.Read.All  (Application)
+    User.Read.All         (Application)
+    Grant admin consent in Entra ID after adding.
+
+STEP 5 — Parse Response
+  Action: Parse JSON
+    Content: Body of HTTP action
+    Schema:
+      {
+        "type": "object",
+        "properties": {
+          "@odata.count": { "type": "integer" },
+          "value": {
+            "type": "array",
+            "items": { "type": "object" }
+          }
+        }
+      }
+
+STEP 6 — Determine Result
+  Action: Compose
+    Name:   isAdminResult
+    Value:  @{greater(body('Parse_JSON')?['@odata.count'], 0)}
+
+STEP 7 — Respond to Copilot Studio (Return Values step)
+  Output:
+    Name:  isAdmin
+    Type:  Boolean
+    Value: outputs('isAdminResult')
+
+================================================================================
+COPILOT STUDIO WIRING (Orchestrator topic: Greeting / Start)
+================================================================================
+
+After building the flow, wire it into the Orchestrator's Greeting topic:
+
+1. In Copilot Studio, open the M365 Governance Agent > Topics > Greeting / Start
+2. After the first Send Message node, add: Action > Run a flow
+3. Select: GovernanceAgent-CheckAdminRole
+4. Input: callerUPN = System.User.PrincipalName
+5. Store output: Topic.IsAdmin = isAdmin (boolean)
+6. Add a Condition node:
+     If Topic.IsAdmin = true  →  show admin menu branch
+     If Topic.IsAdmin = false →  show owner menu branch
+
+================================================================================
+PHASE 1 SHORTCUT (skip for dev/test if only one user)
+================================================================================
+
+If you want to test Phase 1 without configuring the admin group yet:
+  - Set the AdminGroupId value in the Governance Config list to a real Entra group ID
+    (create a new M365 group in Entra, add sofianeb as owner, copy the Object ID)
+  - OR temporarily hard-code: set Topic.IsAdmin = true in the topic for testing
+
+The flow is idempotent and safe to call repeatedly.

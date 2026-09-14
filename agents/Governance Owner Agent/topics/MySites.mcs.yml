@@ -1,0 +1,222 @@
+mcs.metadata:
+  componentName: My Sites
+  description: Returns the signed-in user's SharePoint sites and their governance status.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: My Sites
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - show my sites
+      - my sites
+      - what sites do i own
+      - what do i own
+      - list my sharepoint sites
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_MySitesCallerUpn
+      variable: Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SetVariable
+      id: setVariable_PageNumber
+      variable: Topic.PageNumber
+      value: "1"
+
+    - kind: SetVariable
+      id: setVariable_PageSize
+      variable: Topic.PageSize
+      value: "10"
+
+    - kind: SetVariable
+      id: setVariable_SitesJson
+      variable: Topic.SitesJson
+      value: "[]"
+
+    - kind: SendActivity
+      id: sendActivity_MySitesLoading
+      activity: Loading your sites...
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_7bs5Hg
+      input:
+        binding:
+          text: =Topic.CallerUPN
+
+      output:
+        binding:
+          message: Topic.message
+          sitecount: Topic.SiteCount
+          sitesjson: Topic.sitesJson
+          success: Topic.success
+
+      flowId: 5271c889-d27d-df3d-c19d-3a7e197a8790
+
+    - kind: SetVariable
+      id: setVariable_xezsih
+      variable: Topic.SitesJson
+      value: =Topic.sitesJson
+
+    - kind: SendActivity
+      id: sendActivity_MySitesList
+      activity:
+        attachments:
+          - kind: AdaptiveCardTemplate
+            cardContent: |-
+              ={
+                '$schema': "http://adaptivecards.io/schemas/adaptive-card.json",
+                type: "AdaptiveCard",
+                version: "1.5",
+                body: Table(
+                  {
+                    type: "Container",
+                    bleed: true,
+                    style: "emphasis",
+                    items: Table(
+                      {
+                        type: "TextBlock",
+                        text: "Your Sites",
+                        size: "ExtraLarge",
+                        weight: "Bolder",
+                        wrap: true
+                      },
+                      {
+                        type: "TextBlock",
+                        text: Text(Topic.SiteCount) & " site(s) returned",
+                        size: "Small",
+                        isSubtle: true,
+                        spacing: "None",
+                        wrap: true
+                      }
+                    )
+                  },
+                  {
+                    type: "Container",
+                    items: ForAll(
+                      FirstN(Table(ParseJSON(Topic.SitesJson)), Value(Topic.PageSize)) As site,
+                      {
+                        type: "Container",
+                        spacing: "Medium",
+                        separator: true,
+                        items: Table(
+                          {
+                            type: "ColumnSet",
+                            columns: Table(
+                              {
+                                type: "Column",
+                                width: "stretch",
+                                items: Table(
+                                  {
+                                    type: "TextBlock",
+                                    text: Text(site.Value.title),
+                                    size: "Medium",
+                                    weight: "Bolder",
+                                    wrap: true
+                                  },
+                                  {
+                                    type: "TextBlock",
+                                    text: If(IsBlank(site.Value.siteType), "Site", Text(site.Value.siteType)),
+                                    size: "Small",
+                                    color: "Accent",
+                                    isSubtle: true,
+                                    spacing: "None",
+                                    wrap: true
+                                  }
+                                )
+                              },
+                              {
+                                type: "Column",
+                                width: "auto",
+                                verticalContentAlignment: "Top",
+                                items: Table(
+                                  {
+                                    type: "TextBlock",
+                                    text: Text(site.Value.inventoryStatus),
+                                    weight: "Bolder",
+                                    color: If(Text(site.Value.inventoryStatus) = "Active", "Good", "Attention"),
+                                    horizontalAlignment: "Right",
+                                    wrap: true
+                                  }
+                                )
+                              }
+                            )
+                          },
+                          {
+                            type: "FactSet",
+                            spacing: "Small",
+                            facts: Table(
+                              {
+                                title: "Last activity",
+                                value: Text(site.Value.lastActivityDate)
+                              },
+                              {
+                                title: "Item ID",
+                                value: Text(site.Value.itemId)
+                              }
+                            )
+                          },
+                          {
+                            type: "ActionSet",
+                            spacing: "Small",
+                            actions: Table(
+                              {
+                                type: "Action.Submit",
+                                title: "View details",
+                                data: {
+                                  actionSubmitId: "my_sites_view_details",
+                                  intent: "siteDetail",
+                                  targetTopic: "SiteDetail",
+                                  selectedSiteItemId: Value(site.Value.itemId),
+                                  selectedSiteTitle: Text(site.Value.title),
+                                  selectedSiteUrl: Text(site.Value.siteUrl)
+                                }
+                              },
+                              {
+                                type: "Action.OpenUrl",
+                                title: "Open site",
+                                url: Text(site.Value.siteUrl)
+                              }
+                            )
+                          },
+                          {
+                            type: "ActionSet",
+                            spacing: "Small",
+                            actions: Table(
+                              {
+                                type: "Action.Submit",
+                                title: "Request archive",
+                                data: {
+                                  actionSubmitId: "my_sites_request_archive",
+                                  intent: "requestArchival",
+                                  targetTopic: "RequestArchival",
+                                  selectedSiteItemId: Value(site.Value.itemId),
+                                  selectedSiteTitle: Text(site.Value.title),
+                                  selectedSiteUrl: Text(site.Value.siteUrl)
+                                }
+                              },
+                              {
+                                type: "Action.Submit",
+                                title: "Request deletion review",
+                                data: {
+                                  actionSubmitId: "my_sites_request_deletion",
+                                  intent: "requestDeletionReview",
+                                  targetTopic: "FlagForDeletion",
+                                  selectedSiteItemId: Value(site.Value.itemId),
+                                  selectedSiteTitle: Text(site.Value.title),
+                                  selectedSiteUrl: Text(site.Value.siteUrl)
+                                }
+                              }
+                            )
+                          }
+                        )
+                      }
+                    )
+                  }
+                )
+              }
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_MySites

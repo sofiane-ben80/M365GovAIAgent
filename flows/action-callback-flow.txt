@@ -1,0 +1,12 @@
+================================================================================
+  RETIRED FLOW CONTRACT: Action Callback Flow
+  Replacement: GovernanceAgent-SubmitRequest
+  Reason     : Owner attestation is no longer allowed and owner archive/delete
+               operations are requests, not direct site-record updates.
+================================================================================
+
+DO NOT BUILD OR INVOKE THIS SHAREPOINT-BACKED FLOW FOR OWNER ACTIONS.
+
+Build the Azure SQL contract in submit-governance-request-sql-flow.txt instead.
+It revalidates ownership in SQL, inserts an auditable pending request, returns a
+tracking ID, and supports ARCHIVE, DELETE-REQUESTED, and SUPPORT.

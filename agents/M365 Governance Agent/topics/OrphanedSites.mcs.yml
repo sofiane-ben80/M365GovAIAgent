@@ -1,0 +1,32 @@
+mcs.metadata:
+  componentName: Orphaned Sites
+  description: Returns sites with no owners so admins can decide whether to assign, archive, or delete.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Orphaned Sites
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - orphaned sites
+      - show orphaned sites
+      - sites with no owners
+      - missing owners
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_OrphanedCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_OrphanedHandoff
+      activity: |
+        Routing intent: Orphaned Sites.
+
+        Open Governance Admin Agent and ask: "show orphaned sites".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_OrphanedSites

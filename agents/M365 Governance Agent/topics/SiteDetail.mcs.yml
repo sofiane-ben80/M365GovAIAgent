@@ -1,0 +1,32 @@
+mcs.metadata:
+  componentName: Site Detail
+  description: Site detail scaffold with triage explanation placeholders and action-entry points.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Site Detail
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - site details
+      - show site details
+      - tell me about this site
+      - explain this site
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_DetailCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_DetailHandoff
+      activity: |
+        Routing intent: Site Detail.
+
+        Open Governance Owner Agent and ask: "site details [site name]".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_SiteDetail

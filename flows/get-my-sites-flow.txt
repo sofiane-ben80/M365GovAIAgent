@@ -1,0 +1,269 @@
+================================================================================
+  FLOW CONTRACT — GovernanceAgent-GetMySites
+  Purpose : Return Contoso Sites rows owned by the verified caller for the
+            Governance Owner Agent My Sites topic.
+  Trigger : Microsoft Copilot Studio > When an agent calls the flow
+================================================================================
+
+SECURITY CONTRACT
+
+- Input UserUPN must be populated from System.User.PrincipalName in the calling
+  topic. Do not collect or accept an owner UPN from conversational user input.
+- The flow performs a read only operation.
+- The SharePoint connection needs read access to the Contoso Sites list.
+
+INPUT
+
+  UserUPN (Text, required)
+
+OUTPUTS
+
+  success    (Boolean)
+  siteCount  (Number)
+  sitesJson  (Text containing a JSON array)
+  message    (Text)
+
+Each sitesJson array element has this shape:
+
+  {
+    "itemId": 123,
+    "title": "Contoso Marketing Hub",
+    "siteUrl": "https://contoso.sharepoint.com/sites/contoso-marketing",
+    "siteType": "GROUP",
+    "complianceStatus": "NON-COMPLIANT",
+    "complianceAction": "CERTIFY",
+    "attestationStatus": "EXPIRED",
+    "lastCertificationDate": "2025-06-15",
+    "lastActivityDate": "2026-07-30",
+    "siteOwners": "john.smith@contoso.com;jane.doe@contoso.com",
+    "siteOwnersCount": 2
+  }
+
+POWER AUTOMATE BUILD STEPS
+
+1. Trigger — When an agent calls the flow
+
+   Add one Text input named exactly:
+
+     UserUPN
+
+2. Condition — Validate UserUPN
+
+   Use this expression:
+
+     @and(
+       not(empty(triggerBody()?['UserUPN'])),
+       contains(triggerBody()?['UserUPN'], '@'),
+       not(contains(triggerBody()?['UserUPN'], ''''))
+     )
+
+   If No, add Respond to the agent:
+
+     success   = false
+     siteCount = 0
+     sitesJson = []
+     message   = A valid caller identity was not provided.
+
+   End the No branch after the response.
+
+3. Compose — NormalizedUserUPN
+
+   Expression:
+
+     @toLower(trim(triggerBody()?['UserUPN']))
+
+4. SharePoint — Get items
+
+   Rename the action to Get_owned_sites.
+
+   Site Address:
+
+     https://mngenvmcap733570.sharepoint.com/sites/M365Governance
+
+   List Name:
+
+     Contoso Sites
+
+   List ID:
+
+     44dfbf52-8434-42d6-95c5-8ecf7614351d
+
+   Filter Query:
+
+     substringof('@{outputs('NormalizedUserUPN')}',SiteOwners) eq true
+
+   Order By:
+
+     ComplianceStatus desc,Title asc
+
+   Top Count:
+
+     20
+
+   Limit Columns by View / Select Query, when available:
+
+     ID,Title,SiteURL,SiteType,ComplianceStatus,ComplianceAction,
+     AttestationStatus,LastCertificationDate,LastActivityDate,SiteOwners,
+     SiteOwnersCount
+
+   In Get items Settings:
+
+     Pagination = Off for the initial 20-row contract
+
+5. Data Operation — Select
+
+   Rename the action to Select_site_contract.
+
+   From:
+
+     @body('Get_owned_sites')?['value']
+
+   Map these keys to expressions:
+
+     itemId
+       @item()?['ID']
+
+     title
+       @coalesce(item()?['Title'], '')
+
+     siteUrl
+       @coalesce(item()?['SiteURL'], '')
+
+     siteType
+       @coalesce(item()?['SiteType']?['Value'], item()?['SiteType'], '')
+
+     complianceStatus
+       @coalesce(item()?['ComplianceStatus']?['Value'], item()?['ComplianceStatus'], 'UNKNOWN')
+
+     complianceAction
+       @coalesce(item()?['ComplianceAction']?['Value'], item()?['ComplianceAction'], 'NONE')
+
+     attestationStatus
+       @coalesce(item()?['AttestationStatus']?['Value'], item()?['AttestationStatus'], 'UNKNOWN')
+
+     lastCertificationDate
+       @if(
+         empty(item()?['LastCertificationDate']),
+         '',
+         formatDateTime(item()?['LastCertificationDate'], 'yyyy-MM-dd')
+       )
+
+     lastActivityDate
+       @if(
+         empty(item()?['LastActivityDate']),
+         '',
+         formatDateTime(item()?['LastActivityDate'], 'yyyy-MM-dd')
+       )
+
+     siteOwners
+       @coalesce(item()?['SiteOwners'], '')
+
+     siteOwnersCount
+       @int(coalesce(item()?['SiteOwnersCount'], 0))
+
+   Note: SharePoint Choice fields commonly arrive as plain strings. The Value
+   fallback above also handles connector variants that return an object.
+
+6. Compose — SiteCount
+
+   Expression:
+
+     @length(body('Select_site_contract'))
+
+7. Respond to the agent
+
+   Add these outputs:
+
+     success (Boolean)
+       true
+
+     siteCount (Number)
+       @outputs('SiteCount')
+
+     sitesJson (Text)
+       @string(body('Select_site_contract'))
+
+     message (Text)
+       @if(
+         equals(outputs('SiteCount'), 0),
+         'No owned sites were found in the governance inventory.',
+         concat(string(outputs('SiteCount')), ' owned site(s) returned.')
+       )
+
+ERROR HANDLING
+
+- Put Get_owned_sites, Select_site_contract, SiteCount, and the success response
+  in a Scope named Try.
+- Add a Scope named Catch and configure Run after for failed, timed out, or
+  skipped on Try.
+- In Catch, Respond to the agent with:
+
+    success   = false
+    siteCount = 0
+    sitesJson = []
+    message   = Governance site data could not be loaded. Please try again.
+
+- Enable Secure Inputs on the trigger and Secure Outputs on the response if the
+  environment's data-loss-prevention policy requires UPN masking in run history.
+
+COPILOT STUDIO WIRING
+
+1. In the Governance Owner Agent My Sites topic, set:
+
+     Topic.CallerUPN = System.User.PrincipalName
+
+2. Call GovernanceAgent-GetMySites with:
+
+     UserUPN = Topic.CallerUPN
+
+3. Save outputs into topic variables:
+
+     Topic.GetMySitesSuccess = success
+     Topic.SiteCount         = siteCount
+     Topic.SitesJson         = sitesJson
+     Topic.GetMySitesMessage = message
+
+4. Branch before rendering:
+
+   - success = false: show Topic.GetMySitesMessage and stop.
+   - siteCount = 0: show Topic.GetMySitesMessage and stop.
+   - otherwise: render the My Sites adaptive card.
+
+   In the Copilot Studio Adaptive Card node, select Formula instead of JSON and
+   paste adaptive-cards/my-sites-card.powerfx. The formula converts the text with
+   Table(ParseJSON(Topic.SitesJson)) and generates site containers with ForAll.
+
+   Do not use Adaptive Cards templating keywords such as `$data`, `$when`, or
+   `${...}` in Copilot Studio. Its card renderer does not expand that template
+   syntax and reports `$data` as an unknown property.
+
+   Topic.PageSize limits the rendered table to 10 sites for Teams card payload
+   size and readability.
+
+5. Card field mapping:
+
+   Card title/status/action data       Flow field
+   -----------------------------------------------------------------------------
+   Site title                          title
+   Site type label                     siteType
+   Compliance badge                    complianceStatus
+   Secondary status                    attestationStatus / complianceAction
+   Last certified                      lastCertificationDate
+   Owners                              siteOwners (replace semicolons for display)
+   View/Certify/Archive selected ID     itemId
+   View/Certify/Archive selected title  title
+   View/Certify/Archive selected URL    siteUrl
+
+6. Only show Certify when complianceAction is CERTIFY or attestationStatus is
+   NOT-ATTESTED or EXPIRED. Always preserve itemId, title, and siteUrl in each
+   Action.Submit payload for downstream ownership validation.
+
+TEST CASES
+
+1. Known owner UPN returns only rows whose SiteOwners text contains that UPN.
+2. UPN matching is case-insensitive because the stored sample data and input are
+   normalized; if legacy rows have mixed casing, normalize SiteOwners at ingest.
+3. A UPN with no owned sites returns success=true, siteCount=0, sitesJson=[].
+4. Blank, malformed, or apostrophe-containing input fails before SharePoint.
+5. SharePoint connector failure returns success=false and no list data.
+6. The returned item includes every field required by my-sites-card.powerfx.

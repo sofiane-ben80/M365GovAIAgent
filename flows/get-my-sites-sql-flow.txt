@@ -1,0 +1,209 @@
+================================================================================
+  FLOW CONTRACT — GovernanceData-ListOwnerSites (Azure SQL)
+  Purpose : Return Azure SQL inventory rows owned by the signed-in caller.
+  Trigger : Microsoft Copilot Studio > When an agent calls the flow
+================================================================================
+
+SECURITY CONTRACT
+
+- Populate UserUPN from System.User.PrincipalName in the calling agent or topic.
+- Do not let the model or user supply a different owner UPN.
+- Keep the SQL query parameterized. Never concatenate UserUPN into SQL text.
+- Use a read-only SQL identity with SELECT permission on
+  [ECS_M365].[DOI-SP-Sites].
+- The current Owners format is lowercase, deduplicated, and delimited as
+  ;upn@domain;upn2@domain;. Both delimiters are required for an exact match.
+
+INPUT
+
+  UserUPN (Text, required)
+
+OUTPUTS
+
+  success    (Boolean)
+  siteCount  (Number)
+  sitesJson  (Text containing a JSON array)
+  message    (Text)
+
+Each sitesJson element has this shape:
+
+  {
+    "itemId": 123,
+    "title": "Contoso Marketing Hub",
+    "siteUrl": "https://contoso.sharepoint.com/sites/contoso-marketing",
+    "siteType": "GROUP",
+    "inventoryStatus": "Active",
+    "lastActivityDate": "2026-07-30",
+    "siteOwners": ";john.smith@contoso.com;jane.doe@contoso.com;",
+    "siteOwnersCount": 2,
+    "office": "Office of Communications",
+    "isTeamsConnected": true,
+    "externalSharing": ""
+  }
+
+POWER AUTOMATE BUILD STEPS
+
+1. Trigger — When an agent calls the flow
+
+   Add one Text input named exactly UserUPN.
+
+2. Condition — Validate UserUPN
+
+   Use this expression:
+
+     @and(
+       not(empty(triggerBody()?['UserUPN'])),
+       contains(triggerBody()?['UserUPN'], '@'),
+       lessOrEquals(length(triggerBody()?['UserUPN']), 255)
+     )
+
+   If No, respond to the agent with:
+
+     success   = false
+     siteCount = 0
+     sitesJson = []
+     message   = A valid caller identity was not provided.
+
+3. Compose — NormalizedUserUPN
+
+   Expression:
+
+     @toLower(trim(triggerBody()?['UserUPN']))
+
+4. SQL Server — Execute a SQL query (V2)
+
+   Rename the action to Query_owned_sites.
+
+   Server:
+
+     sql-m365gov-6b5afd0b.database.windows.net
+
+   Database:
+
+     sqldb-m365gov-dev
+
+   Query:
+
+     DECLARE @NormalizedUserUPN nvarchar(255) = LOWER(LTRIM(RTRIM(@UserUPN)));
+
+     SELECT TOP (20)
+         [GovernID] AS [itemId],
+         COALESCE([Title], N'') AS [title],
+         COALESCE([SiteUrl], N'') AS [siteUrl],
+         COALESCE([GroupType], N'') AS [siteType],
+         COALESCE([Status], N'Unknown') AS [inventoryStatus],
+         COALESCE([Last activityUTC], N'') AS [lastActivityDate],
+         COALESCE([Owners], N'') AS [siteOwners],
+         CONVERT(int, COALESCE([OwnerCount], 0)) AS [siteOwnersCount],
+         COALESCE([Office], N'') AS [office],
+         CONVERT(bit, COALESCE([IsTeamsConnected], 0)) AS [isTeamsConnected],
+         COALESCE([External sharing], N'') AS [externalSharing]
+     FROM [ECS_M365].[DOI-SP-Sites]
+     WHERE CHARINDEX(N';' + @NormalizedUserUPN + N';', LOWER(COALESCE([Owners], N''))) > 0
+     ORDER BY
+         CASE COALESCE([Status], N'')
+             WHEN N'Owner required' THEN 0
+             WHEN N'Archived' THEN 1
+             WHEN N'Active' THEN 2
+             ELSE 3
+         END,
+         [Title] ASC,
+         [GovernID] ASC;
+
+   Add the formal parameter UserUPN with SQL type nvarchar(255). Set its value
+   to the output of NormalizedUserUPN. Do not insert a Power Automate expression
+   between quotes in the query text.
+
+   The SQL connector returns the first result set under resultsets/Table1. Use:
+
+     @body('Query_owned_sites')?['resultsets']?['Table1']
+
+   Execute a SQL query (V2) is supported for Azure SQL. It is not supported for
+   an on-premises SQL connection through a data gateway; use a stored procedure
+   in that case.
+
+5. Compose — Sites
+
+   Expression:
+
+     @coalesce(body('Query_owned_sites')?['resultsets']?['Table1'], json('[]'))
+
+6. Compose — SiteCount
+
+   Expression:
+
+     @length(outputs('Sites'))
+
+7. Respond to the agent
+
+   Add these outputs:
+
+     success (Boolean)
+       true
+
+     siteCount (Number)
+       @outputs('SiteCount')
+
+     sitesJson (Text)
+       @string(outputs('Sites'))
+
+     message (Text)
+       @if(
+         equals(outputs('SiteCount'), 0),
+         'No owned sites were found in the governance inventory.',
+         concat(string(outputs('SiteCount')), ' owned site(s) returned.')
+       )
+
+8. Error handling
+
+   Put Query_owned_sites, Sites, SiteCount, and the success response in a Try
+   scope. Configure a Catch scope to run after failed, timed out, or skipped and
+   respond with success=false, siteCount=0, sitesJson=[], and a generic message.
+   Enable Secure Inputs on the trigger and Secure Outputs on the response when
+   UPNs must be hidden from flow run history.
+
+COPILOT STUDIO WIRING
+
+1. Bind UserUPN to System.User.PrincipalName. Do not make this input fillable by
+   generative orchestration.
+2. Describe the tool as: "Lists up to 20 SharePoint sites owned by the signed-in
+   user from the live governance inventory. Never use it to list another user's
+   sites."
+3. Preserve the flow boundary for this operation. Although Copilot Studio can
+   add SQL connector actions directly as tools, this flow provides a fixed
+   identity source, deterministic query, stable output, and centralized errors.
+4. Treat sitesJson as operational data, not agent knowledge. Query it live for
+   each owner request.
+
+CURRENT SCHEMA LIMITATION
+
+The Azure SQL table currently has inventory fields only. It does not contain
+ComplianceStatus, ComplianceAction, LastCertificationDate, AttestationStatus,
+or action-audit fields used by the legacy SharePoint-backed owner card. Do not
+infer those values from Status. Owner attestation is no longer supported. Use
+[ECS_M365].[GovernanceRequests] and GovernanceAgent-SubmitRequest for archive,
+deletion-review, and support requests:
+
+- render inventoryStatus in the list;
+- never render certification or attestation actions;
+- allow archive and deletion-review request buttons for owned sites;
+- keep all request responses pending until the assigned team completes them.
+
+PRODUCTION DATA MODEL
+
+The delimited Owners predicate is correct for the current import but does not
+scale or provide SQL row-level security by itself. For production, normalize
+ownership into a child table such as SiteOwner(GovernID, OwnerUPN), add a unique
+index on (OwnerUPN, GovernID), and expose a parameterized stored procedure or
+secured API/flow. Continue to re-check ownership inside every write operation.
+
+ACCEPTANCE TESTS
+
+1. A known owner receives only exact ;upn; matches.
+2. Matching is case-insensitive and trims the caller UPN.
+3. A partial UPN, another user's UPN, blank input, and malformed input return no
+   unauthorized rows.
+4. Results are capped at 20 and ordered deterministically.
+5. SQL failures return success=false and no inventory data.
+6. The sample import returns 49 rows for
+   sofianeb@mngenvmcap733570.onmicrosoft.com before applying the TOP (20) cap.

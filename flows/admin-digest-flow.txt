@@ -1,0 +1,49 @@
+================================================================================
+  POWER AUTOMATE FLOW: Admin Digest Flow
+  Purpose : Send a weekly tenant-wide governance summary to admin users.
+  Trigger : Recurrence or called from Weekly Site Scan Flow
+  Returns : Summary delivery results
+================================================================================
+
+INPUTS
+  - notificationRunId: text
+  - runMode: WEEKLY | ON-DEMAND
+
+OUTPUTS
+  - adminsNotified: number
+  - totalSites: number
+  - orphanedSites: number
+  - notAttestedSites: number
+
+FLOW STEPS
+──────────
+
+STEP 0 — Read Contoso Sites
+  1. Query all sites without owner filtering.
+  2. Calculate counts by ComplianceStatus and ComplianceAction.
+  3. Identify orphaned sites where EffectiveOwnerCount = 0.
+  4. Identify sites where AttestationStatus = NOT-ATTESTED or AttestationExpiresAt is past due.
+
+STEP 1 — Build summary card
+  1. Include total sites evaluated.
+  2. Include counts for compliant, non-compliant, orphaned, certify, archive, delete, assign-owners, and not-attested.
+  3. Include a short list of highest-priority orphaned sites.
+  4. Include a link to the Copilot admin view or SharePoint list view.
+
+STEP 2 — Send Teams digest
+  1. Determine the admin recipients from the Governance Config AdminGroupId or another admin roster source.
+  2. Send the digest card to each admin user or targeted group channel as configured.
+
+STEP 3 — Return summary
+  1. Return delivery counts and card composition counts.
+
+CARD CONTENT REQUIREMENTS
+  - Date range or run timestamp
+  - Summary counts by action
+  - Orphaned site focus section
+  - Not-attested review section
+  - Buttons for Admin Dashboard and Orphaned Sites
+
+IMPLEMENTATION NOTES
+  1. This flow is the proactive counterpart to the Admin Dashboard topic.
+  2. The not-attested section should use the same definitions as the admin topic filter.

@@ -1,0 +1,43 @@
+mcs.metadata:
+  componentName: Greeting
+  description: This topic is triggered when the user greets the agent.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Greeting
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - Good afternoon
+      - Good morning
+      - Hello
+      - Hey
+      - Hi
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_GreetingCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendMessage_abmysR
+      activity:
+        text:
+          - Hi {System.User.DisplayName}. I am the launcher for governance agents.
+        speak:
+          - Hi {System.User.DisplayName}. I am the launcher for governance agents.
+
+    - kind: SendActivity
+      id: sendActivity_GreetingMenu
+      activity: |
+        Choose an entry agent:
+
+        - Governance Owner Agent: my sites, archive request, deletion review, support
+        - Governance Admin Agent: admin dashboard, orphaned sites, assign owner
+
+        Tell me where to route you, for example: "owner agent" or "admin agent".
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_01At22

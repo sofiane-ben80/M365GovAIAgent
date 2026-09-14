@@ -1,0 +1,34 @@
+mcs.metadata:
+  componentName: Conversation Start
+  description: This system topic triggers when the agent receives an Activity indicating the beginning of a new conversation. If you do not want the agent to initiate the conversation, disable this topic.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnConversationStart
+  id: main
+  actions:
+    - kind: SetVariable
+      id: setVariable_ConversationStartCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendMessage_M0LuhV
+      activity:
+        text:
+          - Hi {System.User.DisplayName}, I am {System.Bot.Name}. I help you manage governance for sites you own.
+        speak:
+          - Hello {System.User.DisplayName}. I help you manage governance for sites you own.
+
+    - kind: SendActivity
+      id: sendActivity_OwnerMenu
+      activity: |
+        You can ask for:
+        - show my sites
+        - request archival
+        - request deletion review
+        - get help from the support team
+
+        What would you like to do first?
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_ConversationStart

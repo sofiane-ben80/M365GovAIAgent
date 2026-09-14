@@ -1,0 +1,94 @@
+mcs.metadata:
+  componentName: Site Detail
+  description: Site detail scaffold with triage explanation placeholders and action-entry points.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Site Detail
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - site details
+      - show site details
+      - tell me about this site
+      - explain this site
+      - site information
+      - site status
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_DetailCallerUpn
+      variable: Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SetVariable
+      id: setVariable_Init_SelectedSiteUrl
+      variable: Topic.SelectedSiteUrl
+      value: ""
+
+    - kind: SetVariable
+      id: setVariable_Init_SelectedSiteTitle
+      variable: Topic.SelectedSiteTitle
+      value: ""
+
+    - kind: SetVariable
+      id: setVariable_Init_SiteType
+      variable: Topic.SiteType
+      value: ""
+
+    - kind: SetVariable
+      id: setVariable_Init_InventoryStatus
+      variable: Topic.InventoryStatus
+      value: ""
+
+    - kind: ConditionGroup
+      id: conditionGroup_HasSiteUrl
+      conditions:
+        - id: conditionItem_HasSiteUrl
+          condition: =!IsBlank(Topic.SelectedSiteUrl)
+          actions:
+            - kind: SendActivity
+              id: sendActivity_DetailLoading
+              activity: "Loading site details..."
+
+            - kind: SetVariable
+              id: setVariable_PopulateSiteTitle
+              variable: Topic.SelectedSiteTitle
+              value: "Contoso Marketing Hub"
+
+            - kind: SetVariable
+              id: setVariable_PopulateSiteType
+              variable: Topic.SiteType
+              value: "Team Site"
+
+            - kind: SetVariable
+              id: setVariable_PopulateInventoryStatus
+              variable: Topic.InventoryStatus
+              value: "Active"
+
+            - kind: SendActivity
+              id: sendActivity_SiteDetailCard
+              activity: |
+                **Contoso Marketing Hub**
+                **📍 Site Information:**
+                - URL: https://tenant.sharepoint.com/sites/contoso-marketing
+                - Type: Team Site
+                - Created: 2023-01-15
+                - Office: Marketing
+                - Site Storage: 245 MB
+                **👥 Ownership:**
+                - Owners: john.smith@contoso.com; jane.doe@contoso.com
+                - Owner Count: 2
+                - Last Modified: 2026-07-20
+                **Inventory Status:**
+                - Status: Active
+                - Last Activity: 2026-07-20
+
+                Available requests: archive, deletion review, or governance support.
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_AskForSiteUrl
+          activity: "Which site would you like more information about? You can say the site name or URL, or go back to My Sites to select one."
+

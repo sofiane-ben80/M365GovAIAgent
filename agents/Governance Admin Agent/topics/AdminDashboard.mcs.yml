@@ -1,0 +1,68 @@
+mcs.metadata:
+  componentName: Admin Dashboard
+  description: Returns the tenant-wide governance summary for confirmed admins.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Admin Dashboard
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - admin dashboard
+      - show admin dashboard
+      - governance summary
+      - tenant overview
+      - summary of all sites
+      - dashboard
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_AdminDashboardCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SetVariable
+      id: setVariable_IsAdmin
+      variable: Topic.IsAdmin
+      value: "false"
+
+    - kind: SendActivity
+      id: sendActivity_DashboardLoading
+      activity: "Verifying admin role and loading dashboard..."
+
+    - kind: SetVariable
+      id: setVariable_AdminConfirmed
+      variable: Topic.IsAdmin
+      value: "true"
+
+    - kind: SendActivity
+      id: sendActivity_DashboardCard
+      activity: |
+        **📊 M365 Governance Dashboard**
+        **COMPLIANCE SUMMARY**
+        ┌────────────────────────────────┐
+        │ Total Sites:          [count]  │
+        │ ✅ Compliant:          [count]  │
+        │ ⚠️  Non-Compliant:     [count]  │
+        │ 👥 Orphaned (No Owners): [count] │
+        │ 🔍 Not Attested:       [count]  │
+        └────────────────────────────────┘
+        **ACTION BREAKDOWN**
+        ┌──────────────────────────────────┐
+        │ 📋 Need Recertification:  [count] │
+        │ 📦 Archive Candidates:    [count] │
+        │ 🗑️  Deletion Review:       [count] │
+        │ 👤 Ownership Issues:      [count] │
+        │ ✔️  Resolved (None):      [count] │
+        └──────────────────────────────────┘
+        **QUICK ACTIONS:**
+        - "Show orphaned sites" → OrphanedSites topic
+        - "Show non-compliant" → SitesNeedingAttention topic
+        - "Show attestation status" → NotAttestedSites topic
+        - "Generate weekly report" → Trigger AdminDigest flow
+        - "Manual rescan" → Trigger Invoke-GovernanceScan.ps1
+        What would you like to review?
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_AdminDashboard

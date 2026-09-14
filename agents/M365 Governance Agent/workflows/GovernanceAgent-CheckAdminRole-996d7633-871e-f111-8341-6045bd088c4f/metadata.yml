@@ -1,0 +1,30 @@
+﻿jsonFileName: workflows/GovernanceAgent-CheckAdminRole-996d7633-871e-f111-8341-6045bd088c4f/workflow.json
+workflowId: 996d7633-871e-f111-8341-6045bd088c4f
+name: GovernanceAgent-CheckAdminRole
+type: 1
+description: 
+subprocess: false
+category: 5
+mode: 0
+scope: 4
+onDemand: false
+triggerOnCreate: false
+triggerOnDelete: false
+asyncAutodelete: false
+syncWorkflowLogOnFailure: false
+stateCode: 0
+statusCode: 1
+runAs: 1
+isTransacted: true
+introducedVersion: 1.0
+isCustomizable:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: iscustomizableanddeletable
+businessProcessType: 0
+isCustomProcessingStepAllowedForOtherPublishers:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: canbedeleted
+modernFlowType: 0
+primaryEntity: none

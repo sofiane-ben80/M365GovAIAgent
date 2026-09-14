@@ -1,0 +1,155 @@
+================================================================================
+  SPO CONNECTOR — ODATA FILTER REFERENCE
+  Purpose : Exact OData filter strings for every SharePoint "Get items" action
+            used in Copilot Studio topics throughout Phase 1 and Phase 2.
+  List    : Contoso Sites
+            https://mngenvmcap733570.sharepoint.com/sites/M365Governance
+  P1 Task : P1-05
+================================================================================
+
+QUICK REFERENCE — POWER FX VARIABLE
+  In Copilot Studio expressions, inject the caller's UPN like this:
+    "substringof('" & System.User.PrincipalName & "', SiteOwners) eq true"
+  Referred to below as [UPN_FILTER]. Replace this literal token with the
+  full expression above in every filter where it appears.
+
+================================================================================
+OWNER-PERSONA TOPICS  (Site Owner Sub-Agent)
+================================================================================
+
+── GET: My All Sites ──────────────────────────────────────────────────────────
+  Topic    : "Show my sites" / site list home
+  Action   : SharePoint > Get items
+  Filter   : substringof('USER@DOMAIN.COM', SiteOwners) eq true
+  Power Fx : [UPN_FILTER]
+  Order By : ComplianceStatus desc   (NON-COMPLIANT sorts before COMPLIANT)
+  Top      : 20  (add paging in Phase 2)
+  Select   : Title, SiteURL, ComplianceStatus, ComplianceAction, LastActivityDate,
+             LastCertificationDate, EffectiveOwnerCount, IsGroupConnected,
+             ConnectedServices, StorageUsageMb, SiteType
+
+── GET: My At-Risk Sites ──────────────────────────────────────────────────────
+  Topic    : "At-risk sites" / "What needs attention"
+  Filter   : substringof('USER@DOMAIN.COM', SiteOwners) eq true
+             and ComplianceStatus eq 'NON-COMPLIANT'
+  Power Fx : [UPN_FILTER] & " and ComplianceStatus eq 'NON-COMPLIANT'"
+  Order By : ComplianceAction  (ASSIGN-OWNERS > ARCHIVE > CERTIFY alphabetically)
+  Top      : 20
+  Note     : For ASSIGN-OWNERS-first ordering, two strategies:
+             (a) Do three separate calls filtered by ComplianceAction and concatenate
+             (b) Sort client-side in topic logic after retrieval
+
+── GET: My Sites Needing Certification ────────────────────────────────────────
+  Topic    : Certify topic, initial site picker
+  Filter   : substringof('USER@DOMAIN.COM', SiteOwners) eq true
+             and ComplianceAction eq 'CERTIFY'
+  Power Fx : [UPN_FILTER] & " and ComplianceAction eq 'CERTIFY'"
+  Top      : 20
+
+── GET: My Sites Needing Owner Assignment ─────────────────────────────────────
+  Topic    : "Sites with no owners" info response
+  Filter   : substringof('USER@DOMAIN.COM', SiteOwners) eq true
+             and ComplianceAction eq 'ASSIGN-OWNERS'
+  Power Fx : [UPN_FILTER] & " and ComplianceAction eq 'ASSIGN-OWNERS'"
+  Top      : 10
+
+── GET: Specific site by URL (for confirmation / certify) ─────────────────────
+  Topic    : Certify topic, ownership validation (Steps 1a/1b in certify-site-topic-spec.txt)
+  Filter   : SiteURL eq 'FULL_SITE_URL'
+             and substringof('USER@DOMAIN.COM', SiteOwners) eq true
+  Power Fx : "SiteURL eq '" & Topic.SelectedSiteUrl & "' and " & [UPN_FILTER]
+  Top      : 1
+  Returns  : Item Id (for subsequent Update item call), current compliance fields
+
+── GET: Specific site by URL (admin / no ownership filter) ────────────────────
+  Topic    : Site Detail card when admin is caller
+  Filter   : SiteURL eq 'FULL_SITE_URL'
+  Power Fx : "SiteURL eq '" & Topic.SelectedSiteUrl & "'"
+  Top      : 1
+
+================================================================================
+ADMIN-PERSONA TOPICS  (Admin Sub-Agent — Phase 2)
+================================================================================
+
+── GET: ALL Non-Compliant Sites ───────────────────────────────────────────────
+  Topic    : Admin dashboard — "Show all non-compliant sites"
+  Filter   : ComplianceStatus eq 'NON-COMPLIANT'
+  Order By : ComplianceAction
+  Top      : 50  (admin views can hold more)
+
+── GET: Orphaned Sites (no effective owners) ──────────────────────────────────
+  Topic    : Admin dashboard — "Show orphaned sites"
+  Filter   : EffectiveOwnerCount eq 0
+  Order By : LastActivityDate
+  Top      : 50
+
+── GET: Sites Needing Action — by type ────────────────────────────────────────
+  ARCHIVE   : ComplianceAction eq 'ARCHIVE'
+  CERTIFY   : ComplianceAction eq 'CERTIFY'
+  ASSIGN-OWNERS : ComplianceAction eq 'ASSIGN-OWNERS'
+
+── GET: Sites by Office / Department (Phase 2+ filtering) ─────────────────────
+  Filter   : Office eq 'OFFICE_NAME'
+             [optionally combined with ComplianceStatus or ComplianceAction]
+
+── GET: Sites Stale by exact days range ───────────────────────────────────────
+  Filter   : LastActivityDate lt '2024-01-01T00:00:00Z'
+             and ComplianceStatus eq 'NON-COMPLIANT'
+  Note     : OData datetime in ISO 8601 format. In Power Fx:
+             "LastActivityDate lt '" & Text(DateAdd(Now(), -365, Days), "yyyy-mm-ddTHH:mm:ssZ") & "'"
+
+================================================================================
+CONNECTION CONFIGURATION
+================================================================================
+
+SharePoint Connector settings (add in Copilot Studio > Settings > Connections):
+  Connector type : SharePoint
+  Auth           : OAuth with the service account OR the logged-in user
+                   (For Phase 1: use current user — each user can only see their own sites)
+                   (For Phase 2 admin agent: use a service account with tenant read)
+  Site URL       : https://mngenvmcap733570.sharepoint.com/sites/M365Governance
+
+For WRITE actions (Update item, Create item — Certify flow):
+  The logged-in user must have Contribute or higher on the Contoso Sites list.
+  Governance Action Log: the logged-in user must have Contribute access.
+  If using delegated (user) auth, this is automatically scoped to their permissions.
+  If using app-only auth (for admin scenarios), the app reg needs Sites.ReadWrite.All.
+
+App Registration permissions summary (for reference):
+  - Sites.Read.All       — Read all SharePoint lists (delegated, for Owner Agent)
+  - Sites.ReadWrite.All  — Write to SPO lists (delegated, for Certify action)
+  - GroupMember.Read.All — Check admin group membership (Application, for Check-AdminRole PA flow)
+  - User.Read.All        — Read user profiles (Application, for Check-AdminRole PA flow)
+
+================================================================================
+ODATA SYNTAX NOTES
+================================================================================
+
+1. SiteOwners is stored as a SINGLE-LINE TEXT field containing semicolon-delimited UPNs.
+   CORRECT  : substringof('upn@domain.com', SiteOwners) eq true
+   INCORRECT: SiteOwners eq 'upn@domain.com'  (this would only match an exact single value)
+
+2. Boolean fields (IsGroupConnected, HasTeams, HasPlanner):
+   CORRECT  : IsGroupConnected eq true
+   ALSO OK  : IsGroupConnected eq 1   (SPO boolean stored as number internally)
+
+3. Number fields (EffectiveOwnerCount, StorageUsageMb):
+   CORRECT  : EffectiveOwnerCount eq 0
+   CORRECT  : EffectiveOwnerCount lt 2
+   INCORRECT: EffectiveOwnerCount eq '0'  (no quotes on numbers)
+
+4. Date/time comparisons:
+   CORRECT  : LastActivityDate lt '2024-01-01T00:00:00Z'
+   NOTE     : SPO "Date and Time" columns use ISO 8601 format in OData
+
+5. Combining filters (AND):
+   CORRECT  : substringof('u@c.com', SiteOwners) eq true and ComplianceStatus eq 'NON-COMPLIANT'
+   NOTE     : No parentheses needed for simple AND chains in SharePoint OData
+
+6. Top count and paging:
+   Top      : Sets maximum items returned per call (default is 100, reduce to 20-50 for performance)
+   Skip     : Use for paging: $skip=20 returns items 21-40. Available in SharePoint OData v3+.
+
+7. Select fields (performance optimisation):
+   Always use Select to limit fields returned to only what the topic needs.
+   Selecting only needed fields reduces payload size and agent token usage.

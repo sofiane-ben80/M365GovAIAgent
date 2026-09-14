@@ -1,0 +1,173 @@
+﻿{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "api": {
+          "name": "shared_sharepointonline"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "new_sharedsharepointonline_8aaab"
+        },
+        "runtimeSource": "invoker"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "type": "SecureObject",
+          "defaultValue": {}
+        },
+        "$connections": {
+          "type": "Object",
+          "defaultValue": {}
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "UPN of the user to check",
+                  "title": "callerUPN",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Initialize_IsAdmin": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "name": "isAdmin",
+                "value": false,
+                "type": "boolean"
+              }
+            ]
+          },
+          "runAfter": {}
+        },
+        "Get_AdminUPNs": {
+          "type": "OpenApiConnection",
+          "inputs": {
+            "parameters": {
+              "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+              "table": "ca14ff4d-e4c5-4324-86d9-848a777c2ca1",
+              "$filter": "Title eq 'AdminUPNs'",
+              "$top": 1
+            },
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "GetItems",
+              "connectionName": "shared_sharepointonline"
+            }
+          },
+          "runAfter": {
+            "Initialize_IsAdmin": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Check_AdminUPNs_Present": {
+          "type": "If",
+          "expression": {
+            "and": [
+              {
+                "greater": [
+                  "@length(coalesce(outputs('Get_AdminUPNs')?['body']?['value']?[0]?['SettingValue'], ''))",
+                  0
+                ]
+              }
+            ]
+          },
+          "actions": {
+            "Is_Caller_In_Admin_List": {
+              "type": "If",
+              "expression": {
+                "and": [
+                  {
+                    "contains": [
+                      "@concat(',', toLower(coalesce(outputs('Get_AdminUPNs')?['body']?['value']?[0]?['SettingValue'], '')), ',')",
+                      "@concat(',', toLower(triggerBody()?['text']), ',')"
+                    ]
+                  }
+                ]
+              },
+              "actions": {
+                "Set_IsAdmin_True": {
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "isAdmin",
+                    "value": true
+                  },
+                  "runAfter": {}
+                }
+              },
+              "else": {
+                "actions": {}
+              },
+              "runAfter": {}
+            }
+          },
+          "else": {
+            "actions": {}
+          },
+          "runAfter": {
+            "Get_AdminUPNs": [
+              "Succeeded",
+              "Failed",
+              "Skipped",
+              "TimedOut"
+            ]
+          }
+        },
+        "Respond_to_agent": {
+          "type": "Response",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "isadmin": {
+                  "title": "IsAdmin",
+                  "type": "boolean",
+                  "x-ms-content-hint": "BOOLEAN",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "additionalProperties": {}
+            },
+            "statusCode": 200,
+            "body": {
+              "isadmin": "@variables('isAdmin')"
+            }
+          },
+          "runAfter": {
+            "Check_AdminUPNs_Present": [
+              "Succeeded",
+              "Failed",
+              "Skipped",
+              "TimedOut"
+            ]
+          }
+        }
+      },
+      "outputs": {}
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}

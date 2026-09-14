@@ -1,0 +1,31 @@
+mcs.metadata:
+  componentName: Flag for Deletion
+  description: Owner deletion-review request with live SQL ownership validation and explicit risk confirmation.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Flag for Deletion
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - flag for deletion
+      - request deletion
+      - delete site
+      - flag this site for deletion
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_DeleteCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_DeleteHandoff
+      activity: |
+        Routing intent: Request Deletion Review.
+
+        Confirm the site name or URL and explain that this creates a review request and does not delete the site. Require the user to type CONFIRM in the current turn, then submit a DELETE-REQUESTED request using the signed-in identity. The governance team must approve and execute any deletion.
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_FlagForDeletion

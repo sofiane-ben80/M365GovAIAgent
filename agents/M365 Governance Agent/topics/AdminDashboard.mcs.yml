@@ -1,0 +1,33 @@
+mcs.metadata:
+  componentName: Admin Dashboard
+  description: Returns the tenant-wide governance summary for confirmed admins.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Admin Dashboard
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - admin dashboard
+      - show admin dashboard
+      - governance summary
+      - tenant overview
+      - summary of all sites
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_AdminDashboardCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_AdminDashboardHandoff
+      activity: |
+        Routing intent: Admin Dashboard.
+
+        Open Governance Admin Agent and ask: "admin dashboard".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_AdminDashboard

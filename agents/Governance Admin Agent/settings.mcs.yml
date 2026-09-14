@@ -1,0 +1,15 @@
+displayName: Governance Admin Agent
+schemaName: copilots_gov_admin_01
+accessControlPolicy: GroupMembership
+authenticationMode: Integrated
+authenticationTrigger: Always
+configuration:
+  settings:
+    GenerativeActionsEnabled: true
+
+  recognizer:
+    kind: GenerativeAIRecognizer
+
+publishedOn: 2026-07-26T14:59:22.0000000Z
+template: kickStartTemplate-1.0.0
+language: 1033

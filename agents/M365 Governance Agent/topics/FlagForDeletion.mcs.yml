@@ -1,0 +1,32 @@
+mcs.metadata:
+  componentName: Flag for Deletion
+  description: Owner deletion-flag scaffold with explicit risk confirmation requirement.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Flag for Deletion
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - flag for deletion
+      - request deletion
+      - delete site
+      - flag this site for deletion
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_DeleteCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_DeleteHandoff
+      activity: |
+        Routing intent: Flag for Deletion.
+
+        Open Governance Owner Agent and ask: "flag [site name] for deletion".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_FlagForDeletion

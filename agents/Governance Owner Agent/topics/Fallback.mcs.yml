@@ -1,0 +1,22 @@
+mcs.metadata:
+  componentName: Fallback
+  description: This system topic triggers when the user's utterance does not match any existing topics.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnUnknownIntent
+  id: main
+  actions:
+    - kind: ConditionGroup
+      id: conditionGroup_LktzXw
+      conditions:
+        - id: conditionItem_tlGIVo
+          condition: =System.FallbackCount < 3
+          actions:
+            - kind: SendActivity
+              id: sendMessage_QZreqo
+              activity: I am a launcher. Say "owner agent" for owner workflows or "admin agent" for tenant-wide governance.
+
+      elseActions:
+        - kind: BeginDialog
+          id: 5aXj5M
+          dialog: copilots_gov_owner_01.topic.Escalate

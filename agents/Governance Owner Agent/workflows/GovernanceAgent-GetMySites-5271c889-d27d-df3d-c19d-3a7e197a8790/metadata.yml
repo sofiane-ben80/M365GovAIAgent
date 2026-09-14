@@ -1,0 +1,32 @@
+﻿jsonFileName: workflows/GovernanceAgent-GetMySites-5271c889-d27d-df3d-c19d-3a7e197a8790/workflow.json
+workflowId: 5271c889-d27d-df3d-c19d-3a7e197a8790
+name: GovernanceAgent-GetMySites
+type: 1
+description: 
+subprocess: false
+category: 5
+mode: 0
+scope: 4
+onDemand: false
+triggerOnCreate: false
+triggerOnDelete: false
+asyncAutodelete: false
+syncWorkflowLogOnFailure: false
+stateCode: 1
+statusCode: 2
+runAs: 1
+isTransacted: true
+introducedVersion: 1.0
+isCustomizable:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: iscustomizableanddeletable
+businessProcessType: 0
+isCustomProcessingStepAllowedForOtherPublishers:
+  value: true
+  canBeChanged: true
+  managedPropertyLogicalName: canbedeleted
+modernFlowType: 0
+primaryEntity: none
+connectionReferences:
+- craa5_sharepointonline_03aeb841ed

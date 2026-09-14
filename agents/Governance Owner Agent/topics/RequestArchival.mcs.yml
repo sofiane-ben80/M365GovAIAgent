@@ -1,0 +1,32 @@
+mcs.metadata:
+  componentName: Request Archival
+  description: Owner archival request with live SQL ownership validation, explicit confirmation, and a pending support-team review.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Request Archival
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - request archival
+      - archive site
+      - archive my site
+      - request archive
+      - archive this site
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_ArchiveCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_ArchiveHandoff
+      activity: |
+        Routing intent: Request Archival.
+
+        Confirm the site name or URL and explain that archival makes the site read-only while preserving its content. After explicit confirmation, submit an ARCHIVE request using the signed-in identity. The support team will review it; do not report the site as archived until processing completes.
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_RequestArchival

@@ -1,0 +1,20 @@
+displayName: Governance Owner Agent
+schemaName: copilots_gov_owner_01
+accessControlPolicy: Any
+authenticationMode: Integrated
+authenticationTrigger: Always
+configuration:
+  channels:
+    - channelId: MsTeams
+
+    - channelId: Microsoft365Copilot
+
+  settings:
+    GenerativeActionsEnabled: true
+
+  publishOnImport: true
+  isLightweightBot: false
+  recognizer:
+    kind: GenerativeAIRecognizer
+
+publishedOn: 2026-07-26T14:59:50.0000000Z

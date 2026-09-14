@@ -1,0 +1,245 @@
+﻿{
+  "properties": {
+    "connectionReferences": {
+      "shared_sharepointonline": {
+        "api": {
+          "name": "shared_sharepointonline"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "craa5_sharepointonline_03aeb841ed"
+        },
+        "runtimeSource": "invoker"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "undefined",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "Please enter your input",
+                  "title": "UserUPN",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Respond_to_the_agent": {
+          "type": "Response",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "title": "success",
+                  "description": "",
+                  "type": "boolean",
+                  "x-ms-content-hint": "BOOLEAN",
+                  "x-ms-dynamically-added": true
+                },
+                "sitecount": {
+                  "title": "siteCount",
+                  "description": "",
+                  "type": "number",
+                  "x-ms-content-hint": "NUMBER",
+                  "x-ms-dynamically-added": true
+                },
+                "sitesjson": {
+                  "title": "sitesJson",
+                  "description": "",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                },
+                "message": {
+                  "title": "message",
+                  "description": "",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "additionalProperties": {}
+            },
+            "statusCode": 200,
+            "body": {
+              "success": true,
+              "sitecount": "@outputs(\u0027Compose\u0027)",
+              "sitesjson": "@{body(\u0027Select\u0027)}",
+              "message": "\u0022Done\u0022"
+            }
+          },
+          "runAfter": {
+            "Condition_\u2014_Validate_UserUPN": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Condition_\u2014_Validate_UserUPN": {
+          "type": "If",
+          "expression": {
+            "and": [
+              {
+                "not": {
+                  "equals": [
+                    "@triggerBody()?[\u0027text\u0027]",
+                    ""
+                  ]
+                }
+              },
+              {
+                "contains": [
+                  "@triggerBody()?[\u0027text\u0027]",
+                  "@"
+                ]
+              },
+              {
+                "not": {
+                  "contains": [
+                    "@triggerBody()?[\u0027text\u0027]",
+                    "\u0027\u0027"
+                  ]
+                }
+              }
+            ]
+          },
+          "actions": {
+            "Compose_\u2014_NormalizedUserUPN": {
+              "type": "Compose",
+              "inputs": "@toLower(trim(triggerBody()?[\u0027text\u0027]))"
+            },
+            "SharePoint_\u2014_Get_items": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "dataset": "https://mngenvmcap733570.sharepoint.com/sites/M365Governance",
+                  "table": "44dfbf52-8434-42d6-95c5-8ecf7614351d",
+                  "$filter": "substringof(\u0027@{outputs(\u0027Compose_\u2014_NormalizedUserUPN\u0027)}\u0027,SiteOwners)",
+                  "$orderby": "ComplianceStatus desc,Title asc",
+                  "$top": 100,
+                  "view": "2324ef1a-9ee8-4e99-9806-d589862f82d9"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+                  "operationId": "GetItems",
+                  "connectionName": "shared_sharepointonline"
+                }
+              },
+              "runAfter": {
+                "Compose_\u2014_NormalizedUserUPN": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Select": {
+              "type": "Select",
+              "inputs": {
+                "from": "@outputs(\u0027SharePoint_\u2014_Get_items\u0027)?[\u0027body/value\u0027]",
+                "select": {
+                  "itemId": "@item()?[\u0027ID\u0027]",
+                  "title": "@item()?[\u0027Title\u0027]",
+                  "siteUrl": "@item()?[\u0027SiteURL\u0027]",
+                  "lastActivityDate": "@item()?[\u0027LastActivityDate\u0027]",
+                  "siteType": "@item()?[\u0027SiteType/Value\u0027]",
+                  "complianceStatus": "@item()?[\u0027ComplianceStatus/Value\u0027]",
+                  "complianceAction": "@item()?[\u0027ComplianceAction/Value\u0027]"
+                }
+              },
+              "runAfter": {
+                "SharePoint_\u2014_Get_items": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Compose": {
+              "type": "Compose",
+              "inputs": "@length(outputs(\u0027SharePoint_\u2014_Get_items\u0027)?[\u0027body/value\u0027])",
+              "runAfter": {
+                "Select": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "else": {
+            "actions": {
+              "Respond_to_the_agent_with_no_sites": {
+                "type": "Response",
+                "kind": "Skills",
+                "inputs": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "title": "success",
+                        "description": "",
+                        "type": "boolean",
+                        "x-ms-content-hint": "BOOLEAN",
+                        "x-ms-dynamically-added": true
+                      },
+                      "sitecount": {
+                        "title": "siteCount",
+                        "description": "",
+                        "type": "number",
+                        "x-ms-content-hint": "NUMBER",
+                        "x-ms-dynamically-added": true
+                      },
+                      "sitesjson": {
+                        "title": "sitesJson",
+                        "description": "",
+                        "type": "string",
+                        "x-ms-content-hint": "TEXT",
+                        "x-ms-dynamically-added": true
+                      },
+                      "message": {
+                        "title": "message",
+                        "description": "",
+                        "type": "string",
+                        "x-ms-content-hint": "TEXT",
+                        "x-ms-dynamically-added": true
+                      }
+                    },
+                    "additionalProperties": {}
+                  },
+                  "statusCode": 200,
+                  "body": {
+                    "success": false,
+                    "sitesjson": "[]",
+                    "message": "A valid caller identity was not provided."
+                  }
+                }
+              }
+            }
+          },
+          "runAfter": {}
+        }
+      }
+    }
+  },
+  "schemaVersion": "1.0.0.0"
+}
