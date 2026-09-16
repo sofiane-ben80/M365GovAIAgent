@@ -6,7 +6,13 @@ This repository intentionally contains only agent-related material. The remediat
 
 ## Start here
 
-Hackathon team members should begin with the [team review packet](docs/team-review-packet.md). It summarizes the problem, current implementation status, design decisions, open questions, review scenarios, and contribution workflow. Detailed architecture and live comparison evidence are linked from that packet.
+Start with the [solution architecture](docs/architecture.md), then use the
+[agent catalog](docs/agent-catalog.md), [persona model](docs/personas.md), and
+[implementation guide](docs/implementation.md) for the final agent boundaries,
+audiences, responsibilities, and delivery state.
+
+The [team review packet](docs/team-review-packet.md) and dated live baseline are
+retained as validation records rather than the current architecture narrative.
 
 ## Repository layout
 
@@ -17,11 +23,18 @@ Hackathon team members should begin with the [team review packet](docs/team-revi
 | `agents/M365 Governance Agent` | Combined agent retained as an optional launcher and migration fallback |
 | `agents/*.ps1` | Export, deployment, and source-sync helpers |
 | `flows` | Power Automate flow contracts and implementation notes used by the agents |
-| `new-agents` | Instructions for the skills-based Copilot Studio agent experience |
+| `new-agents` | Skills-based Owner/Admin targets and five advisor shell definitions |
+| `new-agents/advisor-manifest.yml` | Deployment inventory and route contracts for the five advisor shells |
 | `skills` | Reusable governance skill definitions |
 | `docs/team-review-packet.md` | Teammate orientation, project status, and review checklist |
 | `docs/architecture.md` | Target architecture, responsibilities, and security invariants |
-| `docs/live-baseline-2026-09-14.md` | Verified local-to-live orchestrator comparison |
+| `docs/agent-catalog.md` | Final connected-agent and child-agent catalog |
+| `docs/personas.md` | User personas, agent behavior, tone, and authorization boundaries |
+| `docs/implementation.md` | Current implementation state, runtime paths, source ownership, and release sequence |
+| `docs/08-Advisor-Agent-Integration-Architecture.md` | Shared evidence, connector, tool, and data-source design for domain advisors |
+| `docs/09-Advisor-Implementation-Roadmap.md` | Detailed agent, orchestration, prompt, tool, connector, backend, ALM, and rollout plan |
+| `docs/live-baseline-2026-09-16.md` | Latest live inventory and local-to-live reconciliation |
+| `docs/live-baseline-2026-09-16.md` | Live inventory, Owner/Admin drift classification, and advisor deployment readiness |
 
 The local `agents/exports` directory is ignored because it contains timestamped backups and generated packages rather than source of record.
 

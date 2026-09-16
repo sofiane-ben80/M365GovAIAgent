@@ -9,11 +9,14 @@ flowchart LR
     User[Signed-in user] --> Launcher[Governor M365 launcher]
     Launcher -->|Owner intent| Owner[Governance Owner Agent]
     Launcher -->|Admin intent| Admin[Governance Admin Agent]
+    Launcher -->|Advisory intent| Advisors[Connected domain advisors]
     Owner --> OwnerTools[Owner-scoped read and request tools]
     Admin --> Verify[Verify governance admin]
     Verify -->|Authorized| AdminTools[Tenant-wide read and action tools]
+    Advisors --> Broker[Domain-authorized evidence tools]
     OwnerTools --> Data[(Governance data)]
     AdminTools --> Data
+    Broker --> Evidence[(Normalized evidence and findings)]
     OwnerTools --> Audit[(Governance action log)]
     AdminTools --> Audit
 ```
@@ -28,10 +31,57 @@ The deployed display name is **Governor M365**. Its source package remains `agen
 - Classify clear owner and admin intents.
 - Ask one clarification question when the target is ambiguous.
 - Invoke `copilots_gov_owner_01` or `copilots_gov_admin_01` through connected-agent task actions.
-- Pass conversation history and signed-in identity context to the selected agent.
+- Pass only the conversation and signed-in identity context required by the destination agent.
 - Never query inventory, execute governance logic, or perform writes.
 
 The launcher has web browsing, code interpreter, and file analysis disabled. It uses integrated authentication, group-membership access control, high content moderation, and the Teams and Microsoft 365 Copilot channels.
+
+### Connected domain advisors
+
+The domain layer adds Data Protection, Copilot Readiness, Identity Governance,
+Governance Policy, and Security & Compliance Assurance as connected agents with
+distinct audiences, source access, and release lifecycles.
+
+- Reuse source-agent instructions and business methods for reasoning.
+- Obtain tenant facts only through domain-authorized, versioned tools.
+- Use direct adapters for fresh scoped checks and scheduled collectors for
+  inventory, correlation, baselines, and trends.
+- Share normalized finding or assessment identifiers across domains, not raw
+  privileged evidence or conversation history.
+- Keep recommendations advisory until a separately authorized, confirmed, and
+  audited workflow acts.
+
+The [agent catalog](agent-catalog.md) defines every connected agent and internal
+child. The [persona model](personas.md) defines audience and response behavior.
+The detailed evidence design is in
+[Advisor Agent Integration Architecture](08-Advisor-Agent-Integration-Architecture.md),
+and delivery details are in the [implementation guide](implementation.md) and
+[implementation roadmap](09-Advisor-Implementation-Roadmap.md).
+
+The target runtime uses no more than two generative orchestration levels:
+
+1. the launcher performs one direct connected-agent handoff;
+2. the destination domain agent orchestrates only its own children, topics,
+   knowledge, and tools.
+
+Domain agents do not call peer domain agents. Cross-domain assessments read
+authorized normalized findings through the evidence broker.
+
+## Subagent map
+
+| Subagent | Primary responsibility | Runtime boundary |
+| --- | --- | --- |
+| Governance Owner Agent | Owner-scoped site review and governed requests | Connected agent; caller-owned records only |
+| Governance Admin Agent | Tenant-wide site governance and governed admin actions | Connected agent; live admin verification required |
+| Governance Policy Advisor | Maturity, policy gaps, operating model, and draft artifacts | Connected agent; approved policy-authoring audience |
+| Copilot Readiness Advisor | GCC readiness, prerequisites, capability claims, and rollout planning | Connected agent; readiness audience and current capability evidence |
+| Data Protection Advisor | Exposure, sharing, classification, DLP, retention, and data-risk findings | Connected agent; isolated protection evidence access |
+| Identity Governance Advisor | RBAC, PIM, access reviews, RACI, least privilege, and separation of duties | Connected agent; restricted identity evidence access |
+| Security & Compliance Assurance | Control mapping, evidence sufficiency, audit readiness, and remediation proposals | Connected agent; ISSO/security audience |
+
+Each domain advisor may delegate only to its own child agents, topics, prompts,
+and tools. See the [agent catalog](agent-catalog.md) for those internal
+components and exclusions.
 
 ### Governance Owner Agent
 
@@ -65,6 +115,10 @@ The skills-based target definition is `new-agents/governance-admin-agent.md`. Th
 6. Tool failures deny privileged processing; agents must not invent fallback data.
 7. Successful completion is reported only when the invoked tool returns success.
 8. Every accepted write request is recorded in the governance action log.
+9. Agent instructions and static knowledge are not evidence of current tenant state.
+10. Cross-domain access uses normalized, audience-trimmed findings rather than raw source records.
+11. A normal user turn has one intended response owner and no peer-agent fan-out.
+12. Runtime orchestration does not exceed launcher, domain, and domain-child/tool depth.
 
 ## Source model
 
@@ -90,4 +144,5 @@ The deployable export and the target design are intentionally both retained whil
 6. Commit and push source before publishing to Copilot Studio.
 7. Publish, pull again, and commit server-generated metadata.
 
-The dated comparison in `docs/live-baseline-2026-09-14.md` is the initial operational baseline for this workflow.
+The latest operational comparison is recorded in
+[Live Agent Reconciliation - 2026-09-16](live-baseline-2026-09-16.md).

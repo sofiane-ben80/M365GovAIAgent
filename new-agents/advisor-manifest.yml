@@ -1,0 +1,97 @@
+version: 1
+environmentId: 9417045e-87bb-eac8-bda1-850674b11405
+launcher:
+  displayName: Governor M365
+  botId: d610fa66-3e1e-f111-8341-6045bd088c4f
+  schemaName: copilots_header_04c70
+defaults:
+  authenticationMode: Integrated
+  authenticationTrigger: Always
+  generativeOrchestration: true
+  conversationHistoryTransfer: false
+  webBrowsing: false
+  codeInterpreter: false
+  fileAnalysis: false
+  productionToolsEnabled: false
+agents:
+  - key: governance-policy-advisor
+    displayName: Governance Policy Advisor
+    releaseWave: 1
+    source: governance-policy-advisor.md
+    botId:
+    schemaName:
+    audienceGroup:
+    routeDescription: >-
+      Use Governance Policy Advisor for governance maturity, policy gaps,
+      operating models, RACI, roadmaps, and draft governance artifacts. Do not
+      use it for current tenant security evidence, Entra role analysis, Copilot
+      deployment readiness, or site disposition requests.
+    representativeIntents:
+      - Assess our Copilot governance maturity.
+      - Identify gaps in an approved governance policy.
+      - Draft a governance roadmap from approved findings.
+  - key: copilot-readiness-advisor
+    displayName: Copilot Readiness Advisor
+    releaseWave: 1
+    source: copilot-readiness-advisor.md
+    botId:
+    schemaName:
+    audienceGroup:
+    routeDescription: >-
+      Use Copilot Readiness Advisor for GCC readiness, prerequisites, capability
+      verification, rollout planning, and Microsoft 365 service-change impact.
+      Do not use it for policy drafting, privileged identity review, data
+      exposure investigation, or compliance authorization.
+    representativeIntents:
+      - Assess our readiness for Microsoft 365 Copilot in GCC.
+      - Verify whether a capability is available in our cloud profile.
+      - Build a phased rollout plan from approved readiness gaps.
+  - key: data-protection-advisor
+    displayName: Data Protection Advisor
+    releaseWave: 2
+    source: data-protection-advisor.md
+    botId:
+    schemaName:
+    audienceGroup:
+    routeDescription: >-
+      Use Data Protection Advisor to assess sharing exposure, guests,
+      sensitivity labels, DLP and retention coverage, and Copilot data exposure
+      for authorized Microsoft 365 resources. Do not use it for privileged
+      Entra roles, policy drafting, general rollout planning, or site
+      disposition requests.
+    representativeIntents:
+      - Show authorized resources with the highest oversharing risk.
+      - Explain protection coverage for this resource.
+      - Assess Copilot data exposure using current evidence.
+  - key: identity-governance-advisor
+    displayName: Identity Governance Advisor
+    releaseWave: 3
+    source: identity-governance-advisor.md
+    botId:
+    schemaName:
+    audienceGroup:
+    routeDescription: >-
+      Use Identity Governance Advisor for privileged roles, PIM, access reviews,
+      least privilege, RACI, and separation-of-duty analysis. Do not use it for
+      content exposure, policy drafting, site ownership requests, risky-user
+      investigation, or access changes.
+    representativeIntents:
+      - Review privileged assignments for least-privilege gaps.
+      - Evaluate separation-of-duty conflicts.
+      - Summarize stale PIM or access-review evidence.
+  - key: security-compliance-assurance
+    displayName: Security & Compliance Assurance
+    releaseWave: 4
+    source: security-compliance-assurance.md
+    botId:
+    schemaName:
+    audienceGroup:
+    routeDescription: >-
+      Use Security & Compliance Assurance for control mapping, evidence
+      sufficiency, audit readiness, and remediation proposals based on approved
+      evidence. Do not use it for policy approval, ATO decisions, risk
+      acceptance, raw investigation data, or direct remediation.
+    representativeIntents:
+      - Map approved findings to the applicable control baseline.
+      - Evaluate whether evidence is sufficient and current.
+      - Prepare an audit-readiness remediation proposal.
