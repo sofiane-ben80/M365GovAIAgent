@@ -7,7 +7,20 @@ order. Do not substitute the legacy `M365Governance_1_0_0_1.zip`,
 those packages contain SharePoint-backed proof-of-concept components and do
 not implement the target architecture.
 
-## 1. Release contents
+## 1. Choose the correct solution
+
+Two similarly named solutions may appear in the development environment:
+
+| Solution | Version | Prefix | Tables | Status |
+|---|---:|---|---:|---|
+| `Governor365` | 1.0.0.0 | `sof` | 1 legacy SharePoint Sites table | Legacy proof of concept |
+| `M365Governance` | 2.0.0.0 | `sb` | 9 canonical governance tables | Current schema foundation |
+
+If you see only one table, you are looking at the legacy `Governor365`
+solution. Open or import `M365Governance` 2.0.0.0 instead. Its nine tables are
+listed in the [canonical data model](04-DataModel.md).
+
+## 2. Release contents
 
 A deployable release consists of:
 
@@ -27,14 +40,16 @@ The managed solution must contain:
 - connection references and environment variable definitions; and
 - any Power Apps and Adaptive Card assets included in the release.
 
-> **Current release gate:** the repository contains the scanner, flow
-> contracts, agent source, and deployment documentation, but no managed 2.x
-> package yet. The authenticated development environment currently exposes
-> only legacy packages, so an end-to-end deployment must wait for the target
-> tables and flows to be built, tested, and exported. Do not rename a legacy
-> ZIP and treat it as the 2.x package.
+The repository currently includes
+`release/M365Governance_2_0_0_0_managed.zip`. This managed schema-foundation
+package contains all nine tables, columns, choices, lookups, and alternate
+keys. It does not contain the replacement flows or reviewed agents.
 
-## 2. Prerequisites
+> **Current functional-release gate:** an end-to-end deployment must wait for
+> the target flows and agents to be included and acceptance-tested. Do not
+> rename the schema-only or a legacy ZIP and treat it as the complete package.
+
+## 3. Prerequisites
 
 The deployment operator needs:
 
@@ -55,7 +70,20 @@ tenant sites, read Microsoft 365 group owners, and read each site's associated
 SharePoint Owners group. The deployment account must be allowed to consent to
 those permissions.
 
-## 3. Validate the release package
+## 4. Validate the release package
+
+Validate the currently published schema foundation with:
+
+```powershell
+.\scripts\Test-Governor365SolutionPackage.ps1 `
+  -Path .\release\M365Governance_2_0_0_0_managed.zip `
+  -ValidationProfile SchemaFoundation
+```
+
+This must report `Managed = True`, `RequiredTables = 9`, and
+`ValidationProfile = SchemaFoundation`.
+
+For a future complete package, use the default strict validation:
 
 From the repository root:
 
@@ -68,14 +96,14 @@ The command must report `Managed = True`, nine required tables, at least one
 cloud flow, at least one Copilot agent, and a SHA-256 hash. Compare the hash to
 the release notes. Stop if validation fails.
 
-## 4. Import the managed solution
+## 5. Import the managed solution
 
 ### Power Apps maker portal
 
 1. Open `https://make.powerapps.com`.
 2. Select the target environment.
 3. Open **Solutions**, select **Import solution**, and choose the validated
-   `Governor365_<version>_managed.zip`.
+   `M365Governance_<version>_managed.zip`.
 4. Select **Next** and review dependencies.
 5. Map every connection reference to an approved connection.
 6. Enter environment-variable values for the target tenant, SharePoint admin
@@ -91,7 +119,7 @@ pac auth create `
   --environment "https://contoso.crm.dynamics.com"
 
 pac solution import `
-  --path .\release\Governor365_2_0_0_0_managed.zip `
+  --path .\release\M365Governance_2_0_0_0_managed.zip `
   --publish-changes
 ```
 
@@ -99,7 +127,7 @@ Use a deployment settings file for automated environments when connection
 references or environment variables must be mapped non-interactively. Never
 store connection secrets or access tokens in the repository.
 
-## 5. Configure and activate components
+## 6. Configure and activate components
 
 1. Confirm that all nine tables exist and that their logical names, choices,
    lookups, and alternate keys match the data model.
@@ -116,7 +144,10 @@ store connection secrets or access tokens in the repository.
 7. Open every imported Copilot Studio agent, resolve connection prompts, verify
    tool bindings, and publish only after authorization tests pass.
 
-## 6. Run the backend inventory scanner
+Do not continue to flow and agent activation after importing the current
+schema-foundation package; those components are not included yet.
+
+## 7. Run the backend inventory scanner
 
 Install PnP.PowerShell if it is not already available:
 
@@ -170,7 +201,7 @@ After the bounded test succeeds, run the complete inventory by omitting
 Do not set `-IncludeSiteOwnerGroups:$false` for an authorization-ready
 inventory. That switch omits SharePoint Owners-group members.
 
-## 7. Validate the deployment
+## 8. Validate the deployment
 
 1. Confirm the full scan ends as `Completed`, not `CompletedWithErrors`.
 2. Run the full scan a second time and confirm alternate keys prevent duplicate
@@ -189,7 +220,7 @@ inventory. That switch omits SharePoint Owners-group members.
 10. Publish the agents and enable the recurring Start Scan flow only after all
     tests pass.
 
-## 8. Rollback
+## 9. Rollback
 
 Before importing an upgrade, retain the previously imported managed package
 and record the active connection/environment configuration. If validation

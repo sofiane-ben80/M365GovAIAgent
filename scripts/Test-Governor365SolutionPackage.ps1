@@ -4,22 +4,37 @@
 
 .DESCRIPTION
     Reads a Power Platform solution ZIP without extracting it and fails when
-    the package is unmanaged or does not contain the documented Dataverse
-    tables, Power Automate workflows, and Copilot Studio agents.
+    the package is unmanaged or does not contain the components required by
+    the selected validation profile. Both profiles require all nine documented
+    Dataverse tables. The Complete profile also requires Power Automate
+    workflows and Copilot Studio agents.
 
 .PARAMETER Path
     Path to the managed Governor365 solution ZIP.
 
+.PARAMETER ValidationProfile
+    Complete validates tables, cloud flows, and Copilot Studio agents.
+    SchemaFoundation validates the nine Dataverse tables only. Both profiles
+    require a managed solution package.
+
 .EXAMPLE
     .\Test-Governor365SolutionPackage.ps1 `
       -Path .\release\Governor365_2_0_0_0_managed.zip
+
+.EXAMPLE
+    .\Test-Governor365SolutionPackage.ps1 `
+      -Path .\release\Governor365_2_0_0_0_managed.zip `
+      -ValidationProfile SchemaFoundation
 #>
 
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)]
     [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
-    [string] $Path
+    [string] $Path,
+
+    [ValidateSet("Complete", "SchemaFoundation")]
+    [string] $ValidationProfile = "Complete"
 )
 
 Set-StrictMode -Version Latest
@@ -105,7 +120,7 @@ try {
         $entryNames |
             Where-Object { $_ -match '^Workflows/.+\.json$' }
     )
-    if ($workflowEntries.Count -eq 0) {
+    if ($ValidationProfile -eq "Complete" -and $workflowEntries.Count -eq 0) {
         $errors.Add("No Power Automate cloud flows were found.")
     }
 
@@ -113,7 +128,7 @@ try {
         $entryNames |
             Where-Object { $_ -match '^bots/[^/]+/bot\.xml$' }
     )
-    if ($botEntries.Count -eq 0) {
+    if ($ValidationProfile -eq "Complete" -and $botEntries.Count -eq 0) {
         $errors.Add("No Copilot Studio agents were found.")
     }
 
@@ -126,6 +141,7 @@ try {
         UniqueName       = [string]$solution.UniqueName
         Version          = [string]$solution.Version
         Managed          = $true
+        ValidationProfile = $ValidationProfile
         RequiredTables   = $requiredTables.Count
         CloudFlows       = $workflowEntries.Count
         CopilotAgents    = $botEntries.Count

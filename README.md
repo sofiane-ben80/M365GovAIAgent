@@ -29,6 +29,7 @@ this repository are migration sources and historical proof-of-concept assets.
 - [Power Automate build guide](docs/12-PowerAutomate-Build-Guide.md)
 - [Dataverse inventory flow contract](flows/inventory-dataverse-flow.txt)
 - [Step-by-step deployment guide](docs/26-Deployment-Guide.md)
+- [Release packages and checksums](release/README.md)
 - [Power Platform refactor decision and migration](docs/23-Power-Platform-Refactor.md)
 - [Hackathon project summary](docs/24-Hackathon-Project-Summary.md)
 - [Agent orchestration overview](docs/22-Agent-Orchestration-Architecture.md)
@@ -55,6 +56,7 @@ this repository are migration sources and historical proof-of-concept assets.
 | `connectors` | Governed connector and evidence-broker contracts |
 | `adaptive-cards` | Source-controlled owner/admin presentation assets |
 | `scripts` | Solution-package preflight and Dataverse inventory bootstrap tools |
+| `release` | Validated managed solution packages, scope notes, and checksums |
 | `docs` | Canonical architecture, implementation, release, and hackathon documentation |
 
 ## Current state
@@ -76,8 +78,8 @@ For inventory bootstrap and migration testing, use
 uses the solution-aware three-flow pipeline documented in the Power Automate
 build guide.
 
-The repository does not yet contain a managed 2.x solution ZIP. Follow the
-[deployment guide](docs/26-Deployment-Guide.md), including its mandatory
-package-content validation. The solution export remains blocked until the
-documented target tables and flows are implemented and tested in the
-development environment.
+The repository contains a managed 2.0 schema-foundation package with all nine
+canonical Dataverse tables. It does not yet contain the replacement flows and
+reviewed agents required for a complete application release. Follow the
+[deployment guide](docs/26-Deployment-Guide.md), use the correct validation
+profile, and do not represent the schema-only package as a functional cutover.

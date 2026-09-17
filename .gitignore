@@ -1,6 +1,7 @@
 # Local Copilot Studio exports and packaged solutions
 agents/exports/
 *.zip
+!release/*.zip
 
 # Local configuration and editor state
 .env

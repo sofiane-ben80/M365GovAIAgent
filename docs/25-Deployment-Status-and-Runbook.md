@@ -71,6 +71,19 @@ None contains the complete `sb_` Dataverse schema and replacement flows. The
 [deployment guide](26-Deployment-Guide.md) therefore requires package
 validation before import and records the managed 2.x export as an open gate.
 
+### Schema correction
+
+On 2026-09-17, the canonical `SofianeB` publisher (`sb`) and
+`M365Governance` 2.0.0.0 development solution were created. All nine
+documented tables and 114 schema components were provisioned. A second
+provisioning run created nothing and preserved all 114 components, confirming
+idempotency.
+
+The managed schema-foundation export is published under `release`. It passes
+the `SchemaFoundation` validation profile. It does not pass the default
+`Complete` profile because replacement flows and reviewed agents are not yet
+included.
+
 ## Current cutover boundary
 
 This release is an instruction and documentation alignment, not the Dataverse
