@@ -10,6 +10,23 @@ Publish the latest Power Platform-first design without representing
 design-only Dataverse or Power Automate components as deployed capability, and
 publish the matching source and documentation to GitHub.
 
+## Release result
+
+- GitHub `main` was updated on 2026-09-17 with the reviewed agent source,
+  Dataverse flow contracts, architecture media, canonical documentation, and
+  hackathon materials.
+- The Owner and Admin deployable source instructions were aligned and validated
+  locally.
+- Live Owner/Admin publication was intentionally deferred. The target
+  Dataverse schema and replacement Power Automate tools are not provisioned,
+  while deterministic legacy topics and embedded workflows still exist in the
+  current packages. Publishing instructions alone would not constitute a safe
+  functional cutover.
+- The installed PAC CLI can list, publish, and extract templates but does not
+  provide the guarded `copilot pull`/`push` commands used by the repository
+  deployment helper. A push-capable Copilot Studio source workflow must be
+  restored before the reviewed package can be released.
+
 ## Verified tenant inventory
 
 | Component | ID | Verified state |
