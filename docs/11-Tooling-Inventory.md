@@ -1,9 +1,10 @@
 # 11 - Tooling Inventory
 
-> **Legacy inventory:** The approved target standardizes application data on
-> Dataverse and automation on Power Automate. Azure Automation, Functions, SQL,
-> and governance SharePoint lists below are historical options only. See
-> [02-Architecture.md](02-Architecture.md).
+> **Current target:** The approved target standardizes application data on
+> Dataverse and recurring automation on solution-aware Power Automate flows.
+> The Dataverse PowerShell scanner is a bootstrap and recovery tool. Azure
+> Automation, Functions, SQL, and governance SharePoint lists are historical
+> options only. See [02-Architecture.md](02-Architecture.md).
 
 Document: Implementation tool map for the M365 Governance AI Agent
 Solution: M365 Governance AI Agent
@@ -20,7 +21,7 @@ The solution does not need a standalone app service for phase 1. The required to
 
 1. Power Automate flows
 2. Copilot Studio topic wiring
-3. PowerShell scheduling / orchestration
+3. PowerShell bootstrap and migration tooling
 4. A small set of support contracts for audit and notification handling
 
 ---
@@ -31,15 +32,18 @@ The solution does not need a standalone app service for phase 1. The required to
 
 | Tool | Type | Purpose | Inputs | Outputs | Depends On |
 |------|------|---------|--------|---------|------------|
-| Check-AdminRole | Power Automate flow | Determines whether the caller belongs to the Governance Admin group | callerUPN | isAdmin boolean | Governance Config, Microsoft Graph |
+| Check-AdminRole | Power Automate flow | Determines whether the caller belongs to the configured Governance Admin group | callerUPN | isAdmin boolean | Environment variables, Microsoft Graph |
 | Orchestrator Start / Greeting | Copilot Studio topic | Resolves persona and routes to owner or admin branch | caller identity | persona branch | Check-AdminRole |
 
 ### 2.2 Data Refresh
 
 | Tool | Type | Purpose | Inputs | Outputs | Depends On |
 |------|------|---------|--------|---------|------------|
-| Invoke-GovernanceScan | PowerShell script | Refreshes Contoso Sites with compliance, owner, attestation, and group metadata | CSV or tenant query, Governance Config | Upserted list rows | SharePoint, PnP.PowerShell |
-| Scheduled Scan Runner | Recurrence / automation | Runs the scan on a schedule | Schedule config | Fresh site inventory | Power Automate or Azure Automation |
+| Governor365 - Inventory - Start Scan | Solution-aware Power Automate flow | Creates a scan run and enumerates bounded source pages | Recurrence/manual trigger, environment variables | Scan run and work items | SharePoint/Graph connector, Dataverse |
+| Governor365 - Inventory - Process Work Item | Solution-aware Power Automate flow | Reconciles a bounded site batch and normalized owners | Scan work item | Upserted site and assignment rows | SharePoint/Graph connector, Dataverse |
+| Governor365 - Inventory - Finalize Scan | Solution-aware Power Automate flow | Closes a complete or partial scan without unsafe stale decisions | Terminal work item | Completed scan and safe lifecycle reconciliation | Dataverse |
+| Invoke-DataverseGovernanceScan | PowerShell script | Bootstraps or reconciles the same Dataverse inventory contract | Tenant admin URL, environment URL, tenant/app IDs | Scan run, site rows, owner assignments | PnP.PowerShell, Dataverse Web API |
+| Invoke-GovernanceScan | Legacy PowerShell script | Refreshes the historical Contoso Sites list | CSV, Governance Config | SharePoint list rows | SharePoint, PnP.PowerShell |
 
 ### 2.3 Owner Read Path
 
@@ -81,16 +85,16 @@ The solution does not need a standalone app service for phase 1. The required to
 
 | Tool | Type | Purpose | Inputs | Outputs | Depends On |
 |------|------|---------|--------|---------|------------|
-| Owner Notification Flow | Power Automate flow | Sends individualized owner digests | site rows grouped by owner | Teams adaptive card | Contoso Sites |
-| Admin Digest Flow | Power Automate flow | Sends tenant summary to admins | grouped tenant metrics | Teams adaptive card | Contoso Sites |
-| Adaptive Card Response Flow | Power Automate flow | Handles button clicks from notification cards | card submit payload | write/update result | SharePoint lists |
+| Owner Notification Flow | Power Automate flow | Sends individualized owner digests | active owner assignments and site rows | Teams adaptive card | Dataverse |
+| Admin Digest Flow | Power Automate flow | Sends tenant summary to admins | grouped tenant metrics | Teams adaptive card | Dataverse |
+| Adaptive Card Response Flow | Power Automate flow | Handles button clicks from notification cards | card submit payload | governed request result | Dataverse request flow |
 
 ---
 
 ## 3. Build Priority
 
 1. Check-AdminRole
-2. Invoke-GovernanceScan schedule runner
+2. Governor365 inventory scan flows
 3. Action Callback Flow
 4. Owner Notification Flow
 5. Admin Digest Flow

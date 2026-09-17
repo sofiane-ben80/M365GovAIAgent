@@ -34,6 +34,7 @@ Each document maps to a specific aspect of the solution and serves as both a blu
 | 23 | [23-Power-Platform-Refactor.md](23-Power-Platform-Refactor.md) | Architecture decision, current-to-target mapping, and migration controls | Approved |
 | 24 | [24-Hackathon-Project-Summary.md](24-Hackathon-Project-Summary.md) | Hackathon pitch, demo story, innovation, and success measures | Ready for submission |
 | 25 | [25-Deployment-Status-and-Runbook.md](25-Deployment-Status-and-Runbook.md) | Current tenant/GitHub release status, safe deployment sequence, validation, and rollback | Active release record |
+| 26 | [26-Deployment-Guide.md](26-Deployment-Guide.md) | Package validation, solution import, configuration, inventory bootstrap, acceptance tests, and rollback | Ready; package export gated |
 
 ---
 
@@ -63,7 +64,7 @@ Each document maps to a specific aspect of the solution and serves as both a blu
 
 ## Architecture Status
 
-Documents 1-6, 12, and 22-25 describe the approved Power Platform target.
+Documents 1-6, 12, and 22-26 describe the approved Power Platform target.
 Documents 7-11 and 13-21 contain useful implementation evidence from the
 legacy SharePoint/SQL proof of concept. Where they conflict, the target
 architecture and migration decision in document 23 take precedence.

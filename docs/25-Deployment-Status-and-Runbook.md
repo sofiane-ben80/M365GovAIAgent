@@ -15,6 +15,9 @@ publish the matching source and documentation to GitHub.
 - GitHub `main` was updated on 2026-09-17 with the reviewed agent source,
   Dataverse flow contracts, architecture media, canonical documentation, and
   hackathon materials.
+- The Dataverse inventory scanner, three-flow production contract, concrete
+  scan-table schema, solution-package validator, and end-to-end deployment
+  guide are included in the current source release.
 - The Owner and Admin deployable source instructions were aligned and validated
   locally.
 - Live Owner/Admin publication was intentionally deferred. The target
@@ -54,8 +57,19 @@ The Owner and Admin deployable instruction files now:
 - require typed `CONFIRM` for deletion review; and
 - prohibit fabricated records, request IDs, and successful outcomes.
 
-Flow contracts in `copilot/flows` are implementation specifications. They are
+Flow contracts in `flows` are implementation specifications. They are
 not evidence that corresponding flows are active in the target environment.
+
+Live exports inspected on 2026-09-17 are not valid target packages:
+
+- `Governor365` 1.0 contains advisor bots and a legacy SharePoint Sites table;
+- `M365GovMan` 1.0 contains SharePoint-backed flows and proof-of-concept apps;
+- `M365Governance` 1.0.0.1 contains only a SharePoint-backed Canvas app; and
+- `SPAdminExport` 1.0.0.1 contains a legacy Dataverse table.
+
+None contains the complete `sb_` Dataverse schema and replacement flows. The
+[deployment guide](26-Deployment-Guide.md) therefore requires package
+validation before import and records the managed 2.x export as an open gate.
 
 ## Current cutover boundary
 

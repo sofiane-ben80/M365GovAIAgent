@@ -152,14 +152,40 @@ Initial keys:
 
 ### Governance Scan Run
 
-Key columns: run ID, status, started/completed timestamps, source watermark,
-sites discovered, sites processed, records failed, and correlation ID.
+| Column | Type | Required | Notes |
+|---|---|---:|---|
+| `sb_governancescanrunid` | Unique identifier | Yes | Primary key |
+| `sb_name` | Text (300) | Yes | Human-readable run name |
+| `sb_runid` | Text (36) | Yes | Alternate key and external correlation value |
+| `sb_status` | Choice | Yes | Running, Completed, CompletedWithErrors |
+| `sb_startedat` | Date/time | Yes | UTC start |
+| `sb_completedat` | Date/time | No | UTC terminal time |
+| `sb_sourcewatermark` | Multiline text | No | Minimized continuation/watermark state |
+| `sb_sitesdiscovered` | Whole number | Yes | Source enumeration count |
+| `sb_sitesprocessed` | Whole number | Yes | Successfully reconciled count |
+| `sb_recordsfailed` | Whole number | Yes | Failed site/work-item count |
+| `sb_correlationid` | Text (36) | Yes | Troubleshooting correlation ID |
+
+Alternate key: `sb_runid`.
 
 ### Scan Work Item
 
-Key columns: scan run lookup, page/batch token, status, attempt count,
-next-attempt time, discovered count, processed count, error code, and error
-message. The idempotency key combines scan run and source page token.
+| Column | Type | Required | Notes |
+|---|---|---:|---|
+| `sb_scanworkitemid` | Unique identifier | Yes | Primary key |
+| `sb_name` | Text (300) | Yes | Human-readable batch name |
+| `sb_scanrun` | Lookup | Yes | Parent Governance Scan Run |
+| `sb_idempotencykey` | Text (200) | Yes | Scan run plus stable source page token |
+| `sb_pagetoken` | Multiline text | No | Minimized continuation token or page reference |
+| `sb_status` | Choice | Yes | Pending, InProgress, Completed, Failed |
+| `sb_attemptcount` | Whole number | Yes | Bounded retry counter |
+| `sb_nextattemptat` | Date/time | No | Retry eligibility time |
+| `sb_discoveredcount` | Whole number | Yes | Source rows in the batch |
+| `sb_processedcount` | Whole number | Yes | Successfully reconciled rows |
+| `sb_errorcode` | Text (100) | No | Stable sanitized failure code |
+| `sb_errormessage` | Multiline text | No | Sanitized diagnostic with correlation ID |
+
+Alternate key: `(sb_scanrun, sb_idempotencykey)`.
 
 ### Notification Delivery
 

@@ -1,0 +1,87 @@
+Governor365 Dataverse inventory flow contract
+
+Purpose
+- Make the solution-aware Power Automate pipeline the production scheduler and
+  Dataverse writer for SharePoint Online site inventory.
+- Keep scripts/Invoke-DataverseGovernanceScan.ps1 as a bootstrap, migration,
+  reconciliation, and break-glass tool rather than the recurring production job.
+
+Flow 1: Governor365 - Inventory - Start Scan
+- Trigger: recurrence and manually trigger a flow.
+- Concurrency: 1. Do not permit overlapping tenant scans.
+- Read environment variables for tenant ID, SharePoint admin URL, page size,
+  maximum worker attempts, and stale threshold.
+- Create sb_governancescanrun with:
+  - sb_runid and sb_correlationid: new GUIDs;
+  - sb_status: Running;
+  - sb_startedat: utcNow().
+- Enumerate all non-OneDrive site collections through the approved SharePoint
+  administration custom connector or Microsoft Graph getAllSites endpoint.
+- Follow every source continuation token. Do not load the tenant into one array.
+- For each bounded source page, create one sb_scanworkitem. Store only the
+  source page token or a minimized page payload, never connector credentials.
+- Set sites discovered after enumeration. Enumeration failure sets the scan to
+  CompletedWithErrors and creates no stale-site decisions.
+
+Flow 2: Governor365 - Inventory - Process Work Item
+- Trigger: Dataverse row added for a Pending sb_scanworkitem.
+- Trigger concurrency: a governed value such as 4; tune below source and
+  Dataverse throttling limits.
+- Claim the row by changing Pending to InProgress and incrementing attempt count.
+- Retrieve the source page represented by the work item.
+- For every site:
+  1. Require tenant ID and stable Microsoft 365 site ID.
+  2. Upsert sb_governancesite by (sb_tenantid, sb_m365siteid).
+  3. Update inventory-owned columns and sb_lastobservedat.
+  4. Set sb_lastscanrun to the current scan. Do not overwrite certification,
+     suppression, request, or other workflow-owned state.
+  5. Resolve group owners and SharePoint owners from authoritative endpoints.
+  6. Normalize UPN with toLower(trim(...)).
+  7. Upsert sb_siteownerassignment by site, UPN, and ownership source.
+  8. Deactivate unobserved assignments for that site/source only after that
+     owner endpoint succeeds.
+  9. Evaluate deterministic policy and update compliance recommendation.
+- Mark the work item Completed with discovered/processed counts.
+- On a retryable 408, 429, or 5xx, set Pending and next-attempt time with bounded
+  exponential backoff. After the maximum attempts, set Failed with a sanitized
+  error code/message and correlation ID.
+
+Flow 3: Governor365 - Inventory - Finalize Scan
+- Trigger: sb_scanworkitem row changed to a terminal state.
+- Count work items for the related scan using server-side filters.
+- Exit while any work item is Pending or InProgress.
+- If any work item is Failed:
+  - set the scan to CompletedWithErrors;
+  - persist completion counts and time;
+  - do not mark any unobserved site Unknown, stale, archived, or deleted.
+- If every work item completed:
+  - identify tenant sites whose sb_lastscanrun is not the completed run;
+  - mark those site snapshots Unknown for review;
+  - never delete a Governance Site or owner history from inventory absence;
+  - set the scan to Completed and persist completion counts and time.
+
+Authentication and connections
+- Use solution connection references owned by a dedicated service principal.
+- Grant only the approved SharePoint/Graph read permissions and Dataverse table
+  privileges needed by these flows.
+- Enable secure inputs/outputs for tokens, source payloads, and error details.
+- Apply a DLP policy that keeps SharePoint, Microsoft Graph/custom connector,
+  Dataverse, and Teams in the approved business data group.
+
+Required idempotency and keys
+- sb_governancesite: (sb_tenantid, sb_m365siteid).
+- sb_siteownerassignment: (sb_site, sb_principalupn, sb_ownershipsource).
+- sb_scanworkitem: (sb_scanrun, sb_idempotencykey).
+- A retry must update the same records and never create duplicate sites,
+  assignments, or work items.
+
+Acceptance tests
+1. Two complete scans produce no duplicate site or assignment rows.
+2. A renamed or moved site updates the URL while retaining the Dataverse row ID.
+3. An owner removal deactivates the assignment after a successful owner read.
+4. A failed owner read preserves the previous assignments for that site/source.
+5. A partial source or worker failure produces CompletedWithErrors and does not
+   change unobserved site lifecycle state.
+6. A complete scan marks an intentionally absent test site Unknown, not Deleted.
+7. Certification and notification suppression values survive inventory refresh.
+8. Owner agent queries return only active exact-UPN assignments.

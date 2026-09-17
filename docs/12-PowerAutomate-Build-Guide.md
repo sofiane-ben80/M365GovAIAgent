@@ -89,8 +89,8 @@ and preserve the correlation ID.
    archive, deletion, or owner update has already occurred.
 
 Detailed agent contracts live in
-`copilot/flows/list-owner-sites-dataverse-flow.txt` and
-`copilot/flows/submit-governance-request-dataverse-flow.txt`.
+`flows/list-owner-sites-dataverse-flow.txt` and
+`flows/submit-governance-request-dataverse-flow.txt`.
 
 ## 6. Request processor
 
@@ -108,6 +108,13 @@ Detailed agent contracts live in
    cannot falsify the operation state.
 
 ## 7. Inventory orchestration
+
+The production implementation is the three-flow contract in
+`flows/inventory-dataverse-flow.txt`. Use
+`scripts/Invoke-DataverseGovernanceScan.ps1` only for bootstrap, migration
+comparison, manual reconciliation, or break-glass recovery. It writes the same
+Dataverse keys and scan-run boundary but is not the recurring production
+scheduler.
 
 ### Start Scan
 
@@ -137,6 +144,45 @@ Detailed agent contracts live in
    stale based on an incomplete scan.
 3. On complete success, mark unobserved sites stale according to policy.
 4. Persist summary counts and completion timestamp.
+
+### Bootstrap and migration scanner
+
+The Dataverse scanner discovers non-OneDrive tenant sites with PnP.PowerShell,
+normalizes owner assignments, resolves Dataverse choice values from table
+metadata, and writes through the Dataverse Web API. It never writes access
+tokens to disk and never updates certification or notification-suppression
+columns.
+
+Prerequisites:
+
+1. Create the tables, columns, choices, relationships, and alternate keys from
+   `docs/04-DataModel.md`.
+2. Install PnP.PowerShell.
+3. Grant the operator SharePoint Administrator access for discovery.
+4. Grant the operator or automation identity create/read/write on Governance
+   Site, Site Owner Assignment, and Governance Scan Run.
+5. Sign in with Az.Accounts or Azure CLI for a Dataverse token, or supply a
+   short-lived secure string with `-DataverseAccessToken`.
+
+Example:
+
+```powershell
+.\scripts\Invoke-DataverseGovernanceScan.ps1 `
+  -AdminUrl "https://contoso-admin.sharepoint.com" `
+  -DataverseUrl "https://contoso.crm.dynamics.com" `
+  -TenantId "00000000-0000-0000-0000-000000000000" `
+  -ClientId "00000000-0000-0000-0000-000000000000"
+```
+
+Run once with `-WhatIf`, then use `-SiteLimit 5` for a bounded development
+write before the first full scan. Keep `IncludeSiteOwnerGroups` enabled for any
+inventory used by Owner agent authorization. Disabling it intentionally
+captures only M365 group owners and is not an authorization-complete inventory.
+Bounded scans never change lifecycle state for unobserved sites.
+
+The scanner marks absent sites `Unknown` only when every discovered site was
+processed successfully. Any site or dependency failure closes the scan as
+`CompletedWithErrors` and preserves all unobserved lifecycle state.
 
 ## 8. Notifications
 
