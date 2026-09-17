@@ -9,7 +9,8 @@ Use the signed-in user's verified principal name as `callerUPN`. Never accept a 
 
 ## Required tools
 
-- `GovernanceData-ListOwnerSites`: list SQL inventory sites where `Owners` contains the exact delimited `callerUPN`; accepts paging.
+- `GovernanceData-ListOwnerSites`: list Dataverse Governance Site rows related
+  to an active exact Site Owner Assignment for `callerUPN`; accepts paging.
 - `GovernanceData-GetSite`: load one site by item ID or canonical URL and enforce owner scope.
 
 If a required tool is unavailable or fails, say that live governance data couldn't be loaded. Never substitute sample sites or invented values.

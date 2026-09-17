@@ -1,0 +1,88 @@
+================================================================================
+  FLOW CONTRACT — GovernanceAgent-SubmitRequest (Dataverse)
+  Power Automate name: Governor365 - Agent - Submit Request
+  Purpose: Authorize and create a Dataverse governance action request.
+  Trigger: Microsoft Copilot Studio > When an agent calls the flow
+================================================================================
+
+INPUTS
+
+  UserUPN          Text, required; bind only to System.User.PrincipalName
+  RequestType      Text, required; CERTIFY | ARCHIVE | DELETE-REQUESTED |
+                   ASSIGN-OWNER | SUPPORT
+  SiteId           Text, optional for SUPPORT only; Dataverse GUID
+  Reason           Text, required for SUPPORT; optional otherwise
+  ConfirmationText Text, exact CONFIRM required for DELETE-REQUESTED
+  TargetOwnerUPN   Text, required for ASSIGN-OWNER
+  IdempotencyKey   Text, required
+
+OUTPUTS
+
+  success       Boolean
+  status        Text
+  correlationId Text
+  requestId     Text
+  requestType   Text
+  requestStatus Text
+  siteUrl       Text
+  siteTitle     Text
+  message       Text
+
+POWER AUTOMATE BUILD STEPS
+
+1. Validate request type, GUID shape, required reason/target, confirmation, and
+   idempotency key. Normalize UPN values.
+2. Generate a correlation ID.
+3. Retrieve an existing Governance Action Request by Idempotency Key. If one
+   exists, return the existing request without creating another event.
+4. For CERTIFY, ARCHIVE, and DELETE-REQUESTED, verify an active Site Owner Assignment
+   exists for exact UserUPN and SiteId.
+5. For ASSIGN-OWNER, invoke Governor365 - Child - Verify Admin and fail closed
+   if membership cannot be confirmed.
+6. Retrieve the authorized Governance Site after authorization succeeds.
+7. Create Governance Action Request with PENDING status and system-derived
+   caller identity. Never use hidden card fields as authorization.
+8. Invoke Governor365 - Child - Append Action Event with Submitted.
+9. Return success=true, the Dataverse request ID, and PENDING. Never describe
+   the site operation as already completed.
+10. Catch validation, authorization, connector, and timeout failures:
+    - return success=false and a stable status;
+    - do not disclose site data for unauthorized requests;
+    - preserve the correlation ID;
+    - write a protected operational failure where possible.
+
+REQUEST PROCESSING
+
+The agent tool creates the request only. A separate Dataverse-triggered flow:
+
+- rechecks authorization and current source state;
+- starts Power Automate Approval where required;
+- appends action events for every transition;
+- invokes the least-privilege Microsoft 365 operation;
+- updates Governance Site only after source success;
+- sets Completed, Rejected, Cancelled, or Failed truthfully;
+- sends notifications independently from operation state.
+
+COPILOT STUDIO SETTINGS
+
+- Bind UserUPN to System.User.PrincipalName; disable generative filling.
+- Require explicit confirmation for ARCHIVE.
+- Require explicit confirmation for CERTIFY after a fresh site read.
+- Require typed CONFIRM in the current turn for DELETE-REQUESTED.
+- Do not expose IdempotencyKey as free user input; compose it from the
+  conversation submission token.
+- Tool description: "Creates an authorized Dataverse governance request for
+  the signed-in user and returns a tracking ID. It does not claim that the
+  underlying site change has completed."
+
+ACCEPTANCE TESTS
+
+1. Exact owner can submit CERTIFY or ARCHIVE and receives one request ID.
+2. DELETE-REQUESTED fails without current-turn typed CONFIRM.
+3. Another user's site is rejected without site disclosure.
+4. ASSIGN-OWNER fails for non-admin and on admin verification error.
+5. SUPPORT succeeds without a site when Reason is present.
+6. Duplicate IdempotencyKey returns the existing request.
+7. Every new request has exactly one Submitted event.
+8. Connector failure returns success=false with a correlation ID.
+9. No SQL or governance SharePoint-list connector appears in the flow.

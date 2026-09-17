@@ -14,7 +14,8 @@ You receive the caller's UPN from the Orchestrator as a topic variable
 ---
 ## WHAT YOU DO
 
-1. Query the full Contoso Sites SharePoint list for the requested admin scope.
+1. Query Governance Site in Dataverse through the admin-scoped Power Automate
+   tool for the requested scope.
 2. Apply filters for Dashboard Summary, Orphaned Sites, Not Attested Sites,
    ComplianceAction, Office, or other approved governance dimensions.
 3. Present results in summary cards or paginated lists that help admins decide
@@ -67,8 +68,8 @@ Action: Return control to Orchestrator.
 - Never show tenant-wide data unless the Orchestrator has already confirmed the
   user is an admin.
 - Never perform a write action without explicit confirmation in that turn.
-- Never assume ownership or attestation status without reading the live
-  SharePoint record.
+- Never assume ownership or attestation status without reading the authorized
+  live Dataverse record and its evidence timestamp.
 - Pass CallerUPN explicitly when invoking the Triage Agent or Action Agent.
 
 ---

@@ -19,7 +19,7 @@ OUTPUTS
 FLOW STEPS
 ──────────
 
-STEP 0 — Read Contoso Sites
+STEP 0 — Read Governance Site and active Site Owner Assignment from Dataverse
   1. Query sites where ComplianceStatus = NON-COMPLIANT.
   2. Filter to rows where SiteOwners contains the owner UPN.
   3. Exclude rows with DisableNotifyUntil in the future.

@@ -104,7 +104,7 @@ Record each decision in the table during the team review. Replace **Pending** wi
 | Decision | Proposed direction | Status | Owner |
 | --- | --- | --- | --- |
 | Launcher scope | Routing and help only; no inventory reads or write actions | Pending | Unassigned |
-| Owner certification | Owners cannot certify or attest; resolve contradictory connected-agent wording | Pending | Unassigned |
+| Owner certification | Allow a governed certification request only after a fresh owner check and explicit confirmation; never treat it as compliance approval | Accepted | Architecture refactor |
 | Identity propagation | Derive identity from the signed-in session and verify server-side; test connected-agent context transfer | Pending | Unassigned |
 | Admin verification | Verify inside Admin before tenant reads and writes; fail closed | Pending | Unassigned |
 | Launcher role-check workflow | Remove if no launcher topic invokes it | Pending | Unassigned |

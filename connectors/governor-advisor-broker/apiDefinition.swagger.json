@@ -1,0 +1,1051 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Governor Advisor Broker",
+    "description": "Authorized, versioned policy and Copilot readiness operations for Governor M365 advisors.",
+    "version": "1.0.0"
+  },
+  "host": "governor-advisor-broker.invalid",
+  "basePath": "/v1",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+      "tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+      "scopes": {
+        "api://REPLACE_WITH_BROKER_APP_ID/Governor.Access": "Call Governor advisor broker operations."
+      }
+    }
+  },
+  "security": [
+    {
+      "oauth2": [
+        "api://REPLACE_WITH_BROKER_APP_ID/Governor.Access"
+      ]
+    }
+  ],
+  "paths": {
+    "/policy/search": {
+      "post": {
+        "operationId": "SearchApprovedPolicy",
+        "summary": "Search approved policy",
+        "description": "Searches only approved, effective, audience-authorized policy sources. Never searches draft or superseded content unless explicitly permitted by the broker.",
+        "x-ms-summary": "Search approved policy",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PolicySearchRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized policy search result.",
+            "schema": {
+              "$ref": "#/definitions/PolicySearchResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/policy/{policyId}/lifecycle": {
+      "get": {
+        "operationId": "GetPolicyLifecycleStatus",
+        "summary": "Get policy lifecycle status",
+        "description": "Returns approval, effective, review, and supersession metadata for one authorized policy.",
+        "x-ms-summary": "Get policy lifecycle status",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "name": "policyId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "maxLength": 100
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Policy lifecycle status.",
+            "schema": {
+              "$ref": "#/definitions/PolicyLifecycleResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/findings/aggregate": {
+      "post": {
+        "operationId": "GetAggregateGovernanceFindings",
+        "summary": "Get aggregate governance findings",
+        "description": "Returns audience-authorized aggregate findings without raw identity, security, or content evidence.",
+        "x-ms-summary": "Get aggregate findings",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AggregateFindingsRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Aggregate findings.",
+            "schema": {
+              "$ref": "#/definitions/AggregateFindingsResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/assessments/maturity": {
+      "post": {
+        "operationId": "RunMaturityAssessment",
+        "summary": "Run maturity assessment",
+        "description": "Runs a deterministic, versioned governance maturity rubric against approved responses and evidence references.",
+        "x-ms-summary": "Run maturity assessment",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AssessmentRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Maturity assessment result.",
+            "schema": {
+              "$ref": "#/definitions/AssessmentResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/policy/drafts": {
+      "post": {
+        "operationId": "DraftPolicyArtifact",
+        "summary": "Draft policy artifact",
+        "description": "Creates a visibly draft-only policy artifact from approved inputs and evidence references. It cannot publish or approve policy.",
+        "x-ms-summary": "Draft policy artifact",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DraftArtifactRequest"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Draft creation accepted.",
+            "schema": {
+              "$ref": "#/definitions/DraftArtifactResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/readiness/profiles/{profileId}": {
+      "get": {
+        "operationId": "GetReadinessBaseline",
+        "summary": "Get readiness baseline",
+        "description": "Returns the authorized, source-dated readiness baseline for one deployment profile.",
+        "x-ms-summary": "Get readiness baseline",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "$ref": "#/parameters/ProfileId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Readiness baseline.",
+            "schema": {
+              "$ref": "#/definitions/ReadinessBaselineResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/readiness/prerequisites/{prerequisiteId}/check": {
+      "post": {
+        "operationId": "CheckPrerequisite",
+        "summary": "Check readiness prerequisite",
+        "description": "Checks one prerequisite within an authorized scope and returns evidence freshness and result status.",
+        "x-ms-summary": "Check prerequisite",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "name": "prerequisiteId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "maxLength": 100
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PrerequisiteCheckRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prerequisite check result.",
+            "schema": {
+              "$ref": "#/definitions/PrerequisiteCheckResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/capabilities/{featureId}": {
+      "get": {
+        "operationId": "GetCapabilityClaim",
+        "summary": "Get cloud capability claim",
+        "description": "Returns a short-lived authoritative capability claim for the selected government cloud.",
+        "x-ms-summary": "Get capability claim",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "name": "featureId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "maxLength": 100
+          },
+          {
+            "name": "cloud",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "Commercial",
+              "GCC",
+              "GCCHigh",
+              "DoD"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Capability claim.",
+            "schema": {
+              "$ref": "#/definitions/CapabilityClaimResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/service-changes": {
+      "get": {
+        "operationId": "ListRelevantServiceChanges",
+        "summary": "List relevant service changes",
+        "description": "Lists source-dated service changes relevant to an authorized readiness profile.",
+        "x-ms-summary": "List service changes",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "name": "profileId",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "format": "uuid"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "$ref": "#/parameters/PageToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Relevant service changes.",
+            "schema": {
+              "$ref": "#/definitions/ServiceChangesResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/assessments/readiness": {
+      "post": {
+        "operationId": "RunReadinessAssessment",
+        "summary": "Run readiness assessment",
+        "description": "Runs a deterministic, versioned readiness rubric against an authorized profile, responses, and evidence references.",
+        "x-ms-summary": "Run readiness assessment",
+        "parameters": [
+          {
+            "$ref": "#/parameters/CorrelationId"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AssessmentRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Readiness assessment result.",
+            "schema": {
+              "$ref": "#/definitions/AssessmentResponse"
+            }
+          },
+          "default": {
+            "$ref": "#/responses/ErrorResponse"
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "CorrelationId": {
+      "name": "x-correlation-id",
+      "in": "header",
+      "required": true,
+      "type": "string",
+      "format": "uuid",
+      "description": "Caller-generated correlation identifier propagated through agent, broker, source, and audit telemetry."
+    },
+    "ProfileId": {
+      "name": "profileId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "uuid"
+    },
+    "PageToken": {
+      "name": "pageToken",
+      "in": "query",
+      "required": false,
+      "type": "string",
+      "maxLength": 2000
+    }
+  },
+  "responses": {
+    "ErrorResponse": {
+      "description": "The broker rejected or could not complete the request.",
+      "schema": {
+        "$ref": "#/definitions/ErrorEnvelope"
+      }
+    }
+  },
+  "definitions": {
+    "PolicySearchRequest": {
+      "type": "object",
+      "required": [
+        "query",
+        "profileId"
+      ],
+      "properties": {
+        "query": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 500
+        },
+        "profileId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "maxResults": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 10
+        },
+        "pageToken": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      }
+    },
+    "PolicySearchResponse": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ResponseMetadata"
+        },
+        {
+          "type": "object",
+          "required": [
+            "policies"
+          ],
+          "properties": {
+            "policies": {
+              "type": "array",
+              "maxItems": 20,
+              "items": {
+                "$ref": "#/definitions/PolicySummary"
+              }
+            },
+            "nextPageToken": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "PolicySummary": {
+      "type": "object",
+      "required": [
+        "policyId",
+        "title",
+        "approvalState",
+        "effectiveDate",
+        "sourceRef"
+      ],
+      "properties": {
+        "policyId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "approvalState": {
+          "type": "string",
+          "enum": [
+            "Approved",
+            "Draft",
+            "Superseded",
+            "Expired"
+          ]
+        },
+        "effectiveDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "sourceRef": {
+          "type": "string"
+        }
+      }
+    },
+    "PolicyLifecycleResponse": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ResponseMetadata"
+        },
+        {
+          "type": "object",
+          "required": [
+            "policy"
+          ],
+          "properties": {
+            "policy": {
+              "$ref": "#/definitions/PolicyLifecycle"
+            }
+          }
+        }
+      ]
+    },
+    "PolicyLifecycle": {
+      "type": "object",
+      "required": [
+        "policyId",
+        "approvalState",
+        "owner",
+        "effectiveDate"
+      ],
+      "properties": {
+        "policyId": {
+          "type": "string"
+        },
+        "approvalState": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "effectiveDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "reviewDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "supersededByPolicyId": {
+          "type": "string"
+        }
+      }
+    },
+    "AggregateFindingsRequest": {
+      "type": "object",
+      "required": [
+        "profileId"
+      ],
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "domain": {
+          "type": "string",
+          "enum": [
+            "Readiness",
+            "DataProtection",
+            "Identity",
+            "Assurance"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "Critical",
+            "High",
+            "Medium",
+            "Low"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Open",
+            "Accepted",
+            "Resolved",
+            "Expired"
+          ]
+        }
+      }
+    },
+    "AggregateFindingsResponse": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ResponseMetadata"
+        },
+        {
+          "type": "object",
+          "required": [
+            "counts"
+          ],
+          "properties": {
+            "counts": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer"
+              }
+            },
+            "findingRefs": {
+              "type": "array",
+              "maxItems": 100,
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "AssessmentRequest": {
+      "type": "object",
+      "required": [
+        "profileId",
+        "rubricVersion",
+        "responses"
+      ],
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "rubricVersion": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "responses": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "AssessmentResponse": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ResponseMetadata"
+        },
+        {
+          "type": "object",
+          "required": [
+            "assessmentId",
+            "rubricVersion",
+            "result",
+            "evidenceSufficiency"
+          ],
+          "properties": {
+            "assessmentId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "rubricVersion": {
+              "type": "string"
+            },
+            "result": {
+              "type": "string"
+            },
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "evidenceSufficiency": {
+              "type": "string",
+              "enum": [
+                "Sufficient",
+                "Partial",
+                "Insufficient"
+              ]
+            },
+            "findingRefs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "DraftArtifactRequest": {
+      "type": "object",
+      "required": [
+        "templateId",
+        "approvedInputs",
+        "evidenceRefs"
+      ],
+      "properties": {
+        "templateId": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "approvedInputs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "DraftArtifactResponse": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ResponseMetadata"
+        },
+        {
+          "type": "object",
+          "required": [
+            "artifactId",
+            "status",
+            "watermark"
+          ],
+          "properties": {
+            "artifactId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "Pending",
+                "Completed",
+                "Failed"
+              ]
+            },
+            "watermark": {
+              "type": "string",
+              "enum": [
+                "DRAFT - NOT APPROVED"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "ReadinessBaselineResponse": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ResponseMetadata"
+        },
+        {
+          "type": "object",
+          "required": [
+            "profileId",
+            "cloud",
+            "prerequisites"
+          ],
+          "properties": {
+            "profileId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "cloud": {
+              "type": "string",
+              "enum": [
+                "Commercial",
+                "GCC",
+                "GCCHigh",
+                "DoD"
+              ]
+            },
+            "prerequisites": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PrerequisiteResult"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "PrerequisiteCheckRequest": {
+      "type": "object",
+      "required": [
+        "profileId",
+        "scope"
+      ],
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scope": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "PrerequisiteCheckResponse": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ResponseMetadata"
+        },
+        {
+          "type": "object",
+          "required": [
+            "prerequisite"
+          ],
+          "properties": {
+            "prerequisite": {
+              "$ref": "#/definitions/PrerequisiteResult"
+            }
+          }
+        }
+      ]
+    },
+    "PrerequisiteResult": {
+      "type": "object",
+      "required": [
+        "prerequisiteId",
+        "status",
+        "checkedAt"
+      ],
+      "properties": {
+        "prerequisiteId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Met",
+            "NotMet",
+            "Partial",
+            "Unknown"
+          ]
+        },
+        "checkedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CapabilityClaimResponse": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ResponseMetadata"
+        },
+        {
+          "type": "object",
+          "required": [
+            "featureId",
+            "cloud",
+            "availability",
+            "retrievedAt",
+            "revalidateAfter"
+          ],
+          "properties": {
+            "featureId": {
+              "type": "string"
+            },
+            "cloud": {
+              "type": "string"
+            },
+            "availability": {
+              "type": "string",
+              "enum": [
+                "Available",
+                "Preview",
+                "Unavailable",
+                "Unknown"
+              ]
+            },
+            "retrievedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "revalidateAfter": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "authoritativeSourceUrl": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      ]
+    },
+    "ServiceChangesResponse": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ResponseMetadata"
+        },
+        {
+          "type": "object",
+          "required": [
+            "changes"
+          ],
+          "properties": {
+            "changes": {
+              "type": "array",
+              "maxItems": 100,
+              "items": {
+                "$ref": "#/definitions/ServiceChange"
+              }
+            },
+            "nextPageToken": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "ServiceChange": {
+      "type": "object",
+      "required": [
+        "changeId",
+        "title",
+        "publishedAt",
+        "sourceUrl"
+      ],
+      "properties": {
+        "changeId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "publishedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "effectiveAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sourceUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "ResponseMetadata": {
+      "type": "object",
+      "required": [
+        "correlationId",
+        "status",
+        "asOf",
+        "partial",
+        "classification",
+        "sourceRefs"
+      ],
+      "properties": {
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Complete",
+            "Partial"
+          ]
+        },
+        "asOf": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "partial": {
+          "type": "boolean"
+        },
+        "classification": {
+          "type": "string"
+        },
+        "sourceRefs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ErrorEnvelope": {
+      "type": "object",
+      "required": [
+        "correlationId",
+        "error"
+      ],
+      "properties": {
+        "correlationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "message",
+            "retryable"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": [
+                "Unauthorized",
+                "Forbidden",
+                "InvalidRequest",
+                "NotFound",
+                "StaleEvidence",
+                "PartialEvidence",
+                "SourceUnavailable",
+                "Timeout",
+                "InternalError"
+              ]
+            },
+            "message": {
+              "type": "string"
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "retryAfterSeconds": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

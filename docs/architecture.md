@@ -1,5 +1,9 @@
 # M365 Governance Agent Architecture
 
+> **Power Platform target (2026-09-17):** Governance data is stored in
+> Dataverse and all agent tools, evidence brokering, requests, approvals, and
+> notifications run through solution-aware Power Automate flows.
+
 ## Purpose
 
 The solution separates discovery and routing from privileged governance work. The launcher identifies intent and invokes a dedicated agent; it does not query governance data or perform governance actions itself.
@@ -14,10 +18,10 @@ flowchart LR
     Admin --> Verify[Verify governance admin]
     Verify -->|Authorized| AdminTools[Tenant-wide read and action tools]
     Advisors --> Broker[Domain-authorized evidence tools]
-    OwnerTools --> Data[(Governance data)]
+    OwnerTools --> Data[(Microsoft Dataverse)]
     AdminTools --> Data
-    Broker --> Evidence[(Normalized evidence and findings)]
-    OwnerTools --> Audit[(Governance action log)]
+    Broker --> Evidence[(Dataverse evidence and findings)]
+    OwnerTools --> Audit[(Requests and action events)]
     AdminTools --> Audit
 ```
 
@@ -87,11 +91,13 @@ components and exclusions.
 
 - Show only sites owned by the signed-in caller.
 - Read a fresh site record before submitting a request.
-- Submit archival, deletion-review, and support requests after explicit current-turn confirmation.
+- Submit certification, archival, deletion-review, and support requests after
+  the required fresh read and explicit current-turn confirmation.
 - Report requests as pending until the responsible team completes them.
 - Never expose another owner's records or tenant-wide data.
 - Never directly delete a site.
-- Do not perform owner certification or attestation.
+- Treat certification as a governed request recorded in Dataverse; it is not a
+  compliance approval or direct source-system write by the agent.
 
 The skills-based target definition is `new-agents/governance-owner-agent.md`. The classic exported package remains under `agents/Governance Owner Agent` during migration.
 
@@ -114,7 +120,8 @@ The skills-based target definition is `new-agents/governance-admin-agent.md`. Th
 5. Destructive operations are governed requests, not direct site deletion.
 6. Tool failures deny privileged processing; agents must not invent fallback data.
 7. Successful completion is reported only when the invoked tool returns success.
-8. Every accepted write request is recorded in the governance action log.
+8. Every accepted write request and state transition is recorded in Dataverse
+   Governance Action Request and Governance Action Event.
 9. Agent instructions and static knowledge are not evidence of current tenant state.
 10. Cross-domain access uses normalized, audience-trimmed findings rather than raw source records.
 11. A normal user turn has one intended response owner and no peer-agent fan-out.

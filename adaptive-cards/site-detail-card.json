@@ -1,0 +1,309 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+
+  "comment": [
+    "SITE DETAIL CARD — full-width card showing all fields for one site,",
+    "including Triage Agent reasoning. Rendered when user taps [View Details].",
+    "",
+    "PLACEHOLDERS: Replace ${...} with Power Fx topic variable references.",
+    "",
+    "Variable mapping:",
+    "  From site record (Topic.SiteRecord):",
+    "    ${siteTitle}              — site display name",
+    "    ${siteUrl}                — full SPO URL",
+    "    ${siteType}               — 'GROUP' | 'COMMUNICATION' | 'CLASSIC' | 'OTHER'",
+    "    ${createdDate}            — formatted date",
+    "    ${lastActivityDate}       — formatted date",
+    "    ${lastCertificationDate}  — formatted date or 'Never certified'",
+    "    ${storageUsageMb}         — number formatted as string e.g. '2,200 MB'",
+    "    ${ownersStr}              — short form owners e.g. 'sofianeb; grace.hall'",
+    "    ${siteOwnersCount}        — number as string",
+    "    ${m365GroupOwnerCount}    — number as string",
+    "    ${effectiveOwnerCount}    — number as string",
+    "    ${isGroupConnected}       — boolean (isVisible control)",
+    "    ${connectedServices}      — e.g. 'M365Group · Teams · Planner'",
+    "    ${m365GroupId}            — GUID string",
+    "    ${externalUsers}          — semicolon-delimited or empty",
+    "    ${complianceStatus}       — 'COMPLIANT' or 'NON-COMPLIANT'",
+    "    ${complianceAction}       — action code",
+    "    ${statusColor}            — 'Good' or 'Attention'",
+    "    ${actionColor}            — 'Good' | 'Warning' | 'Attention'",
+    "  From Triage Agent (Topic.TriageResult):",
+    "    ${reasoning}              — plain-English paragraph",
+    "    ${severity}               — 'INFO' | 'MEDIUM' | 'HIGH' | 'CRITICAL'",
+    "    ${daysSinceActivity}      — integer as string",
+    "    ${daysSinceCert}          — integer as string or 'N/A'",
+    "    ${nextCertDueInDays}      — integer as string (only when COMPLIANT)",
+    "  Action visibility flags (set by topic logic):",
+    "    ${showCertifyAction}      — true when action = CERTIFY",
+    "    ${showArchiveAction}      — true when action = ARCHIVE",
+    "    ${showDeleteAction}       — true when action is flaggable by owner",
+    "    ${showGroupSection}       — true when isGroupConnected = true"
+  ],
+
+  "body": [
+    {
+      "type": "Container",
+      "bleed": true,
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${siteTitle}",
+                  "size": "ExtraLarge",
+                  "weight": "Bolder",
+                  "wrap": true
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${siteUrl}",
+                  "color": "Accent",
+                  "size": "Small",
+                  "wrap": true,
+                  "spacing": "None"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "verticalContentAlignment": "Top",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${complianceStatus}",
+                  "weight": "Bolder",
+                  "color": "${statusColor}",
+                  "horizontalAlignment": "Right",
+                  "size": "Medium"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${complianceAction}",
+                  "weight": "Bolder",
+                  "color": "${actionColor}",
+                  "horizontalAlignment": "Right",
+                  "size": "Small",
+                  "spacing": "None"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "type": "Container",
+      "spacing": "Medium",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "SITE INFORMATION",
+          "weight": "Bolder",
+          "size": "Small",
+          "color": "Accent",
+          "isSubtle": true
+        },
+        {
+          "type": "FactSet",
+          "facts": [
+            {
+              "title": "Site Type",
+              "value": "${siteType}"
+            },
+            {
+              "title": "Created",
+              "value": "${createdDate}"
+            },
+            {
+              "title": "Last Activity",
+              "value": "${lastActivityDate}  (${daysSinceActivity} days ago)"
+            },
+            {
+              "title": "Last Certified",
+              "value": "${lastCertificationDate}  (${daysSinceCert} days ago)"
+            },
+            {
+              "title": "Storage",
+              "value": "${storageUsageMb}"
+            },
+            {
+              "title": "External Users",
+              "value": "${externalUsers}"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "type": "Container",
+      "spacing": "Medium",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "OWNERSHIP",
+          "weight": "Bolder",
+          "size": "Small",
+          "color": "Accent",
+          "isSubtle": true
+        },
+        {
+          "type": "FactSet",
+          "facts": [
+            {
+              "title": "SPO Owners",
+              "value": "${ownersStr}"
+            },
+            {
+              "title": "SPO Owner Count",
+              "value": "${siteOwnersCount}"
+            },
+            {
+              "title": "M365 Group Owners",
+              "value": "${m365GroupOwnerCount}"
+            },
+            {
+              "title": "Effective Owner Count",
+              "value": "${effectiveOwnerCount}"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "type": "Container",
+      "spacing": "Medium",
+      "separator": true,
+      "isVisible": "${showGroupSection}",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "CONNECTED SERVICES",
+          "weight": "Bolder",
+          "size": "Small",
+          "color": "Accent",
+          "isSubtle": true
+        },
+        {
+          "type": "FactSet",
+          "facts": [
+            {
+              "title": "Services",
+              "value": "${connectedServices}"
+            },
+            {
+              "title": "M365 Group ID",
+              "value": "${m365GroupId}"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "type": "Container",
+      "spacing": "Medium",
+      "separator": true,
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "WHY IS THIS SITE FLAGGED?",
+          "weight": "Bolder",
+          "size": "Small",
+          "color": "Accent",
+          "isSubtle": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "${reasoning}",
+          "wrap": true,
+          "spacing": "Small"
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Severity:",
+                  "isSubtle": true,
+                  "size": "Small"
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${severity}",
+                  "weight": "Bolder",
+                  "color": "${actionColor}",
+                  "size": "Small"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "✓ Certify This Site",
+      "style": "positive",
+      "data": {
+        "intent": "certifySite",
+        "siteUrl": "${siteUrl}",
+        "siteTitle": "${siteTitle}"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "📦 Request Archive",
+      "data": {
+        "intent": "archiveSite",
+        "siteUrl": "${siteUrl}",
+        "siteTitle": "${siteTitle}"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "🗑 Flag for Deletion",
+      "data": {
+        "intent": "deleteSite",
+        "siteUrl": "${siteUrl}",
+        "siteTitle": "${siteTitle}"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "← Back to My Sites",
+      "data": {
+        "intent": "backToList"
+      }
+    }
+  ]
+}

@@ -1,0 +1,286 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+
+  "body": [
+    {
+      "type": "Container",
+      "bleed": true,
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "M365 Governance Dashboard",
+          "size": "ExtraLarge",
+          "weight": "Bolder",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "Tenant governance summary · ${generatedAt}",
+          "size": "Small",
+          "isSubtle": true,
+          "spacing": "None",
+          "wrap": true
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "spacing": "Medium",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "COMPLIANCE SUMMARY",
+          "weight": "Bolder",
+          "size": "Small",
+          "color": "Accent",
+          "isSubtle": true
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Total sites",
+                  "wrap": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${totalSites}",
+                  "weight": "Bolder",
+                  "horizontalAlignment": "Right"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Compliant",
+                  "wrap": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${compliantSites}",
+                  "weight": "Bolder",
+                  "color": "Good",
+                  "horizontalAlignment": "Right"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Non-compliant",
+                  "wrap": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${nonCompliantSites}",
+                  "weight": "Bolder",
+                  "color": "Attention",
+                  "horizontalAlignment": "Right"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Orphaned (no owners)",
+                  "wrap": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${orphanedSites}",
+                  "weight": "Bolder",
+                  "color": "Attention",
+                  "horizontalAlignment": "Right"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "Not attested",
+                  "wrap": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${notAttestedSites}",
+                  "weight": "Bolder",
+                  "color": "Warning",
+                  "horizontalAlignment": "Right"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "spacing": "Medium",
+      "separator": true,
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "ACTION BREAKDOWN",
+          "weight": "Bolder",
+          "size": "Small",
+          "color": "Accent",
+          "isSubtle": true
+        },
+        {
+          "type": "FactSet",
+          "spacing": "Small",
+          "facts": [
+            {
+              "title": "Need recertification",
+              "value": "${recertificationSites}"
+            },
+            {
+              "title": "Archive candidates",
+              "value": "${archiveCandidates}"
+            },
+            {
+              "title": "Deletion review",
+              "value": "${deletionReviewSites}"
+            },
+            {
+              "title": "Ownership issues",
+              "value": "${ownershipIssueSites}"
+            },
+            {
+              "title": "Resolved (none)",
+              "value": "${resolvedSites}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "TextBlock",
+      "text": "Choose an area to review or run an admin operation.",
+      "wrap": true,
+      "spacing": "Medium",
+      "isSubtle": true
+    }
+  ],
+
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Show orphaned sites",
+      "data": {
+        "intent": "showOrphanedSites",
+        "targetTopic": "OrphanedSites"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Show non-compliant",
+      "data": {
+        "intent": "showNonCompliantSites",
+        "targetTopic": "SitesNeedingAttention"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Show attestation status",
+      "data": {
+        "intent": "showNotAttestedSites",
+        "targetTopic": "NotAttestedSites"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Generate weekly report",
+      "data": {
+        "intent": "generateAdminDigest",
+        "targetFlow": "GovernanceAgent-AdminDigest",
+        "runMode": "ON-DEMAND"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Manual rescan",
+      "style": "positive",
+      "data": {
+        "intent": "manualRescan",
+        "targetAutomation": "GovernanceScan"
+      }
+    }
+  ]
+}

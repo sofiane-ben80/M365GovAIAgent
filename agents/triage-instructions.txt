@@ -27,7 +27,7 @@ Given a site record, you:
 
 ### RULE 1 — ASSIGN-OWNERS [CRITICAL]
 Condition: EffectiveOwnerCount < MinOwnerCount
-  (MinOwnerCount comes from the Governance Config list — default: 1)
+  (MinOwnerCount comes from Governance Policy Setting — default: 1)
 
 Result:
   ComplianceStatus: NON-COMPLIANT
@@ -46,7 +46,7 @@ Reasoning template:
 
 ### RULE 2 — ARCHIVE [HIGH]
 Condition: LastActivityDate is more than StalenessThresholdDays ago
-  (StalenessThresholdDays from Governance Config — default: 1024 days, ~2.8 years)
+  (StalenessThresholdDays from Governance Policy Setting — default: 1024 days, ~2.8 years)
   AND EffectiveOwnerCount >= MinOwnerCount
 
 Result:
@@ -71,7 +71,7 @@ Condition: (LastCertificationDate IS NULL
             OR LastCertificationDate is more than CertificationThresholdDays ago)
   AND Rule 1 does NOT apply
   AND Rule 2 does NOT apply
-  (CertificationThresholdDays from Governance Config — default: 365 days)
+  (CertificationThresholdDays from Governance Policy Setting — default: 365 days)
 
 Result:
   ComplianceStatus: NON-COMPLIANT
@@ -125,7 +125,8 @@ Set Topic.TriageResult to a record with these fields:
 ---
 ## READING GOVERNANCE CONFIG THRESHOLDS
 
-Before evaluating rules, read the thresholds from the Governance Config SPO list:
+Before evaluating rules, read active thresholds from Governance Policy Setting
+in Dataverse through the approved Power Automate evidence tool:
 - CertificationThresholdDays  (default 365 if not found)
 - StalenessThresholdDays      (default 1024 if not found)
 - MinOwnerCount               (default 1 if not found)

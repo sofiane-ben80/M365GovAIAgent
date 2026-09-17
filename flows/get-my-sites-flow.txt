@@ -1,4 +1,9 @@
 ================================================================================
+  LEGACY SHAREPOINT CONTRACT — DO NOT BUILD FOR THE TARGET SOLUTION
+  Use list-owner-sites-dataverse-flow.txt instead.
+================================================================================
+
+================================================================================
   FLOW CONTRACT — GovernanceAgent-GetMySites
   Purpose : Return Contoso Sites rows owned by the verified caller for the
             Governance Owner Agent My Sites topic.

@@ -1,4 +1,9 @@
 ================================================================================
+  LEGACY SHAREPOINT CONTRACT — ADAPT TO DATAVERSE REQUEST/EVENT FLOWS
+  Use submit-governance-request-dataverse-flow.txt and the request processor.
+================================================================================
+
+================================================================================
   COPILOT STUDIO TOPIC: Certify Site
   Purpose : Confirm user intent, update SPO list, write audit log entry.
   Agent   : Site Owner Agent (topic invoked from Site List or Site Detail card)

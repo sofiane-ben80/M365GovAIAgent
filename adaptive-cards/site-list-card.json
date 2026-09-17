@@ -1,0 +1,159 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.5",
+
+  "comment": [
+    "SITE LIST CARD — compact card for one site; used in a carousel (one card per site).",
+    "",
+    "PLACEHOLDERS: Replace ${...} with Power Fx topic variable references in",
+    "Copilot Studio's Adaptive Card editor, e.g. ${siteTitle} → =Topic.SiteTitle",
+    "",
+    "Variable mapping (set these Topic variables before rendering the card):",
+    "  ${siteTitle}           — site display name",
+    "  ${siteUrl}             — full SPO URL",
+    "  ${complianceStatus}    — 'COMPLIANT' or 'NON-COMPLIANT'",
+    "  ${complianceAction}    — 'NONE' | 'CERTIFY' | 'ARCHIVE' | 'ASSIGN-OWNERS'",
+    "  ${statusColor}         — 'Good' (compliant) | 'Attention' (non-compliant)",
+    "  ${actionColor}         — 'Good' | 'Warning' | 'Attention' based on action",
+    "  ${lastActivityDate}    — formatted date string, e.g. 'Jan 15, 2026'",
+    "  ${lastCertificationDate} — formatted date string or 'Never'",
+    "  ${effectiveOwnerCount} — number as string",
+    "  ${connectedServices}   — e.g. 'M365 Group · Teams · Planner' or 'Standalone'",
+    "  ${siteType}            — 'GROUP' | 'COMMUNICATION' | 'CLASSIC' | 'OTHER'",
+    "  ${isGroupConnected}    — 'true' or 'false' (for isVisible logic)",
+    "  ${showCertifyButton}   — 'true' when complianceAction = CERTIFY"
+  ],
+
+  "body": [
+    {
+      "type": "Container",
+      "bleed": true,
+      "style": "emphasis",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "stretch",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${siteTitle}",
+                  "size": "Large",
+                  "weight": "Bolder",
+                  "wrap": true,
+                  "color": "Default"
+                },
+                {
+                  "type": "TextBlock",
+                  "text": "${connectedServices}",
+                  "size": "Small",
+                  "color": "Accent",
+                  "spacing": "None",
+                  "isSubtle": true
+                }
+              ]
+            },
+            {
+              "type": "Column",
+              "width": "auto",
+              "verticalContentAlignment": "Top",
+              "spacing": "Small",
+              "items": [
+                {
+                  "type": "TextBlock",
+                  "text": "${complianceStatus}",
+                  "weight": "Bolder",
+                  "color": "${statusColor}",
+                  "horizontalAlignment": "Right"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "type": "Container",
+      "spacing": "Small",
+      "style": "default",
+      "items": [
+        {
+          "type": "ColumnSet",
+          "spacing": "Small",
+          "columns": [
+            {
+              "type": "Column",
+              "width": "auto",
+              "items": [
+                {
+                  "type": "Container",
+                  "style": "emphasis",
+                  "bleed": false,
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "text": "ACTION: ${complianceAction}",
+                      "weight": "Bolder",
+                      "color": "${actionColor}",
+                      "size": "Small"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+
+        {
+          "type": "FactSet",
+          "spacing": "Small",
+          "facts": [
+            {
+              "title": "Last Activity",
+              "value": "${lastActivityDate}"
+            },
+            {
+              "title": "Last Certified",
+              "value": "${lastCertificationDate}"
+            },
+            {
+              "title": "Effective Owners",
+              "value": "${effectiveOwnerCount}"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "View Details",
+      "data": {
+        "intent": "siteDetail",
+        "siteUrl": "${siteUrl}",
+        "siteTitle": "${siteTitle}"
+      }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "✓ Certify",
+      "style": "positive",
+      "data": {
+        "intent": "certifySite",
+        "siteUrl": "${siteUrl}",
+        "siteTitle": "${siteTitle}"
+      }
+    },
+    {
+      "type": "Action.OpenUrl",
+      "title": "Open Site ↗",
+      "url": "${siteUrl}"
+    }
+  ]
+}

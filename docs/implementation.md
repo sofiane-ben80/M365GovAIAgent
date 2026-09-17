@@ -13,7 +13,7 @@ reported as live capability.
 | Governance Owner Agent | Implemented classic package | `agents/Governance Owner Agent` |
 | Governance Admin Agent | Implemented classic package | `agents/Governance Admin Agent` |
 | Owner and Admin skills migration | Defined; acceptance and cutover remain | `new-agents` and `skills` |
-| Five connected domain advisors | Authoring definitions and manifest ready; no live advisor agents or bound production tools | `new-agents` and `docs/agent-catalog.md` |
+| Five connected domain advisors | Published shells verified; audiences and production tools remain disabled | `new-agents/advisor-manifest.yml` and `docs/live-baseline-2026-09-16.md` |
 | Shared evidence and tool broker | Contract and data model defined; implementation remains | `docs/08-Advisor-Agent-Integration-Architecture.md` |
 
 ## Runtime path

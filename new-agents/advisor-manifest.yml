@@ -18,8 +18,8 @@ agents:
     displayName: Governance Policy Advisor
     releaseWave: 1
     source: governance-policy-advisor.md
-    botId:
-    schemaName:
+    botId: 0af1ffd3-d69a-4313-9bcb-05c91c19ffd6
+    schemaName: copilots_gov_policy_01
     audienceGroup:
     routeDescription: >-
       Use Governance Policy Advisor for governance maturity, policy gaps,
@@ -34,8 +34,8 @@ agents:
     displayName: Copilot Readiness Advisor
     releaseWave: 1
     source: copilot-readiness-advisor.md
-    botId:
-    schemaName:
+    botId: a303e7c0-110d-4f10-9736-53dd7c51b040
+    schemaName: copilots_copilot_readiness_01
     audienceGroup:
     routeDescription: >-
       Use Copilot Readiness Advisor for GCC readiness, prerequisites, capability
@@ -50,8 +50,8 @@ agents:
     displayName: Data Protection Advisor
     releaseWave: 2
     source: data-protection-advisor.md
-    botId:
-    schemaName:
+    botId: 7f9c6873-cf91-455e-95f7-86321e2f84a3
+    schemaName: copilots_data_protection_01
     audienceGroup:
     routeDescription: >-
       Use Data Protection Advisor to assess sharing exposure, guests,
@@ -67,8 +67,8 @@ agents:
     displayName: Identity Governance Advisor
     releaseWave: 3
     source: identity-governance-advisor.md
-    botId:
-    schemaName:
+    botId: 7f385fc4-d4a2-42f0-b9e7-0890096b6fed
+    schemaName: copilots_identity_governance_01
     audienceGroup:
     routeDescription: >-
       Use Identity Governance Advisor for privileged roles, PIM, access reviews,
@@ -83,8 +83,8 @@ agents:
     displayName: Security & Compliance Assurance
     releaseWave: 4
     source: security-compliance-assurance.md
-    botId:
-    schemaName:
+    botId: ad57f320-41aa-4e1b-8b85-e432ba139ebc
+    schemaName: copilots_security_assurance_01
     audienceGroup:
     routeDescription: >-
       Use Security & Compliance Assurance for control mapping, evidence

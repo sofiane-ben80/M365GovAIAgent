@@ -1,5 +1,10 @@
 # M365 Governor Advisor Implementation Roadmap
 
+> **Architecture update (2026-09-17):** Implement registry, evidence, findings,
+> and orchestration capabilities with Dataverse and Power Automate. Azure SQL,
+> Logic App, Function App, and managed-API items below are historical options
+> superseded by `../../docs/23-Power-Platform-Refactor.md`.
+
 ## Purpose
 
 This roadmap turns the final advisor integration architecture into buildable

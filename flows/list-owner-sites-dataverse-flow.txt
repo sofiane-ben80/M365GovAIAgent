@@ -1,0 +1,88 @@
+================================================================================
+  FLOW CONTRACT — GovernanceData-ListOwnerSites (Dataverse)
+  Power Automate name: Governor365 - Agent - List Owner Sites
+  Purpose: Return Dataverse sites assigned to the signed-in caller.
+  Trigger: Microsoft Copilot Studio > When an agent calls the flow
+================================================================================
+
+SECURITY CONTRACT
+
+- Bind UserUPN only to System.User.PrincipalName.
+- Never accept a caller identity from message text or a model-generated value.
+- Normalize UPN with toLower(trim(...)).
+- Start the query from active Site Owner Assignment rows with an exact UPN
+  match. Do not scan a delimited owner field.
+- Return only related Governance Site columns required by the experience.
+- Connector failure must return success=false, not an empty success.
+
+INPUTS
+
+  UserUPN          Text, required
+  PageSize         Number, optional; default 10, maximum 20
+  ContinuationToken Text, optional
+  AttentionOnly    Boolean, optional; default false
+
+OUTPUTS
+
+  success           Boolean
+  status            Text
+  correlationId     Text
+  siteCount         Number
+  sitesJson         Text containing a JSON array
+  continuationToken Text
+  message           Text
+
+Each sitesJson element uses this minimized shape:
+
+  {
+    "siteId": "Dataverse GUID",
+    "m365SiteId": "stable source identifier",
+    "title": "Contoso Marketing Hub",
+    "siteUrl": "https://contoso.sharepoint.com/sites/marketing",
+    "siteType": "Group",
+    "lifecycleStatus": "Active",
+    "lastActivityAt": "2026-07-30T00:00:00Z",
+    "effectiveOwnerCount": 2,
+    "complianceStatus": "NonCompliant",
+    "recommendedAction": "Archive",
+    "triageReason": "Activity and certification evidence are outside policy.",
+    "attestationStatus": "Expired",
+    "lastObservedAt": "2026-09-17T12:00:00Z"
+  }
+
+POWER AUTOMATE BUILD STEPS
+
+1. Create a solution-aware instant cloud flow using the Copilot Studio trigger.
+2. Validate UserUPN and PageSize. Generate a correlation GUID.
+3. Normalize UserUPN.
+4. List Site Owner Assignment rows with server-side criteria:
+   - Principal UPN equals normalized UserUPN
+   - Is Active equals true
+   Expand the related Governance Site and select only contract columns.
+5. If AttentionOnly is true, additionally include only related sites whose
+   Compliance Status is NonCompliant.
+6. Apply deterministic ordering, page size, and Dataverse pagination. Preserve
+   the next-link token as an opaque continuation token.
+7. Shape the minimized response array.
+8. Return success=true and COMPLETED.
+9. In a Catch scope configured for failed, timed-out, and skipped actions,
+   return success=false, CONNECTOR_FAILED, no sites, and the correlation ID.
+   Log protected connector detail outside the agent response.
+
+COPILOT STUDIO WIRING
+
+- Bind UserUPN to System.User.PrincipalName and disable generative filling.
+- Describe the tool as: "Lists governed SharePoint sites assigned to the
+  signed-in owner from Dataverse. Never use it to list another user's sites."
+- Treat results as operational data queried live, not as agent knowledge.
+- Render lastObservedAt so stale evidence is visible.
+
+ACCEPTANCE TESTS
+
+1. A known owner receives only active exact assignments.
+2. Matching is case-insensitive and whitespace is trimmed.
+3. Partial, malformed, blank, and another user's UPN expose no records.
+4. AttentionOnly excludes compliant records.
+5. Paging is deterministic and never exceeds 20 rows.
+6. Connector failure returns success=false and a correlation ID.
+7. No SQL or governance SharePoint-list connector appears in the flow.

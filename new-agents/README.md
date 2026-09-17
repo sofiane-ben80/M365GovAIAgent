@@ -32,6 +32,27 @@ knowledge boundaries, and shell acceptance checks.
 7. Bind tools and knowledge in release-wave order. A shell must report that
    live evidence is unavailable until its authorized tools are configured.
 
+## CLI deployment
+
+From `copilot/agents`, preview or run the repeatable shell deployment:
+
+```powershell
+.\publish-advisor-agents.ps1 `
+    -EnvironmentId '9417045e-87bb-eac8-bda1-850674b11405' `
+    -Create `
+    -Publish `
+    -DryRun
+
+.\publish-advisor-agents.ps1 `
+    -EnvironmentId '9417045e-87bb-eac8-bda1-850674b11405' `
+    -Create `
+    -Publish
+```
+
+Use `-AgentKey governance-policy-advisor` to deploy one canary. Generated PAC
+templates are written under the ignored `agents/exports/advisor-publish`
+directory. The script never places credentials in source.
+
 Do not deploy the classic Owner/Admin live definitions over the hardened local
 packages without reviewing the dated live-baseline report. Live currently
 contains legacy components that conflict with the target security boundaries.

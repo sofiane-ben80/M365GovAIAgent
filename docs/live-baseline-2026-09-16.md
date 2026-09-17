@@ -45,11 +45,12 @@ needs to be imported.
 
 ### Governance Owner Agent
 
-Live contains older classic behavior that conflicts with the hardened local
-target:
+Live contains older classic behavior that conflicts with the Power
+Platform-first local target:
 
 - online-only `CertifySite` and `ActionCertify` components allow owner
-  certification, which the target design explicitly prohibits;
+  certification through hard-coded placeholders rather than the approved
+  Dataverse request contract;
 - `ProcessUserRequest` is online-only and must be reviewed before adoption;
 - the live greeting, conversation start, status, archive, deletion, escalation,
   site list, and site detail paths retain certification and routing scaffolds;
@@ -57,8 +58,10 @@ target:
   owner-scoped flow wiring;
 - the live `SiteDetail` still contains hard-coded sample records.
 
-Decision: preserve the extracted template as evidence, but do not overwrite the
-hardened local Owner package.
+Decision: preserve the extracted template as evidence. Owner certification is
+supported by the target only through a fresh owner check, explicit confirmation,
+and `GovernanceAgent-SubmitRequest`; hard-coded completion behavior is not
+accepted.
 
 ### Governance Admin Agent
 
@@ -78,17 +81,22 @@ authorization check and live dashboard data contract are active.
 
 ## New advisor readiness
 
-No live agents currently match the five domain advisor shells:
+After the reconciliation capture, all five domain advisor shells were created
+and published in the target environment:
 
-- Governance Policy Advisor
-- Copilot Readiness Advisor
-- Data Protection Advisor
-- Identity Governance Advisor
-- Security & Compliance Assurance
+| Agent | Bot ID |
+| --- | --- |
+| Governance Policy Advisor | `0af1ffd3-d69a-4313-9bcb-05c91c19ffd6` |
+| Copilot Readiness Advisor | `a303e7c0-110d-4f10-9736-53dd7c51b040` |
+| Data Protection Advisor | `7f9c6873-cf91-455e-95f7-86321e2f84a3` |
+| Identity Governance Advisor | `7f385fc4-d4a2-42f0-b9e7-0890096b6fed` |
+| Security & Compliance Assurance | `ad57f320-41aa-4e1b-8b85-e432ba139ebc` |
 
-Local Phase-2 shell definitions and deployment metadata are now maintained
-under `new-agents`. Production tools are deliberately disabled until audience,
-authorization, evidence, and failure-path tests pass.
+PAC list/status reports each shell as published, active, and provisioned.
+Template extraction round-trip verification confirmed that all five live
+descriptions and instructions match their source Markdown. Production tools
+remain disabled until audience, authorization, evidence, and failure-path
+tests pass.
 
 ## Safe next deployment sequence
 
@@ -96,8 +104,9 @@ authorization, evidence, and failure-path tests pass.
    into ignored comparison folders.
 2. Review and commit existing local documentation changes before modifying
    deployable classic packages.
-3. Create and publish the five advisor shells without production connectors.
-4. Record each bot ID, schema name, audience group, owner, and sharing policy in
+3. Keep the five published advisor shells free of production connectors until
+   audience and mismatch tests pass.
+4. Complete each audience group, owner, and sharing policy in
    `new-agents/advisor-manifest.yml`.
 5. Add launcher connected-agent declarations only after the shells are
    connectable and routing tests pass.

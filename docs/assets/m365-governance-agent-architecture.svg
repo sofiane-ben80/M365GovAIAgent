@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">M365 Governance multi-agent architecture</title>
+  <desc id="desc">A Power Platform-native M365 Governance orchestrator routes users to Owner, Admin, and specialist agents. Power Automate connects them to Dataverse and governed Microsoft 365 APIs.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#605e5c"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity=".15"/>
+    </filter>
+    <style>
+      .title{font:700 38px 'Segoe UI',Arial,sans-serif;fill:#242424}.subtitle{font:400 20px 'Segoe UI',Arial,sans-serif;fill:#605e5c}
+      .box{rx:16;filter:url(#shadow);stroke-width:2}.h{font:700 20px 'Segoe UI',Arial,sans-serif}.t{font:400 15px 'Segoe UI',Arial,sans-serif}
+      .light{fill:#fff}.dark{fill:#242424}.line{fill:none;stroke:#605e5c;stroke-width:2.5;marker-end:url(#arrow)}
+      .section{font:700 17px 'Segoe UI',Arial,sans-serif;letter-spacing:1.5px;fill:#605e5c}
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="#faf9f8"/>
+  <text x="70" y="62" class="title">M365 Governance AI Agent Architecture</text>
+  <text x="70" y="96" class="subtitle">Copilot Studio, Dataverse, Power Automate, Power Apps, and Teams</text>
+
+  <text x="70" y="145" class="section">EXPERIENCE &amp; ORCHESTRATION</text>
+  <rect x="70" y="170" width="270" height="112" class="box" fill="#fff" stroke="#8a8886"/>
+  <text x="205" y="207" class="h dark" text-anchor="middle">Users</text>
+  <text x="205" y="236" class="t dark" text-anchor="middle">Site owners</text>
+  <text x="205" y="260" class="t dark" text-anchor="middle">Governance administrators</text>
+
+  <rect x="470" y="150" width="440" height="152" class="box" fill="#5b2c83" stroke="#35134f"/>
+  <text x="690" y="194" class="h light" text-anchor="middle">M365 Governance Agent</text>
+  <text x="690" y="224" class="t light" text-anchor="middle">Orchestrator / launcher</text>
+  <text x="690" y="252" class="t light" text-anchor="middle">Intent classification • role-aware routing</text>
+  <text x="690" y="276" class="t light" text-anchor="middle">Consolidated conversational response</text>
+
+  <rect x="1040" y="170" width="310" height="112" class="box" fill="#704c9f" stroke="#35134f"/>
+  <text x="1195" y="211" class="h light" text-anchor="middle">Triage &amp; routing</text>
+  <text x="1195" y="241" class="t light" text-anchor="middle">Selects operational agent</text>
+  <text x="1195" y="265" class="t light" text-anchor="middle">or specialist advisor</text>
+  <path d="M340 226 H470" class="line"/><path d="M910 226 H1040" class="line"/>
+
+  <text x="70" y="352" class="section">OPERATIONAL AGENTS</text>
+  <rect x="70" y="378" width="365" height="150" class="box" fill="#0078d4" stroke="#004f8b"/>
+  <text x="252" y="418" class="h light" text-anchor="middle">Governance Owner Agent</text>
+  <text x="252" y="451" class="t light" text-anchor="middle">Portfolio • assessment • explanations</text>
+  <text x="252" y="477" class="t light" text-anchor="middle">Support • action tracking</text>
+  <text x="252" y="503" class="t light" text-anchor="middle">Disposition requests</text>
+
+  <rect x="470" y="378" width="365" height="150" class="box" fill="#0078d4" stroke="#004f8b"/>
+  <text x="652" y="418" class="h light" text-anchor="middle">Governance Admin Agent</text>
+  <text x="652" y="451" class="t light" text-anchor="middle">Admin verification • tenant review</text>
+  <text x="652" y="477" class="t light" text-anchor="middle">Certification decisions</text>
+  <text x="652" y="503" class="t light" text-anchor="middle">Action status and follow-up</text>
+
+  <rect x="270" y="565" width="365" height="104" class="box" fill="#d9efff" stroke="#0078d4"/>
+  <text x="452" y="604" class="h dark" text-anchor="middle">Reusable governance skills</text>
+  <text x="452" y="634" class="t dark" text-anchor="middle">Consistent, bounded capabilities</text>
+  <rect x="670" y="565" width="365" height="104" class="box" fill="#d9efff" stroke="#0078d4"/>
+  <text x="852" y="604" class="h dark" text-anchor="middle">Governance action service</text>
+  <text x="852" y="634" class="t dark" text-anchor="middle">Requests • callbacks • audit status</text>
+
+  <path d="M1130 282 C1070 335 370 320 252 378" class="line"/>
+  <path d="M1195 282 C1130 350 760 325 652 378" class="line"/>
+  <path d="M252 528 C260 555 370 550 420 565" class="line"/>
+  <path d="M652 528 C620 552 530 550 485 565" class="line"/>
+  <path d="M300 528 C390 555 735 535 800 565" class="line"/>
+  <path d="M700 528 C720 545 800 548 830 565" class="line"/>
+
+  <text x="900" y="352" class="section">SPECIALIST ADVISORS</text>
+  <rect x="900" y="378" width="260" height="80" class="box" fill="#008575" stroke="#005b50"/>
+  <text x="1030" y="412" class="h light" text-anchor="middle">Policy Advisor</text><text x="1030" y="438" class="t light" text-anchor="middle">Policy interpretation</text>
+  <rect x="1185" y="378" width="300" height="80" class="box" fill="#008575" stroke="#005b50"/>
+  <text x="1335" y="412" class="h light" text-anchor="middle">Readiness Advisor</text><text x="1335" y="438" class="t light" text-anchor="middle">Copilot readiness</text>
+  <rect x="900" y="480" width="260" height="80" class="box" fill="#008575" stroke="#005b50"/>
+  <text x="1030" y="514" class="h light" text-anchor="middle">Data Protection</text><text x="1030" y="540" class="t light" text-anchor="middle">Classification and sharing</text>
+  <rect x="1185" y="480" width="300" height="80" class="box" fill="#008575" stroke="#005b50"/>
+  <text x="1335" y="514" class="h light" text-anchor="middle">Identity Governance</text><text x="1335" y="540" class="t light" text-anchor="middle">Roles, access, ownership</text>
+  <rect x="1040" y="582" width="330" height="80" class="box" fill="#008575" stroke="#005b50"/>
+  <text x="1205" y="616" class="h light" text-anchor="middle">Security &amp; Compliance</text><text x="1205" y="642" class="t light" text-anchor="middle">Control assurance</text>
+
+  <path d="M1240 282 C1260 330 1090 340 1030 378" class="line"/>
+  <path d="M1260 282 C1320 325 1330 335 1335 378" class="line"/>
+  <path d="M1260 282 C1350 370 1130 430 1050 480" class="line"/>
+  <path d="M1270 282 C1410 360 1370 420 1335 480" class="line"/>
+  <path d="M1220 282 V582" class="line"/>
+
+  <rect x="70" y="758" width="310" height="112" class="box" fill="#fff" stroke="#605e5c"/>
+  <text x="225" y="798" class="h dark" text-anchor="middle">Evidence &amp; tool broker</text>
+  <text x="225" y="828" class="t dark" text-anchor="middle">Normalized, approved access</text>
+  <text x="225" y="852" class="t dark" text-anchor="middle">for specialist agents</text>
+  <rect x="455" y="758" width="310" height="112" class="box" fill="#fff" stroke="#605e5c"/>
+  <text x="610" y="798" class="h dark" text-anchor="middle">Power Automate</text>
+  <text x="610" y="828" class="t dark" text-anchor="middle">Flows and connectors</text>
+  <text x="610" y="852" class="t dark" text-anchor="middle">Approved action contracts</text>
+  <rect x="840" y="758" width="310" height="112" class="box" fill="#fff" stroke="#605e5c"/>
+  <text x="995" y="798" class="h dark" text-anchor="middle">Microsoft Dataverse</text>
+  <text x="995" y="828" class="t dark" text-anchor="middle">Sites • owners • requests</text>
+  <text x="995" y="852" class="t dark" text-anchor="middle">Policy • evidence • audit events</text>
+  <rect x="1225" y="758" width="300" height="112" class="box" fill="#fff" stroke="#605e5c"/>
+  <text x="1375" y="798" class="h dark" text-anchor="middle">Structured response</text>
+  <text x="1375" y="828" class="t dark" text-anchor="middle">Adaptive Cards</text>
+  <text x="1375" y="852" class="t dark" text-anchor="middle">Traceable recommendations</text>
+
+  <path d="M452 669 V688 H610 V758" class="line"/>
+  <path d="M852 669 V708 H650 V758" class="line"/>
+  <path d="M380 814 H455" class="line"/><path d="M765 814 H840" class="line"/><path d="M1150 814 H1225" class="line"/>
+  <rect x="55" y="700" width="540" height="48" fill="#faf9f8"/>
+  <text x="70" y="733" class="section">SHARED GOVERNED EVIDENCE &amp; AUTOMATION</text>
+
+  <rect x="70" y="920" width="1455" height="44" rx="10" fill="#edebe9"/>
+  <text x="797" y="948" class="t dark" text-anchor="middle">Human accountability • role-aware access • reusable actions • governed evidence • auditable outcomes</text>
+</svg>

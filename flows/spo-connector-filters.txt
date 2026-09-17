@@ -1,4 +1,9 @@
 ================================================================================
+  LEGACY GOVERNANCE-LIST FILTERS — DO NOT USE FOR THE DATAVERSE TARGET
+  SharePoint remains a governed source system, not application storage.
+================================================================================
+
+================================================================================
   SPO CONNECTOR — ODATA FILTER REFERENCE
   Purpose : Exact OData filter strings for every SharePoint "Get items" action
             used in Copilot Studio topics throughout Phase 1 and Phase 2.

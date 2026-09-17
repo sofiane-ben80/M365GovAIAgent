@@ -1,5 +1,10 @@
 # Advisor Agent Integration Architecture
 
+> **Architecture update (2026-09-17):** Dataverse and Power Automate replace
+> Azure SQL and Azure-hosted broker proposals in the approved target. Retain
+> the evidence contracts and agent boundaries in this document, but implement
+> storage and orchestration per `../../docs/23-Power-Platform-Refactor.md`.
+
 ## Decision
 
 Integrate the five domain advisors through a shared, governed evidence plane.
