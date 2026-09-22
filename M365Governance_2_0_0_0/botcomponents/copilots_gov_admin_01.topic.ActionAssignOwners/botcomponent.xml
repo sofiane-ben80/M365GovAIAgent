@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_admin_01.topic.ActionAssignOwners">
+  <componenttype>9</componenttype>
+  <description>Action Agent scaffold for assigning site owners from the admin path.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Action Assign Owners</name>
+  <parentbotid>
+    <schemaname>copilots_gov_admin_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

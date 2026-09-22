@@ -1,0 +1,30 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Request Archival
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - request archival
+      - archive site
+      - archive my site
+      - request archive
+      - archive this site
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_ArchiveCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendActivity_ArchiveHandoff
+      activity: |
+        Routing intent: Request Archival.
+
+        Open Governance Owner Agent and ask: "request archival for [site name]".
+        Caller context to pass: {Topic.CallerUPN}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_RequestArchival

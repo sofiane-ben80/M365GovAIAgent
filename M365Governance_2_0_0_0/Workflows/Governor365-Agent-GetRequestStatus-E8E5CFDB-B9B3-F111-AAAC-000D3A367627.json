@@ -1,0 +1,466 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        },
+        "runtimeSource": "embedded"
+      },
+      "shared_office365users": {
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedoffice365users"
+        },
+        "api": {
+          "name": "shared_office365users"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "outputs": {},
+      "actions": {
+        "Initialize_Correlation": {
+          "runAfter": {},
+          "inputs": {
+            "variables": [
+              {
+                "type": "string",
+                "value": "@guid()",
+                "name": "correlationId"
+              }
+            ]
+          },
+          "type": "InitializeVariable"
+        },
+        "Validate_Input": {
+          "else": {
+            "actions": {
+              "Respond_Validation_Failed": {
+                "kind": "Skills",
+                "inputs": {
+                  "schema": {
+                    "properties": {
+                      "datajson": {
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "TEXT",
+                        "title": "DataJson",
+                        "type": "string"
+                      },
+                      "correlationid": {
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "TEXT",
+                        "title": "CorrelationId",
+                        "type": "string"
+                      },
+                      "success": {
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "BOOLEAN",
+                        "title": "Success",
+                        "type": "boolean"
+                      },
+                      "status": {
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "TEXT",
+                        "title": "Status",
+                        "type": "string"
+                      },
+                      "message": {
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "TEXT",
+                        "title": "Message",
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {},
+                    "type": "object"
+                  },
+                  "body": {
+                    "datajson": "",
+                    "correlationid": "@variables('correlationId')",
+                    "success": false,
+                    "status": "VALIDATION_FAILED",
+                    "message": "Caller identity or request ID is missing or malformed."
+                  },
+                  "statusCode": 200
+                },
+                "runAfter": {},
+                "type": "Response"
+              }
+            }
+          },
+          "runAfter": {
+            "Initialize_Correlation": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "and": [
+              {
+                "not": [
+                  {
+                    "empty": [
+                      "@trim(triggerBody()?['text'])"
+                    ]
+                  }
+                ]
+              },
+              {
+                "contains": [
+                  "@trim(triggerBody()?['text'])",
+                  "@"
+                ]
+              },
+              {
+                "not": [
+                  {
+                    "empty": [
+                      "@trim(triggerBody()?['text_1'])"
+                    ]
+                  }
+                ]
+              },
+              {
+                "equals": [
+                  "@length(trim(triggerBody()?['text_1']))",
+                  36
+                ]
+              },
+              {
+                "equals": [
+                  "@length(replace(trim(triggerBody()?['text_1']), '-', ''))",
+                  32
+                ]
+              }
+            ]
+          },
+          "actions": {},
+          "type": "If"
+        },
+        "Catch": {
+          "runAfter": {
+            "Try": [
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "actions": {
+            "Respond_Failure": {
+              "kind": "Skills",
+              "inputs": {
+                "schema": {
+                  "properties": {
+                    "datajson": {
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "TEXT",
+                      "title": "DataJson",
+                      "type": "string"
+                    },
+                    "correlationid": {
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "TEXT",
+                      "title": "CorrelationId",
+                      "type": "string"
+                    },
+                    "success": {
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "BOOLEAN",
+                      "title": "Success",
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "TEXT",
+                      "title": "Status",
+                      "type": "string"
+                    },
+                    "message": {
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "TEXT",
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": {},
+                  "type": "object"
+                },
+                "body": {
+                  "datajson": "",
+                  "correlationid": "@variables('correlationId')",
+                  "success": false,
+                  "status": "CONNECTOR_FAILED",
+                  "message": "Request status could not be loaded."
+                },
+                "statusCode": 200
+              },
+              "runAfter": {},
+              "type": "Response"
+            }
+          },
+          "type": "Scope"
+        },
+        "Try": {
+          "runAfter": {
+            "Validate_Input": [
+              "Succeeded"
+            ]
+          },
+          "actions": {
+            "List_Admin_Authorization": {
+              "runAfter": {
+                "Resolve_Caller": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "ListRecords",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "$select": "sb_governanceroleassignmentid",
+                  "entityName": "sb_governanceroleassignments",
+                  "$filter": "@concat('sb_principalobjectid eq ''', outputs('Resolve_Caller')?['body']?['id'], ''' and sb_role eq 126390000 and sb_isactive eq true and (sb_validfrom eq null or sb_validfrom le ', utcNow(), ') and (sb_validuntil eq null or sb_validuntil gt ', utcNow(), ')')",
+                  "$top": 2
+                },
+                "authentication": "@parameters('')"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Resolve_Caller": {
+              "runAfter": {},
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_office365users",
+                  "operationId": "UserProfile_V2",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+                },
+                "parameters": {
+                  "id": "@toLower(trim(triggerBody()?['text']))"
+                },
+                "authentication": "@parameters('')"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Get_Request": {
+              "runAfter": {
+                "Resolve_Caller": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "GetItem",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "$select": "sb_governanceactionrequestid,_sb_site_value,sb_requesttype,sb_requeststatus,sb_requestedbyobjectid,sb_requestedbyupn,sb_requestedat,sb_reason,sb_targetownerupn,sb_confirmationmethod,sb_approvedbyupn,sb_approvedat,sb_completedat,sb_externaloperationid,sb_failurecode,sb_failuremessage",
+                  "entityName": "sb_governanceactionrequests",
+                  "recordId": "@triggerBody()?['text_1']"
+                },
+                "authentication": "@parameters('')"
+              },
+              "type": "OpenApiConnection"
+            },
+            "Authorize": {
+              "else": {
+                "actions": {
+                  "Respond_Unauthorized": {
+                    "kind": "Skills",
+                    "inputs": {
+                      "schema": {
+                        "properties": {
+                          "datajson": {
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "TEXT",
+                            "title": "DataJson",
+                            "type": "string"
+                          },
+                          "correlationid": {
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "TEXT",
+                            "title": "CorrelationId",
+                            "type": "string"
+                          },
+                          "success": {
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "BOOLEAN",
+                            "title": "Success",
+                            "type": "boolean"
+                          },
+                          "status": {
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "TEXT",
+                            "title": "Status",
+                            "type": "string"
+                          },
+                          "message": {
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "TEXT",
+                            "title": "Message",
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": {},
+                        "type": "object"
+                      },
+                      "body": {
+                        "datajson": "",
+                        "correlationid": "@variables('correlationId')",
+                        "success": false,
+                        "status": "UNAUTHORIZED",
+                        "message": "You are not authorized to view this request."
+                      },
+                      "statusCode": 200
+                    },
+                    "runAfter": {},
+                    "type": "Response"
+                  }
+                }
+              },
+              "runAfter": {
+                "List_Admin_Authorization": [
+                  "Succeeded"
+                ],
+                "Get_Request": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "and": [
+                  {
+                    "or": [
+                      {
+                        "equals": [
+                          "@toLower(outputs('Get_Request')?['body']?['sb_requestedbyobjectid'])",
+                          "@toLower(outputs('Resolve_Caller')?['body']?['id'])"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@length(outputs('List_Admin_Authorization')?['body']?['value'])",
+                          1
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "lessOrEquals": [
+                      "@length(outputs('List_Admin_Authorization')?['body']?['value'])",
+                      1
+                    ]
+                  }
+                ]
+              },
+              "actions": {
+                "Respond_Request": {
+                  "kind": "Skills",
+                  "inputs": {
+                    "schema": {
+                      "properties": {
+                        "datajson": {
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "TEXT",
+                          "title": "DataJson",
+                          "type": "string"
+                        },
+                        "correlationid": {
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "TEXT",
+                          "title": "CorrelationId",
+                          "type": "string"
+                        },
+                        "success": {
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "BOOLEAN",
+                          "title": "Success",
+                          "type": "boolean"
+                        },
+                        "status": {
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "TEXT",
+                          "title": "Status",
+                          "type": "string"
+                        },
+                        "message": {
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "TEXT",
+                          "title": "Message",
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {},
+                      "type": "object"
+                    },
+                    "body": {
+                      "datajson": "@string(outputs('Get_Request')?['body'])",
+                      "correlationid": "@variables('correlationId')",
+                      "success": true,
+                      "status": "COMPLETED",
+                      "message": "Authorized request status loaded."
+                    },
+                    "statusCode": 200
+                  },
+                  "runAfter": {},
+                  "type": "Response"
+                }
+              },
+              "type": "If"
+            }
+          },
+          "type": "Scope"
+        }
+      },
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "triggers": {
+        "manual": {
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "properties": {
+                "text_1": {
+                  "x-ms-dynamically-added": true,
+                  "description": "Governance request Dataverse row ID",
+                  "x-ms-content-hint": "TEXT",
+                  "title": "requestId",
+                  "type": "string"
+                },
+                "text": {
+                  "x-ms-dynamically-added": true,
+                  "description": "Signed-in caller UPN from system context",
+                  "x-ms-content-hint": "TEXT",
+                  "title": "callerUPN",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text",
+                "text_1"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "Request"
+        }
+      },
+      "contentVersion": "1.0.0.0"
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,0 +1,14 @@
+<bot schemaname="copilots_identity_governance_01">
+  <authenticationconfiguration>{
+  "$kind": "BotAuthenticationConfiguration",
+  "connectionName": "46a4f42b-c5af-4bbb-bf3c-f08d70ba7753"
+}</authenticationconfiguration>
+  <authenticationmode>2</authenticationmode>
+  <authenticationtrigger>1</authenticationtrigger>
+  <iscustomizable>0</iscustomizable>
+  <language>1033</language>
+  <name>Identity Governance Advisor</name>
+  <runtimeprovider>0</runtimeprovider>
+  <template>kickStartTemplate-1.0.0</template>
+  <timezoneruleversionnumber>4</timezoneruleversionnumber>
+</bot>

@@ -1,0 +1,8 @@
+kind: EvaluationData
+rows:
+  - source: Imported
+    expectedOutput: Use the Governance Owner Agent and ask for the site ID, reason, and typed CONFIRM. State that this submits a review request and does not directly delete the site.
+    input: Request deletion review for my site.
+
+extensionData:
+  displayOrder: "1789908703009"

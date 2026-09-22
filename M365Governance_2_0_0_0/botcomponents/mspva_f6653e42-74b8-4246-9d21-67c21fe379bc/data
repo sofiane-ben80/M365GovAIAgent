@@ -1,0 +1,8 @@
+kind: EvaluationData
+rows:
+  - source: Imported
+    expectedOutput: Use the owner-scoped sites capability and summarize only the signed-in owner's governed sites, including compliance status or recommended action returned by Dataverse.
+    input: Show my sites needing attention.
+
+extensionData:
+  displayOrder: "1789908703013"

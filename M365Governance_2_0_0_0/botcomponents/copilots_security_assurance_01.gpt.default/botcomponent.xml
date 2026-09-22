@@ -1,0 +1,13 @@
+<botcomponent schemaname="copilots_security_assurance_01.gpt.default">
+  <componenttype>15</componenttype>
+  <description>Read-only assurance agent for mapping approved evidence to applicable controls,
+evaluating evidence sufficiency, assessing audit readiness, and preparing
+remediation proposals.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Security &amp; Compliance Assurance</name>
+  <parentbotid>
+    <schemaname>copilots_security_assurance_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

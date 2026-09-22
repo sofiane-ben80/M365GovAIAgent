@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CanvasApp xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name>sb_governor365dashboard_b39d0</Name>
+  <AppVersion>2026-09-22T04:25:43Z</AppVersion>
+  <Status>Ready</Status>
+  <CreatedByClientVersion>3.26091.9.0</CreatedByClientVersion>
+  <MinClientVersion>3.26091.9.0</MinClientVersion>
+  <Tags>{"primaryDeviceWidth":"1366","primaryDeviceHeight":"768","supportsPortrait":"true","supportsLandscape":"true","primaryFormFactor":"Tablet","showStatusBar":"false","publisherVersion":"3.26091.9","minimumRequiredApiVersion":"2.2.0","hasComponent":"false","hasUnlockedComponent":"false","isUnifiedRootApp":"false","m365CopilotSettingValue":"0","sienaVersion":"20260921T213111Z-3.26085.11.0"}</Tags>
+  <IsCdsUpgraded>0</IsCdsUpgraded>
+  <GalleryItemId xsi:nil="true"></GalleryItemId>
+  <BackgroundColor>RGBA(0,176,240,1)</BackgroundColor>
+  <DisplayName>Governor365 Dashboard</DisplayName>
+  <Description></Description>
+  <CommitMessage></CommitMessage>
+  <Publisher></Publisher>
+  <AuthorizationReferences>[]</AuthorizationReferences>
+  <ConnectionReferences>{}</ConnectionReferences>
+  <DatabaseReferences>{"default.cds":{"databaseDetails":{"referenceType":"Environmental","environmentName":"default.cds","overrideValues":{"status":"NotSpecified","environmentVariableName":""}},"dataSources":{"Governance Sites":{"entitySetName":"sb_governancesites","logicalName":"sb_governancesite"},"Governance Action Requests":{"entitySetName":"sb_governanceactionrequests","logicalName":"sb_governanceactionrequest"},"Governance Role Assignments":{"entitySetName":"sb_governanceroleassignments","logicalName":"sb_governanceroleassignment"}},"components":[{"componentName":"CustomControl","identifier":"sb_Governor365.AgentChat","identifierType":"LogicalName","capabilities":{"pcfExternalServiceUsageAllowed":true}},{"componentName":"CustomControl","identifier":"sb_Governor365.AgentChat","identifierType":"LogicalName","capabilities":{"pcfExternalServiceUsageAllowed":true}}]}}</DatabaseReferences>
+  <AppComponents>[]</AppComponents>
+  <AppComponentDependencies>[]</AppComponentDependencies>
+  <CanConsumeAppPass>1</CanConsumeAppPass>
+  <CanvasAppType>0</CanvasAppType>
+  <BypassConsent>0</BypassConsent>
+  <AdminControlBypassConsent>0</AdminControlBypassConsent>
+  <EmbeddedApp xsi:nil="true"></EmbeddedApp>
+  <IntroducedVersion>1.0</IntroducedVersion>
+  <CdsDependencies>{"cdsdependencies":[{"componenttype":1,"logicalname":"sb_governancesite"},{"componenttype":1,"logicalname":"sb_governanceactionrequest"},{"componenttype":1,"logicalname":"sb_governanceroleassignment"},{"componenttype":66,"logicalname":"sb_Governor365.AgentChat","componenttypeplatformname":"CustomControl"},{"componenttype":66,"logicalname":"sb_Governor365.AgentChat","componenttypeplatformname":"CustomControl"}]}</CdsDependencies>
+  <IsCustomizable>1</IsCustomizable>
+  <BackgroundImageUri>/CanvasApps/sb_governor365dashboard_b39d0_BackgroundImageUri</BackgroundImageUri>
+  <DocumentUri>/CanvasApps/sb_governor365dashboard_b39d0_DocumentUri.msapp</DocumentUri>
+  <AdditionalUris>
+    <AdditionalUri>/CanvasApps/sb_governor365dashboard_b39d0_AdditionalUris0_identity.json</AdditionalUri>
+  </AdditionalUris>
+</CanvasApp>

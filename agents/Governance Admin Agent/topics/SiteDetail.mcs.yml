@@ -1,0 +1,159 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Site Detail
+    triggerQueries:
+      - site details
+      - show site details
+      - review site by ID
+      - administrator governance review
+  actions:
+    - kind: Question
+      id: question_SiteId
+      alwaysPrompt: false
+      variable: init:Topic.SiteId
+      prompt: Which Governor365 Dataverse site ID should I review?
+      entity: StringPrebuiltEntity
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_GetSiteDetail
+      input:
+        binding:
+          text: =System.User.PrincipalName
+          text_1: =Topic.SiteId
+      output:
+        binding:
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          status: Topic.ResultStatus
+          success: Topic.Success
+      flowId: 4190243f-b9b3-f111-aaac-000d3a367627
+    - kind: ConditionGroup
+      id: conditionGroup_SiteDetailResult
+      conditions:
+        - id: conditionItem_SiteDetailFailed
+          condition: =Topic.Success <> true
+          actions:
+            - kind: SendActivity
+              id: sendActivity_SiteDetailFailed
+              activity: "{Topic.ResultMessage} Status: {Topic.ResultStatus}. Correlation ID: {Topic.CorrelationId}"
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_SiteDetailResult
+          activity:
+            attachments:
+              - kind: AdaptiveCardTemplate
+                cardContent: |-
+                  =With(
+                    { site: ParseJSON(Topic.DataJson) },
+                    {
+                      '$schema': "http://adaptivecards.io/schemas/adaptive-card.json",
+                      type: "AdaptiveCard",
+                      version: "1.5",
+                      body: Table(
+                        {
+                          type: "TextBlock",
+                          text: Text(site.sb_name),
+                          size: "Large",
+                          weight: "Bolder",
+                          wrap: true
+                        },
+                        {
+                          type: "TextBlock",
+                          text: Coalesce(Text(site.sb_siteurl), "URL not available"),
+                          color: "Accent",
+                          spacing: "None",
+                          wrap: true
+                        },
+                        {
+                          type: "FactSet",
+                          facts: Table(
+                            {
+                              title: "Site type",
+                              value: Switch(
+                                Text(site.sb_sitetype),
+                                "100000000", "Group",
+                                "100000001", "Communication",
+                                "100000002", "Classic",
+                                "100000003", "Other",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Lifecycle",
+                              value: Switch(
+                                Text(site.sb_lifecyclestatus),
+                                "100000000", "Active",
+                                "100000001", "Read only",
+                                "100000002", "Archived",
+                                "100000003", "Deleted",
+                                "100000004", "Unknown",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Owners",
+                              value: Coalesce(Text(site.sb_effectiveownercount), "0")
+                            },
+                            {
+                              title: "Compliance",
+                              value: Switch(
+                                Text(site.sb_compliancestatus),
+                                "100000000", "Compliant",
+                                "100000001", "Non-compliant",
+                                "100000002", "Unknown",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Attestation",
+                              value: Switch(
+                                Text(site.sb_attestationstatus),
+                                "100000000", "Not attested",
+                                "100000001", "Attested",
+                                "100000002", "Expired",
+                                "100000003", "Exempt",
+                                "100000004", "Unknown",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Last activity",
+                              value: Coalesce(Text(site.sb_lastactivityat), "Not available")
+                            },
+                            {
+                              title: "Recommended action",
+                              value: Switch(
+                                Text(site.sb_recommendedaction),
+                                "100000000", "None",
+                                "100000001", "Certify",
+                                "100000002", "Archive",
+                                "100000003", "Deletion review",
+                                "100000004", "Assign owners",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Reason",
+                              value: Coalesce(Text(site.sb_triagereason), "Not available")
+                            }
+                          )
+                        },
+                        {
+                          type: "ActionSet",
+                          actions: Table(
+                            {
+                              type: "Action.OpenUrl",
+                              title: "Open site",
+                              url: Text(site.sb_siteurl)
+                            }
+                          )
+                        }
+                      )
+                    }
+                  )
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_SiteDetail

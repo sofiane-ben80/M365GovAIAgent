@@ -10,6 +10,12 @@ agents/exports/
 .vscode/
 *.user
 
+# Generated Power Platform and PCF build output
+pcf/**/node_modules/
+pcf/**/bin/
+pcf/**/obj/
+pcf/**/out/
+
 # Temporary files
 *.bak
 *.tmp

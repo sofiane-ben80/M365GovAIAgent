@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="sb_NotificationSchedule">
+  <description default="Environment-specific owner and admin notification schedule expression.">
+    <label description="Environment-specific owner and admin notification schedule expression." languagecode="1033" />
+  </description>
+  <displayname default="Notification Schedule">
+    <label description="Notification Schedule" languagecode="1033" />
+  </displayname>
+  <introducedversion>2.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

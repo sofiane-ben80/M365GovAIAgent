@@ -1,0 +1,13 @@
+<botcomponent schemaname="copilots_identity_governance_01.gpt.default">
+  <componenttype>15</componenttype>
+  <description>Read-only advisory agent for privileged roles, PIM, access reviews, least
+privilege, RACI, and separation-of-duty analysis using authorized identity
+evidence.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Identity Governance Advisor</name>
+  <parentbotid>
+    <schemaname>copilots_identity_governance_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

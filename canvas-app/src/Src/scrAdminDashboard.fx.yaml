@@ -1,0 +1,994 @@
+scrAdminDashboard As screen:
+    Fill: =RGBA(15, 23, 42, 1)
+    OnVisible: |-
+        =If(IsBlank(varAdminFilter), Set(varAdminFilter, "All"));
+        Set(varChatPromptText, "");
+        Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1)
+
+    lblDashboardTitle_1 As label:
+        Color: =RGBA(248, 250, 252, 1)
+        FontWeight: =FontWeight.Semibold
+        Size: =22
+        Text: |
+            ="Governance administration"
+        Width: =600
+        X: =20
+        Y: =8
+        ZIndex: =1
+
+    lblAdminPersona As label:
+        Align: =Align.Right
+        Color: =RGBA(148, 163, 184, 1)
+        FocusedBorderThickness: =2
+        Height: =32
+        Size: =12
+        TabIndex: =0
+        Text: ="Tenant-wide admin view"
+        Width: =300
+        X: =1046
+        Y: =12
+        ZIndex: =2
+
+    btnAdminAll As button:
+        BorderThickness: =0
+        Fill: =If(varAdminFilter = "All", RGBA(79, 70, 229, 1), RGBA(49, 46, 129, 1))
+        Height: =72
+        HoverFill: =ColorFade(Self.Fill, -10%)
+        OnSelect: |-
+            =Set(varAdminFilter, "All");
+            Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1)
+        Size: =13
+        Text: ="All sites" & Char(10) & CountRows(Filter('Governance Sites', !IsBlank(sb_governancesiteid)))
+        Width: =211
+        X: =20
+        Y: =56
+        ZIndex: =3
+
+    btnAdminOwnerless As button:
+        BorderThickness: =0
+        Fill: =If(varAdminFilter = "Ownerless", RGBA(220, 38, 38, 1), RGBA(153, 27, 27, 1))
+        Height: =72
+        HoverFill: =ColorFade(Self.Fill, -10%)
+        OnSelect: |-
+            =Set(varAdminFilter, "Ownerless");
+            Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1)
+        Size: =13
+        Text: ="Ownerless" & Char(10) & CountRows(Filter('Governance Sites', sb_effectiveownercount = 0))
+        Width: =211
+        X: =243
+        Y: =56
+        ZIndex: =4
+
+    btnAdminNeedsOwners As button:
+        BorderThickness: =0
+        Fill: =If(varAdminFilter = "NeedsOwners", RGBA(234, 88, 12, 1), RGBA(154, 52, 18, 1))
+        Height: =72
+        HoverFill: =ColorFade(Self.Fill, -10%)
+        OnSelect: |-
+            =Set(varAdminFilter, "NeedsOwners");
+            Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1)
+        Size: =13
+        Text: ="Needs owners" & Char(10) & CountRows(Filter('Governance Sites', sb_effectiveownercount < 2))
+        Width: =211
+        X: =466
+        Y: =56
+        ZIndex: =5
+
+    btnAdminStale As button:
+        BorderThickness: =0
+        Fill: =If(varAdminFilter = "Stale", RGBA(217, 119, 6, 1), RGBA(146, 64, 14, 1))
+        Height: =72
+        HoverFill: =ColorFade(Self.Fill, -10%)
+        OnSelect: |-
+            =Set(varAdminFilter, "Stale");
+            Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1)
+        Size: =13
+        Text: ="Stale review" & Char(10) & CountRows(Filter('Governance Sites', sb_recommendedaction = 'Recommended Action (Governance Sites)'.Archive || sb_recommendedaction = 'Recommended Action (Governance Sites)'.DeleteReview))
+        Width: =211
+        X: =689
+        Y: =56
+        ZIndex: =6
+
+    btnAdminExternal As button:
+        BorderThickness: =0
+        Fill: =If(varAdminFilter = "External", RGBA(8, 145, 178, 1), RGBA(21, 94, 117, 1))
+        Height: =72
+        HoverFill: =ColorFade(Self.Fill, -10%)
+        OnSelect: |-
+            =Set(varAdminFilter, "External");
+            Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1)
+        Size: =13
+        Text: ="External sharing" & Char(10) & CountRows(Filter('Governance Sites', sb_externalsharing <> 'External Sharing (Governance Sites)'.Disabled && sb_externalsharing <> 'External Sharing (Governance Sites)'.Unknown))
+        Width: =211
+        X: =912
+        Y: =56
+        ZIndex: =7
+
+    btnAdminNonCompliant As button:
+        BorderThickness: =0
+        Fill: =If(varAdminFilter = "NonCompliant", RGBA(190, 24, 93, 1), RGBA(131, 24, 67, 1))
+        Height: =72
+        HoverFill: =ColorFade(Self.Fill, -10%)
+        OnSelect: |-
+            =Set(varAdminFilter, "NonCompliant");
+            Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1)
+        Size: =13
+        Text: ="Noncompliant" & Char(10) & CountRows(Filter('Governance Sites', sb_compliancestatus = 'Compliance Status (Governance Sites)'.NonCompliant))
+        Width: =211
+        X: =1135
+        Y: =56
+        ZIndex: =8
+
+    txtSiteSearch_1 As text:
+        AccessibleLabel: |
+            ="Search governance sites"
+        BorderColor: =RGBA(71, 85, 105, 1)
+        Color: =RGBA(15, 23, 42, 1)
+        Default: |
+            =""
+        Fill: =RGBA(248, 250, 252, 1)
+        Height: =44
+        HintText: |
+            ="Search governance sites"
+        RadiusBottomLeft: =8
+        RadiusBottomRight: =8
+        RadiusTopLeft: =8
+        RadiusTopRight: =8
+        Size: =12
+        X: =20
+        Y: =152
+        ZIndex: =9
+
+    btnAdminAssessSite As button:
+        BorderThickness: =0
+        DisplayMode: =If(IsBlank(galSites_1.Selected), DisplayMode.Disabled, DisplayMode.Edit)
+        Fill: =RGBA(37, 99, 235, 1)
+        Height: =44
+        HoverFill: =ColorFade(Self.Fill, -10%)
+        OnSelect: |-
+            =Set(
+                varChatPromptText,
+                "Delegate this request to Owner Operations for an exact-site governance review. Site ID: " &
+                Text(galSites_1.Selected.sb_governancesiteid) &
+                ". Retrieve this live Governor365 Dataverse record by ID. Do not list sites or substitute another site. Return only the site's evidence, risk analysis, policy recommendation comparison, and prioritized remediation. Do not make changes."
+            );
+            Set(varChatPromptVersion, Coalesce(varChatPromptVersion, 0) + 1)
+        Size: =12
+        Text: ="Review selected site"
+        Tooltip: ="Ask Owner Operations for a live, authorized review of the selected site"
+        Width: =267
+        X: =352
+        Y: =152
+        ZIndex: =10
+
+    "galSites_1 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0'":
+        AccessibleLabel: |
+            ="Governance sites"
+        Default: =varSelectedSite
+        DelayItemLoading: =true
+        Fill: =RGBA(30, 41, 59, 1)
+        Height: =536
+        Items: |
+            =Switch(
+                varAdminFilter,
+                "Ownerless", Filter('Governance Sites', (IsBlank(txtSiteSearch_1.Text) || StartsWith(sb_name, txtSiteSearch_1.Text)) && sb_effectiveownercount = 0),
+                "NeedsOwners", Filter('Governance Sites', (IsBlank(txtSiteSearch_1.Text) || StartsWith(sb_name, txtSiteSearch_1.Text)) && sb_effectiveownercount < 2),
+                "Stale", Filter('Governance Sites', (IsBlank(txtSiteSearch_1.Text) || StartsWith(sb_name, txtSiteSearch_1.Text)) && (sb_recommendedaction = 'Recommended Action (Governance Sites)'.Archive || sb_recommendedaction = 'Recommended Action (Governance Sites)'.DeleteReview)),
+                "External", Filter('Governance Sites', (IsBlank(txtSiteSearch_1.Text) || StartsWith(sb_name, txtSiteSearch_1.Text)) && sb_externalsharing <> 'External Sharing (Governance Sites)'.Disabled && sb_externalsharing <> 'External Sharing (Governance Sites)'.Unknown),
+                "NonCompliant", Filter('Governance Sites', (IsBlank(txtSiteSearch_1.Text) || StartsWith(sb_name, txtSiteSearch_1.Text)) && sb_compliancestatus = 'Compliance Status (Governance Sites)'.NonCompliant),
+                Filter('Governance Sites', IsBlank(txtSiteSearch_1.Text) || StartsWith(sb_name, txtSiteSearch_1.Text))
+            )
+        Layout: =Layout.Vertical
+        LoadingSpinner: =LoadingSpinner.Data
+        OnSelect: |-
+            =Set(varSelectedSite, ThisItem);
+            Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1)
+        TabIndex: |
+            =0
+        TemplatePadding: =0
+        TemplateSize: =56
+        Width: =320
+        X: =20
+        Y: =208
+        ZIndex: =10
+
+        Rectangle1_1 As rectangle:
+            Fill: =RGBA(96, 165, 250, 1)
+            Height: =Parent.TemplateHeight - Separator1_1.Height
+            OnSelect: =Select(Parent)
+            Visible: =ThisItem.IsSelected
+            Width: =4
+            ZIndex: =1
+
+        Image1_1 As image:
+            Height: =32
+            Image: |
+                =Blank()
+            OnSelect: =Select(Parent)
+            RadiusBottomLeft: =8
+            RadiusBottomRight: =8
+            RadiusTopLeft: =8
+            RadiusTopRight: =8
+            Visible: =false
+            Width: =32
+            X: =12
+            Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+            ZIndex: =2
+
+        NextArrow1_1 As icon.ChevronRight:
+            AccessibleLabel: =Self.Tooltip
+            BorderColor: =RGBA(0, 0, 0, 1)
+            Color: =RGBA(148, 163, 184, 1)
+            DisabledBorderColor: =RGBA(56, 56, 56, 1)
+            DisabledColor: =RGBA(119, 119, 119, 1)
+            Height: =40
+            Icon: =Icon.ChevronRight
+            OnSelect: =Select(Parent)
+            PaddingBottom: =9
+            PaddingLeft: =9
+            PaddingRight: =9
+            PaddingTop: =9
+            Tooltip: ="View item details"
+            Width: =40
+            X: =Parent.TemplateWidth - Self.Width - 4
+            Y: =(Parent.TemplateHeight / 2) - (Self.Height / 2)
+            ZIndex: =3
+
+        Title1_1 As label:
+            Color: =RGBA(248, 250, 252, 1)
+            FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+            Height: =22
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =12
+            Text: |
+                =ThisItem.sb_name
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth - 56
+            X: =16
+            Y: =7
+            ZIndex: =4
+
+        Subtitle1_1 As label:
+            Color: =RGBA(148, 163, 184, 1)
+            FontWeight: =If(ThisItem.IsSelected, FontWeight.Semibold, FontWeight.Normal)
+            Height: =18
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            Size: =9
+            Text: |
+                =With(
+                    {
+                        tenantUrl: Match(
+                            ThisItem.sb_siteurl,
+                            "^https?://[^/]+",
+                            MatchOptions.IgnoreCase
+                        ).FullMatch
+                    },
+                    With(
+                        {relativePath: Substitute(ThisItem.sb_siteurl, tenantUrl, "")},
+                        If(IsBlank(relativePath), "/", relativePath)
+                    )
+                )
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Title1_1.Width
+            X: =Title1_1.X
+            Y: =29
+            ZIndex: =5
+
+        Separator1_1 As rectangle:
+            Fill: =RGBA(51, 65, 85, 1)
+            Height: =1
+            OnSelect: =Select(Parent)
+            Width: =Parent.TemplateWidth
+            Y: =Parent.TemplateHeight - Self.Height
+            ZIndex: =6
+
+    btnAdminTakeAction As button:
+        BorderThickness: =0
+        DisplayMode: =If(IsBlank(galSites_1.Selected), DisplayMode.Disabled, DisplayMode.Edit)
+        Fill: =RGBA(5, 150, 105, 1)
+        Height: =44
+        HoverFill: =ColorFade(Self.Fill, -10%)
+        OnSelect: |-
+            =Set(
+                varChatPromptText,
+                "Delegate this request to Owner Operations to start a governed action for the exact site. Site ID: " &
+                Text(galSites_1.Selected.sb_governancesiteid) &
+                ". Retrieve and authorize this live Governor365 Dataverse record by ID. Do not list sites. Prompt me to choose Certify, Archive, Deletion review, Assign owners, or Cancel. This is a mock action-intent interaction only; acknowledge my choice and do not submit a request or make changes."
+            );
+            Set(varChatPromptVersion, Coalesce(varChatPromptVersion, 0) + 1)
+        Size: =12
+        Text: ="Start governed action"
+        Tooltip: ="Ask Owner Operations to capture a governed action intent for the selected site"
+        Width: =267
+        X: =633
+        Y: =152
+        ZIndex: =11
+
+    frmSiteDetail_1 As formViewer:
+        DataSource: |
+            ='Governance Sites'
+        Fill: =RGBA(30, 41, 59, 1)
+        Height: =536
+        Item: |
+            =galSites_1.Selected
+        Visible: =false
+        Width: =548
+        X: =352
+        Y: =208
+        ZIndex: =12
+
+        "'Governance Site_DataCard1_1' As typedDataCard.textualViewCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_name"
+            Default: |
+                =ThisItem.sb_name
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_name')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            Required: =true
+            Width: =216
+            X: =0
+            Y: =0
+            ZIndex: =7
+
+            DataCardKey1_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =8
+
+            DataCardValue1_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(248, 250, 252, 1)
+                DisplayMode: =Parent.DisplayMode
+                Height: =27
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Default
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey1_1.Y + DataCardKey1_1.Height + 5
+                ZIndex: =9
+
+        "'Site URL_DataCard1_1' As typedDataCard.urlViewCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_siteurl"
+            Default: =ThisItem.'Site URL'
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_siteurl')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            Required: =true
+            Width: =216
+            X: =1
+            Y: =0
+            ZIndex: =10
+
+            DataCardKey2_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =11
+
+            DataCardValue2_1 As htmlViewer:
+                AutoHeight: =true
+                DisplayMode: =Parent.DisplayMode
+                Height: =31
+                HtmlText: |-
+                    ="<a style='color:rgb(96,165,250)' href='" & Parent.Default & "'>" & Parent.Default & "</a>"
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey2_1.Y + DataCardKey2_1.Height + 5
+                ZIndex: =12
+
+        Office_DataCard1_1 As typedDataCard.textualViewCard:
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_office"
+            Default: =ThisItem.Office
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_office')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            Required: =false
+            Width: =216
+            X: =2
+            Y: =0
+            ZIndex: =13
+
+            DataCardKey3_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =14
+
+            DataCardValue3_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(248, 250, 252, 1)
+                DisplayMode: =Parent.DisplayMode
+                Height: =27
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Default
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey3_1.Y + DataCardKey3_1.Height + 5
+                ZIndex: =15
+
+        "'Compliance Status_DataCard1_1' As typedDataCard.comboBoxOptionSetSingleViewCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_compliancestatus"
+            Default: =ThisItem.'Compliance Status'
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_compliancestatus')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =true
+            Update: =DataCardValue4_1.Selected
+            Width: =216
+            X: =0
+            Y: =1
+            ZIndex: =16
+
+            StarVisible1_1 As label:
+                Align: =Align.Center
+                Height: =DataCardKey4_1.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey4_1.Y
+                ZIndex: =17
+
+            DataCardKey4_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =18
+
+            DataCardValue4_1 As combobox:
+                AccessibleLabel: |
+                    =Parent.DisplayName
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =[Parent.Default]
+                DisabledColor: =RGBA(248, 250, 252, 1)
+                DisabledFill: =RGBA(30, 41, 59, 1)
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices('Compliance Status (Governance Sites)')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SelectMultiple: =false
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey4_1.Y + DataCardKey4_1.Height + 5
+                ZIndex: =19
+
+            ErrorMessage1_1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue4_1.Y + DataCardValue4_1.Height
+                ZIndex: =20
+
+        "'Attestation Status_DataCard1_1' As typedDataCard.comboBoxOptionSetSingleViewCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_attestationstatus"
+            Default: =ThisItem.'Attestation Status'
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_attestationstatus')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =true
+            Update: =DataCardValue5_1.Selected
+            Width: =216
+            X: =1
+            Y: =1
+            ZIndex: =21
+
+            StarVisible2_1 As label:
+                Align: =Align.Center
+                Height: =DataCardKey5_1.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey5_1.Y
+                ZIndex: =22
+
+            DataCardKey5_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =23
+
+            DataCardValue5_1 As combobox:
+                AccessibleLabel: |
+                    =Parent.DisplayName
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =[Parent.Default]
+                DisabledColor: =RGBA(248, 250, 252, 1)
+                DisabledFill: =RGBA(30, 41, 59, 1)
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices('Attestation Status (Governance Sites)')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SelectMultiple: =false
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey5_1.Y + DataCardKey5_1.Height + 5
+                ZIndex: =24
+
+            ErrorMessage2_1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue5_1.Y + DataCardValue5_1.Height
+                ZIndex: =25
+
+        "'Last Activity At_DataCard1_1' As typedDataCard.textualViewCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_lastactivityat"
+            Default: =ThisItem.'Last Activity At'
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_lastactivityat')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            Required: =false
+            Width: =216
+            X: =2
+            Y: =1
+            ZIndex: =26
+
+            DataCardKey6_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =27
+
+            DataCardValue6_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(248, 250, 252, 1)
+                DisplayMode: =Parent.DisplayMode
+                Height: =27
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Default
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey6_1.Y + DataCardKey6_1.Height + 5
+                ZIndex: =28
+
+        "'Recommended Action_DataCard1_1' As typedDataCard.comboBoxOptionSetSingleViewCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_recommendedaction"
+            Default: =ThisItem.'Recommended Action'
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_recommendedaction')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =true
+            Update: =DataCardValue7_1.Selected
+            Width: =216
+            X: =0
+            Y: =2
+            ZIndex: =29
+
+            StarVisible3_1 As label:
+                Align: =Align.Center
+                Height: =DataCardKey7_1.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey7_1.Y
+                ZIndex: =30
+
+            DataCardKey7_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =31
+
+            DataCardValue7_1 As combobox:
+                AccessibleLabel: |
+                    =Parent.DisplayName
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =[Parent.Default]
+                DisabledColor: =RGBA(248, 250, 252, 1)
+                DisabledFill: =RGBA(30, 41, 59, 1)
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices('Recommended Action (Governance Sites)')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SelectMultiple: =false
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey7_1.Y + DataCardKey7_1.Height + 5
+                ZIndex: =32
+
+            ErrorMessage3_1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue7_1.Y + DataCardValue7_1.Height
+                ZIndex: =33
+
+        "'Direct Owner Count_DataCard1_1' As typedDataCard.textualViewCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_directownercount"
+            Default: =ThisItem.'Direct Owner Count'
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_directownercount')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            Required: =true
+            Width: =216
+            X: =1
+            Y: =2
+            ZIndex: =34
+
+            DataCardKey8_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =35
+
+            DataCardValue8_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(248, 250, 252, 1)
+                DisplayMode: =Parent.DisplayMode
+                Height: =27
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Default
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey8_1.Y + DataCardKey8_1.Height + 5
+                ZIndex: =36
+
+        "'External Sharing_DataCard1_1' As typedDataCard.comboBoxOptionSetSingleViewCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_externalsharing"
+            Default: =ThisItem.'External Sharing'
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_externalsharing')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =50
+            Required: =false
+            Update: =DataCardValue9_1.Selected
+            Width: =216
+            X: =2
+            Y: =2
+            ZIndex: =37
+
+            StarVisible4_1 As label:
+                Align: =Align.Center
+                Height: =DataCardKey9_1.Height
+                Text: ="*"
+                Visible: =And(Parent.Required, Parent.DisplayMode=DisplayMode.Edit)
+                Width: =30
+                Wrap: =false
+                Y: =DataCardKey9_1.Y
+                ZIndex: =38
+
+            DataCardKey9_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =39
+
+            DataCardValue9_1 As combobox:
+                AccessibleLabel: |
+                    =Parent.DisplayName
+                BorderColor: =If(IsBlank(Parent.Error), Parent.BorderColor, Color.Red)
+                DefaultSelectedItems: =[Parent.Default]
+                DisabledColor: =RGBA(248, 250, 252, 1)
+                DisabledFill: =RGBA(30, 41, 59, 1)
+                DisplayMode: =Parent.DisplayMode
+                IsSearchable: =false
+                Items: =Choices('External Sharing (Governance Sites)')
+                PaddingLeft: =If(Self.DisplayMode = DisplayMode.Edit, 5, 0)
+                SelectMultiple: =false
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey9_1.Y + DataCardKey9_1.Height + 5
+                ZIndex: =40
+
+            ErrorMessage4_1 As label:
+                AutoHeight: =true
+                Height: =10
+                Live: =Live.Assertive
+                PaddingBottom: =0
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Error
+                Visible: =Parent.DisplayMode=DisplayMode.Edit
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardValue9_1.Y + DataCardValue9_1.Height
+                ZIndex: =41
+
+        "'Storage Usage MB_DataCard1_1' As typedDataCard.textualViewCard":
+            BorderStyle: =BorderStyle.Solid
+            DataField: ="sb_storageusagemb"
+            Default: =ThisItem.'Storage Usage MB'
+            DisplayMode: =DisplayMode.View
+            DisplayName: =DataSourceInfo([@'Governance Sites'],DataSourceInfo.DisplayName,'sb_storageusagemb')
+            Fill: =RGBA(0, 0, 0, 0)
+            Height: =40
+            Required: =false
+            Width: =216
+            X: =0
+            Y: =3
+            ZIndex: =42
+
+            DataCardKey10_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(148, 163, 184, 1)
+                FontWeight: =FontWeight.Semibold
+                Height: =34
+                Text: =Parent.DisplayName
+                Width: =Parent.Width - 60
+                Wrap: =false
+                X: =30
+                Y: =10
+                ZIndex: =43
+
+            DataCardValue10_1 As label:
+                AutoHeight: =true
+                Color: =RGBA(248, 250, 252, 1)
+                DisplayMode: =Parent.DisplayMode
+                Height: =27
+                PaddingLeft: =0
+                PaddingRight: =0
+                PaddingTop: =0
+                Text: =Parent.Default
+                Width: =Parent.Width - 60
+                X: =30
+                Y: =DataCardKey10_1.Y + DataCardKey10_1.Height + 5
+                ZIndex: =44
+
+    "galSiteDetails_1 As gallery.'BrowseLayout_Vertical_TwoTextOneImageVariant_ver5.0'":
+        AccessibleLabel: ="Selected site governance details"
+        Fill: =RGBA(30, 41, 59, 1)
+        Height: =536
+        Items: |-
+            =Table(
+                {Label: "Recommended action", Value: Coalesce(Text(galSites_1.Selected.'Recommended Action'), "-")},
+                {Label: "Compliance", Value: Coalesce(Text(galSites_1.Selected.'Compliance Status'), "-")},
+                {Label: "Site path", Value: "View"},
+                {Label: "Site", Value: Coalesce(galSites_1.Selected.sb_name, "-")},
+                {Label: "Office", Value: Coalesce(galSites_1.Selected.Office, "-")},
+                {Label: "Attestation", Value: Coalesce(Text(galSites_1.Selected.'Attestation Status'), "-")},
+                {Label: "Last activity", Value: If(IsBlank(galSites_1.Selected.'Last Activity At'), "-", Text(galSites_1.Selected.'Last Activity At', "mmm d, yyyy"))},
+                {Label: "Direct owners", Value: Coalesce(Text(galSites_1.Selected.'Direct Owner Count'), "-")},
+                {Label: "Effective owners", Value: Coalesce(Text(galSites_1.Selected.'Effective Owner Count'), "-")},
+                {Label: "External sharing", Value: Coalesce(Text(galSites_1.Selected.'External Sharing'), "-")},
+                {Label: "Storage used", Value: If(IsBlank(galSites_1.Selected.'Storage Usage MB'), "-", Text(galSites_1.Selected.'Storage Usage MB', "#,##0") & " MB")},
+                {Label: "Site type", Value: Coalesce(Text(galSites_1.Selected.'Site Type'), "-")},
+                {Label: "Lifecycle", Value: Coalesce(Text(galSites_1.Selected.'Lifecycle Status'), "-")},
+                {Label: "Attestation expires", Value: If(IsBlank(galSites_1.Selected.'Attestation Expires At'), "-", Text(galSites_1.Selected.'Attestation Expires At', "mmm d, yyyy"))},
+                {Label: "Triage reason", Value: Coalesce(galSites_1.Selected.'Triage Reason', "-")}
+            )
+        Layout: =Layout.Vertical
+        ShowScrollbar: =false
+        TemplatePadding: =4
+        TemplateSize: =96
+        Width: =548
+        WrapCount: =3
+        X: =352
+        Y: =208
+        ZIndex: =13
+
+        lblDetailKey_1 As label:
+            Color: =RGBA(148, 163, 184, 1)
+            FontWeight: =If(ThisItem.Label = "Recommended action" || ThisItem.Label = "Compliance", FontWeight.Bold, FontWeight.Semibold)
+            Height: =22
+            OnSelect: =Select(Parent)
+            PaddingBottom: =0
+            PaddingLeft: =8
+            PaddingRight: =8
+            PaddingTop: =0
+            Size: =9
+            Text: =ThisItem.Label
+            Width: =Parent.TemplateWidth - 8
+            X: =4
+            Y: =8
+            ZIndex: =1
+
+        lblDetailValue_1 As label:
+            Color: =Switch(ThisItem.Label, "Recommended action", RGBA(251, 191, 36, 1), "Compliance", Switch(ThisItem.Value, "Compliant", RGBA(134, 239, 172, 1), "NonCompliant", RGBA(248, 113, 113, 1), RGBA(251, 191, 36, 1)), "Site path", RGBA(96, 165, 250, 1), RGBA(248, 250, 252, 1))
+            FontWeight: =If(ThisItem.Label = "Recommended action" || ThisItem.Label = "Compliance", FontWeight.Bold, FontWeight.Semibold)
+            Height: =46
+            OnSelect: =If(ThisItem.Label = "Site path", Launch(galSites_1.Selected.sb_siteurl), Select(Parent))
+            PaddingBottom: =0
+            PaddingLeft: =8
+            PaddingRight: =8
+            PaddingTop: =0
+            Size: =If(ThisItem.Label = "Recommended action" || ThisItem.Label = "Compliance", 11, 10)
+            TabIndex: =If(ThisItem.Label = "Site path", 0, -1)
+            Text: =ThisItem.Value
+            Tooltip: =If(ThisItem.Label = "Site path", galSites_1.Selected.sb_siteurl, ThisItem.Value)
+            Underline: =ThisItem.Label = "Site path"
+            VerticalAlign: =VerticalAlign.Top
+            Width: =Parent.TemplateWidth - 8
+            X: =4
+            Y: =32
+            ZIndex: =2
+
+        recDetailSeparator_1 As rectangle:
+            Fill: =RGBA(51, 65, 85, 1)
+            Height: =1
+            Width: =Parent.TemplateWidth - 16
+            X: =8
+            Y: =Parent.TemplateHeight - 1
+            ZIndex: =3
+
+    "AgentChatAdmin As 'Governor365 Agent Chat'":
+        contextJson: |-
+            =JSON(
+                {
+                    schemaVersion: 1,
+                    screen: App.ActiveScreen.Name,
+                    persona: "Administrator",
+                    activeFilter: varAdminFilter,
+                    siteId: If(IsBlank(galSites_1.Selected), Blank(), Text(galSites_1.Selected.sb_governancesiteid)),
+                    siteName: If(IsBlank(galSites_1.Selected), Blank(), galSites_1.Selected.sb_name)
+                },
+                JSONFormat.Compact
+            )
+        contextVersion: =varChatContextVersion
+        DisplayMode: =DisplayMode.Edit
+        Height: =592
+        locale: ="en-US"
+        OnAgentAction: |-
+            =With(
+                { action: ParseJSON(AgentChatAdmin.lastActionJson) },
+                Switch(
+                    Text(action.name),
+                    "openSite",
+                        With(
+                            { requestedSiteId: IfError(GUID(Text(action.payload.siteId)), Blank()) },
+                            If(
+                                IsBlank(requestedSiteId),
+                                Notify("The agent supplied an invalid site identifier.", NotificationType.Error),
+                                Set(
+                                    varSelectedSite,
+                                    LookUp('Governance Sites', sb_governancesiteid = requestedSiteId)
+                                );
+                                If(
+                                    IsBlank(varSelectedSite),
+                                    Notify("The requested site is not available.", NotificationType.Error),
+                                    Reset(galSites_1);
+                                    Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1)
+                                )
+                            )
+                        ),
+                    "refreshSites",
+                        Refresh('Governance Sites');
+                        Set(varChatContextVersion, Coalesce(varChatContextVersion, 0) + 1),
+                    Notify("The agent requested an unsupported app action.", NotificationType.Warning)
+                )
+            )
+        OnConnectionStatusChanged: |-
+            =If(
+                AgentChatAdmin.connectionStatus = "error",
+                Notify(
+                    If(
+                        IsBlank(AgentChatAdmin.lastError),
+                        "Unable to connect to Governor365.",
+                        AgentChatAdmin.lastError
+                    ),
+                    NotificationType.Error
+                )
+            )
+        promptText: =varChatPromptText
+        promptVersion: =varChatPromptVersion
+        ssoClientId: ="f104fe0a-6b8a-446b-a623-cfbd7c7e2b11"
+        ssoLoginHint: =User().Email
+        ssoRedirectUri: |-
+            ="https://runtime-app.powerplatform.com/"
+        ssoTenantId: ="8221c52a-2c7f-4da0-8b1f-34c6f692d915"
+        title: ="Governor365 assistant"
+        tokenEndpoint: |-
+            ="https://9417045e87bbeac8bda1850674b114.05.environment.api.powerplatform.com/powervirtualagents/botsbyschema/copilots_header_04c70/directline/token?api-version=2022-03-01-preview"
+        userDisplayName: =User().FullName
+        userId: =User().Email
+        Width: =422
+        X: =924
+        Y: =152
+        ZIndex: =13

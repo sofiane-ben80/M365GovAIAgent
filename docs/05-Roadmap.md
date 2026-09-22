@@ -19,7 +19,7 @@
 | Phase | Outcome | Exit gate |
 |---|---|---|
 | A - Platform foundation | Solution, Dataverse schema, security, ALM | Managed import to test succeeds |
-| B - Owner read path | Owner agent and app read Dataverse only | Isolation, paging, and delegation pass |
+| B - Unified read experience | Owner/Admin agents and dashboard read Dataverse only | Isolation, paging, delegation, and Teams launch pass |
 | C - Admin and requests | Admin tools, requests, approvals, audit events | Authorization and lifecycle tests pass |
 | D - Inventory | Power Automate scan/work-item pipeline | Two reconciled complete scans |
 | E - Notifications | Owner/admin Teams notifications and responses | Retry and duplicate tests pass |
@@ -32,25 +32,35 @@
 - Create Governor365 solution and publisher.
 - Add Dataverse tables, choices, keys, relationships, views, auditing, and
   security roles from [04-DataModel.md](04-DataModel.md).
+- Create Governance Role Assignment, migrate approved privileged users from
+  the legacy SharePoint list, and restrict all role writes.
 - Add environment variables and connection references.
 - Configure DLP and approved service accounts.
 - Establish solution checker, export, unpack, source control, and managed import.
 
-## Phase B - Owner read path
+## Phase B - Unified read experience
 
 - Import representative sites and normalized owner assignments.
 - Build `List Owner Sites` and `Get Site Detail` agent tool flows.
 - Rebind owner agent topics and Adaptive Cards.
 - Rebind the Canvas app to delegable Dataverse views.
+- Preserve and modernize the useful browse, search, filter, sort, site-detail,
+  and site-launch behavior from the 1.0 Canvas proof of concept.
+- Add owner and admin role-aware dashboard experiences over the same Dataverse
+  records and governed request flows used by the agents.
 - Configure and reconcile per-site read-only access teams for direct owner app
   access, or route owner app reads through the owner-scoped flow.
+- Package the dashboard as an organizational Teams personal app/tab and add
+  tested agent-to-app and app-to-agent deep links.
+- Validate Microsoft 365 Copilot/app-launcher discoverability; use a governed
+  Teams or web deep link if direct Canvas hosting is not supported.
 - Test exact/partial UPN, inactive assignment, renamed URL, paging, failure, and
   large-volume cases.
 
 ## Phase C - Admin and request lifecycle
 
-- Build `Verify Admin`, `List Admin Sites`, `Submit Request`, and `Get Request
-  Status`.
+- Build Dataverse role verification, `List Admin Sites`, `Submit Request`, and
+  `Get Request Status`.
 - Build request processor, approvals, action events, and notifications.
 - Rebind Admin and Action agent topics.
 - Add governance admin Power App views.
@@ -103,11 +113,11 @@
 - approval and action event trail;
 - scan/work-item inventory;
 - managed-solution deployment and DLP.
+- Dataverse-backed Power Apps dashboard deployed in Teams.
 
 ### Should have
 
 - owner/admin Teams digests;
-- Power Apps dashboards;
 - owner assignment workflow;
 - attestation integration;
 - operational retry dashboard.

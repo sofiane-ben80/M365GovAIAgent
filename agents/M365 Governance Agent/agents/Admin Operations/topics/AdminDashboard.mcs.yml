@@ -1,0 +1,175 @@
+mcs.metadata:
+  componentName: Admin Dashboard
+  description: Returns the tenant-wide governance summary for confirmed administrators.
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Admin Dashboard
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - admin dashboard
+      - show admin dashboard
+      - governance summary
+      - tenant overview
+      - summary of all sites
+      - dashboard
+      - proactive tenant governance briefing
+      - give me a concise proactive tenant governance briefing
+      - ownerless compliance external sharing staleness and attestation risks
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_AdminDashboardCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SetVariable
+      id: setVariable_AdminDashboardRecordCount
+      variable: init:Topic.RecordCount
+      value: 0
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_ListAdminSites
+      input:
+        binding:
+          number: =20
+          number_1: =365
+          text: =Topic.CallerUPN
+          text_1: ="ALL"
+          text_2: =""
+          text_3: =""
+          text_4: ="NONE"
+
+      output:
+        binding:
+          continuationtoken: Topic.ContinuationToken
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          recordcount: Topic.RecordCount
+          status: Topic.ResultStatus
+          success: Topic.Success
+
+      flowId: 364a1e5b-b9b3-f111-aaac-000d3a367627
+
+    - kind: ConditionGroup
+      id: conditionGroup_AdminDashboardResult
+      conditions:
+        - id: conditionItem_AdminDashboardFailed
+          condition: =Lower(Text(Topic.Success)) <> "true"
+          actions:
+            - kind: SendActivity
+              id: sendActivity_AdminDashboardFailed
+              activity: |
+                I could not load the admin dashboard. {Topic.ResultMessage}
+                Status: {Topic.ResultStatus}
+                Correlation ID: {Topic.CorrelationId}
+
+      elseActions:
+        - kind: ConditionGroup
+          id: conditionGroup_AdminDashboardEmpty
+          conditions:
+            - id: conditionItem_AdminDashboardEmpty
+              condition: =Topic.RecordCount = 0
+              actions:
+                - kind: SendActivity
+                  id: sendActivity_AdminDashboardEmpty
+                  activity: No governed sites matched the dashboard query.
+
+          elseActions:
+            - kind: SendActivity
+              id: sendActivity_AdminDashboard
+              activity:
+                attachments:
+                  - kind: AdaptiveCardTemplate
+                    cardContent: |-
+                      ={
+                        '$schema': "http://adaptivecards.io/schemas/adaptive-card.json",
+                        type: "AdaptiveCard",
+                        version: "1.5",
+                        body: Table(
+                          {
+                            type: "TextBlock",
+                            text: "Governance dashboard",
+                            size: "Large",
+                            weight: "Bolder",
+                            wrap: true
+                          },
+                          {
+                            type: "TextBlock",
+                            text: Text(Topic.RecordCount) & " site(s) returned",
+                            isSubtle: true,
+                            spacing: "None",
+                            wrap: true
+                          },
+                          {
+                            type: "Container",
+                            items: ForAll(
+                              FirstN(Table(ParseJSON(Topic.DataJson)), 10) As site,
+                              {
+                                type: "Container",
+                                separator: true,
+                                spacing: "Medium",
+                                items: Table(
+                                  {
+                                    type: "TextBlock",
+                                    text: Text(site.Value.sb_name),
+                                    weight: "Bolder",
+                                    wrap: true
+                                  },
+                                  {
+                                    type: "FactSet",
+                                    facts: Table(
+                                      {
+                                        title: "Office",
+                                        value: Coalesce(Text(site.Value.sb_office), "Not available")
+                                      },
+                                      {
+                                        title: "Owners",
+                                        value: Coalesce(Text(site.Value.sb_effectiveownercount), "0")
+                                      },
+                                      {
+                                        title: "Compliance",
+                                        value: Switch(
+                                          Text(site.Value.sb_compliancestatus),
+                                          "100000000", "Compliant",
+                                          "100000001", "Non-compliant",
+                                          "100000002", "Unknown",
+                                          "Not available"
+                                        )
+                                      },
+                                      {
+                                        title: "Recommended action",
+                                        value: Switch(
+                                          Text(site.Value.sb_recommendedaction),
+                                          "100000000", "None",
+                                          "100000001", "Certify",
+                                          "100000002", "Archive",
+                                          "100000003", "Deletion review",
+                                          "100000004", "Assign owners",
+                                          "Not available"
+                                        )
+                                      }
+                                    )
+                                  },
+                                  {
+                                    type: "ActionSet",
+                                    actions: Table(
+                                      {
+                                        type: "Action.OpenUrl",
+                                        title: "Open site",
+                                        url: Text(site.Value.sb_siteurl)
+                                      }
+                                    )
+                                  }
+                                )
+                              }
+                            )
+                          }
+                        )
+                      }
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_AdminDashboard

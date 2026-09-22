@@ -1,0 +1,13 @@
+<botcomponent schemaname="copilots_copilot_readiness_01.gpt.default">
+  <componenttype>15</componenttype>
+  <description>Advisory agent for Microsoft 365 Copilot readiness, GCC capability
+verification, prerequisites, phased rollout planning, and service-change
+impact.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Copilot Readiness Advisor</name>
+  <parentbotid>
+    <schemaname>copilots_copilot_readiness_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

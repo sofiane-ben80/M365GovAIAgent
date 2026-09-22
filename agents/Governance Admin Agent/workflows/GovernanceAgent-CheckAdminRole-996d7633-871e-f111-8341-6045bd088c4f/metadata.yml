@@ -2,7 +2,7 @@
 workflowId: 996d7633-871e-f111-8341-6045bd088c4f
 name: GovernanceAgent-CheckAdminRole
 type: 1
-description: 
+description: Verify one active GovernanceAdmin assignment by immutable Entra object ID.
 subprocess: false
 category: 5
 mode: 0
@@ -29,5 +29,5 @@ isCustomProcessingStepAllowedForOtherPublishers:
 modernFlowType: 0
 primaryEntity: none
 connectionReferences:
-- new_sharedsharepointonline_8aaab
-- new_sharedteams_4bb9d
+- sb_sharedoffice365users
+- sb_sharedcommondataserviceforapps

@@ -1,0 +1,53 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Certify a Site
+    triggerQueries:
+      - certify site
+      - certify my site
+  actions:
+    - kind: Question
+      id: question_SiteId
+      alwaysPrompt: true
+      variable: init:Topic.SiteId
+      prompt: Enter the Governor365 Dataverse site ID to certify.
+      entity: StringPrebuiltEntity
+    - kind: Question
+      id: question_Reason
+      alwaysPrompt: true
+      variable: init:Topic.Reason
+      prompt: Briefly state the evidence supporting certification.
+      entity: StringPrebuiltEntity
+    - kind: Question
+      id: question_Confirmation
+      alwaysPrompt: true
+      variable: init:Topic.Confirmation
+      prompt: Type CONFIRM to submit the certification request.
+      entity: StringPrebuiltEntity
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_SubmitCertification
+      input:
+        binding:
+          text: =System.User.PrincipalName
+          text_1: ="CERTIFY"
+          text_2: =Topic.SiteId
+          text_3: =Topic.Reason
+          text_4: =Upper(Topic.Confirmation)
+          text_5: =Text(GUID())
+          text_6: =""
+      output:
+        binding:
+          correlationid: Topic.CorrelationId
+          message: Topic.ResultMessage
+          requestid: Topic.RequestId
+          requeststatus: Topic.RequestStatus
+          status: Topic.ResultStatus
+          success: Topic.Success
+      flowId: 7f675f00-bab3-f111-aaac-000d3a367627
+    - kind: SendActivity
+      id: sendActivity_CertificationResult
+      activity: "{Topic.ResultMessage} Request ID: {Topic.RequestId}. Status: {Topic.RequestStatus}. Correlation ID: {Topic.CorrelationId}"
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_CertifySite

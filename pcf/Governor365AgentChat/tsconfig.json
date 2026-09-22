@@ -1,0 +1,7 @@
+{
+    "extends": "./node_modules/pcf-scripts/tsconfig_base.json",
+    "compilerOptions": {
+        "lib": ["DOM", "ES2021"],
+        "typeRoots": ["node_modules/@types"]
+    }
+}

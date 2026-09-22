@@ -1,0 +1,69 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: My Sites
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - show my sites
+      - my sites
+      - what sites do i own
+      - what do i own
+      - list my sharepoint sites
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_MySitesRecordCount
+      variable: init:Topic.RecordCount
+      value: 0
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_ListOwnerSites
+      input:
+        binding:
+          number: =20
+          text: =System.User.PrincipalName
+          text_2: =""
+
+      output:
+        binding:
+          continuationtoken: Topic.ContinuationToken
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          recordcount: Topic.RecordCount
+          status: Topic.ResultStatus
+          success: Topic.Success
+
+      flowId: 68784ae7-b8b3-f111-aaac-000d3a367627
+
+    - kind: ConditionGroup
+      id: conditionGroup_ListOwnerSitesResult
+      conditions:
+        - id: conditionItem_ListOwnerSitesFailed
+          condition: =Topic.Success <> true
+          actions:
+            - kind: SendActivity
+              id: sendActivity_ListOwnerSitesFailed
+              activity: |
+                I could not load your governed sites. {Topic.ResultMessage}
+                Status: {Topic.ResultStatus}
+                Correlation ID: {Topic.CorrelationId}
+
+        - id: conditionItem_NoOwnerSites
+          condition: =Topic.RecordCount = 0
+          actions:
+            - kind: SendActivity
+              id: sendActivity_NoOwnerSites
+              activity: No active Dataverse site-owner assignments were found for your signed-in account.
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_OwnerSites
+          activity: |
+            I found {Topic.RecordCount} governed site(s) assigned to you.
+            {Topic.DataJson}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_MySites

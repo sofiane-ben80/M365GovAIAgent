@@ -1,0 +1,15 @@
+<botcomponent schemaname="mspva_d0f7c8fc-e664-4b64-8a14-45a5ff706741">
+  <category>Testing</category>
+  <componenttype>19</componenttype>
+  <description>Check my governance request.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Check my governance request.</name>
+  <parentbotcomponentid>
+    <schemaname>mspva_8469fb50-afd5-499a-b329-c28ef8245030</schemaname>
+  </parentbotcomponentid>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.gpt.default">
+  <componenttype>15</componenttype>
+  <description>Central handoff-only supervisor for seven local Microsoft 365 governance child agents.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>M365 Governance Agent</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

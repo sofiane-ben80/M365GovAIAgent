@@ -65,9 +65,9 @@ Adopt a Power Platform-first target:
   or access tokens.
 - Direct site deletion remains out of scope. The solution submits and approves
   governed requests before a least-privilege operation is invoked.
-- Existing SQL, Bicep, SharePoint-list scripts, and Canvas packages remain in
-  the repository as migration evidence until cutover. They are not production
-  target artifacts.
+- Existing SQL, Bicep, SharePoint-list scripts, and legacy Canvas packages are
+  retained under `../archive/legacy-2026-09-19/` as migration evidence. They
+  are not production target artifacts.
 
 ## Migration phases
 

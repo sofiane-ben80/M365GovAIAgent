@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.agent.DataProtectionAdvisor">
+  <componenttype>9</componenttype>
+  <description>Use for authorized sharing exposure, guests, sensitivity labels, DLP, retention, and Copilot data exposure. This child is advisory and read-only.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>Data Protection Advisor</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

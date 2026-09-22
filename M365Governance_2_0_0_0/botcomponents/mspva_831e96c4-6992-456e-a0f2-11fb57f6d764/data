@@ -1,0 +1,8 @@
+kind: EvaluationData
+rows:
+  - source: Imported
+    expectedOutput: Use the Governance Owner Agent and the List Owner Sites Dataverse-backed capability for the signed-in user. Return only authorized owner-scoped results or a clear no-sites result.
+    input: Show my sites.
+
+extensionData:
+  displayOrder: "1789908703015"

@@ -1,0 +1,61 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Orphaned Sites
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - orphaned sites
+      - show orphaned sites
+      - sites with no owners
+      - missing owners
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_OrphanedRecordCount
+      variable: init:Topic.RecordCount
+      value: 0
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_ListOrphanedSites
+      input:
+        binding:
+          number: =20
+          number_1: =365
+          text: =System.User.PrincipalName
+          text_1: ="ORPHANED"
+          text_2: =""
+          text_3: =""
+          text_4: ="NONE"
+
+      output:
+        binding:
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          recordcount: Topic.RecordCount
+          status: Topic.ResultStatus
+          success: Topic.Success
+
+      flowId: 364a1e5b-b9b3-f111-aaac-000d3a367627
+
+    - kind: ConditionGroup
+      id: conditionGroup_OrphanedResult
+      conditions:
+        - id: conditionItem_OrphanedFailed
+          condition: =Topic.Success <> true
+          actions:
+            - kind: SendActivity
+              id: sendActivity_OrphanedFailed
+              activity: "{Topic.ResultMessage} Status: {Topic.ResultStatus}. Correlation ID: {Topic.CorrelationId}"
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_OrphanedResult
+          activity: |
+            Dataverse returned {Topic.RecordCount} orphaned site(s).
+            {Topic.DataJson}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_OrphanedSites

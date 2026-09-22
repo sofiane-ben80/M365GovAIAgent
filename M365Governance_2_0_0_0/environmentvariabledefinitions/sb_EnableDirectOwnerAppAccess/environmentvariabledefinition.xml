@@ -1,0 +1,14 @@
+<environmentvariabledefinition schemaname="sb_EnableDirectOwnerAppAccess">
+  <defaultvalue>false</defaultvalue>
+  <description default="Feature flag for Dataverse access-team backed direct owner Canvas app reads.">
+    <label description="Feature flag for Dataverse access-team backed direct owner Canvas app reads." languagecode="1033" />
+  </description>
+  <displayname default="Enable Direct Owner App Access">
+    <label description="Enable Direct Owner App Access" languagecode="1033" />
+  </displayname>
+  <introducedversion>2.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000002</type>
+</environmentvariabledefinition>

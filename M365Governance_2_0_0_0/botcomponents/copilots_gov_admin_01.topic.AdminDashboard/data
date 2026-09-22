@@ -1,0 +1,66 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Admin Dashboard
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - admin dashboard
+      - show admin dashboard
+      - governance summary
+      - tenant overview
+      - summary of all sites
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_AdminDashboardRecordCount
+      variable: init:Topic.RecordCount
+      value: 0
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_ListAdminSites
+      input:
+        binding:
+          number: =20
+          number_1: =365
+          text: =System.User.PrincipalName
+          text_1: ="ALL"
+          text_2: =""
+          text_3: =""
+          text_4: ="NONE"
+
+      output:
+        binding:
+          continuationtoken: Topic.ContinuationToken
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          recordcount: Topic.RecordCount
+          status: Topic.ResultStatus
+          success: Topic.Success
+
+      flowId: 364a1e5b-b9b3-f111-aaac-000d3a367627
+
+    - kind: ConditionGroup
+      id: conditionGroup_AdminDashboardResult
+      conditions:
+        - id: conditionItem_AdminDashboardFailed
+          condition: =Topic.Success <> true
+          actions:
+            - kind: SendActivity
+              id: sendActivity_AdminDashboardFailed
+              activity: |
+                I could not load the admin dashboard. {Topic.ResultMessage}
+                Status: {Topic.ResultStatus}
+                Correlation ID: {Topic.CorrelationId}
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_AdminDashboard
+          activity: |
+            The authorized Dataverse governance query returned {Topic.RecordCount} site(s).
+            {Topic.DataJson}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_AdminDashboard

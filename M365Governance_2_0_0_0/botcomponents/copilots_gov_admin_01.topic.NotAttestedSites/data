@@ -1,0 +1,61 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Not Attested Sites
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - not attested sites
+      - show not attested sites
+      - attestation overdue
+      - sites not attested
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_NotAttestedRecordCount
+      variable: init:Topic.RecordCount
+      value: 0
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_ListAttestationSites
+      input:
+        binding:
+          number: =20
+          number_1: =365
+          text: =System.User.PrincipalName
+          text_1: ="ATTESTATION"
+          text_2: =""
+          text_3: =""
+          text_4: ="NONE"
+
+      output:
+        binding:
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          recordcount: Topic.RecordCount
+          status: Topic.ResultStatus
+          success: Topic.Success
+
+      flowId: 364a1e5b-b9b3-f111-aaac-000d3a367627
+
+    - kind: ConditionGroup
+      id: conditionGroup_AttestationResult
+      conditions:
+        - id: conditionItem_AttestationFailed
+          condition: =Topic.Success <> true
+          actions:
+            - kind: SendActivity
+              id: sendActivity_AttestationFailed
+              activity: "{Topic.ResultMessage} Status: {Topic.ResultStatus}. Correlation ID: {Topic.CorrelationId}"
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_AttestationResult
+          activity: |
+            Dataverse returned {Topic.RecordCount} site(s) requiring attestation review.
+            {Topic.DataJson}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_NotAttestedSites

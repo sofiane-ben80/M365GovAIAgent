@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="Governor365" constructor="AgentChat"       version="0.3.3" display-name-key="AgentChat_DisplayName" description-key="AgentChat_Description" control-type="virtual">
+    <external-service-usage enabled="true">
+      <domain>*.environment.api.powerplatform.com</domain>
+      <domain>*.environment.api.powerplatform.us</domain>
+      <domain>directline.botframework.com</domain>
+      <domain>directline.botframework.azure.us</domain>
+      <domain>alcdn.msauth.net</domain>
+      <domain>login.microsoftonline.com</domain>
+    </external-service-usage>
+    <property name="tokenEndpoint" display-name-key="TokenEndpoint_DisplayName" description-key="TokenEndpoint_Description" of-type="SingleLine.Text" usage="input" required="true" />
+    <property name="ssoClientId" display-name-key="SsoClientId_DisplayName" description-key="SsoClientId_Description" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="ssoTenantId" display-name-key="SsoTenantId_DisplayName" description-key="SsoTenantId_Description" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="ssoRedirectUri" display-name-key="SsoRedirectUri_DisplayName" description-key="SsoRedirectUri_Description" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="ssoLoginHint" display-name-key="SsoLoginHint_DisplayName" description-key="SsoLoginHint_Description" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="contextJson" display-name-key="ContextJson_DisplayName" description-key="ContextJson_Description" of-type="Multiple" usage="input" required="false" />
+    <property name="contextVersion" display-name-key="ContextVersion_DisplayName" description-key="ContextVersion_Description" of-type="Whole.None" usage="input" required="false" />
+    <property name="promptText" display-name-key="PromptText_DisplayName" description-key="PromptText_Description" of-type="Multiple" usage="input" required="false" />
+    <property name="promptVersion" display-name-key="PromptVersion_DisplayName" description-key="PromptVersion_Description" of-type="Whole.None" usage="input" required="false" />
+    <property name="userId" display-name-key="UserId_DisplayName" description-key="UserId_Description" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="userDisplayName" display-name-key="UserDisplayName_DisplayName" description-key="UserDisplayName_Description" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="locale" display-name-key="Locale_DisplayName" description-key="Locale_Description" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="title" display-name-key="Title_DisplayName" description-key="Title_Description" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="connectionStatus" display-name-key="ConnectionStatus_DisplayName" description-key="ConnectionStatus_Description" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="conversationId" display-name-key="ConversationId_DisplayName" description-key="ConversationId_Description" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="lastActionName" display-name-key="LastActionName_DisplayName" description-key="LastActionName_Description" of-type="SingleLine.Text" usage="output" required="false" />
+    <property name="lastActionJson" display-name-key="LastActionJson_DisplayName" description-key="LastActionJson_Description" of-type="Multiple" usage="output" required="false" />
+    <property name="lastError" display-name-key="LastError_DisplayName" description-key="LastError_Description" of-type="Multiple" usage="output" required="false" />
+    <event name="OnAgentAction" display-name-key="OnAgentAction_DisplayName" description-key="OnAgentAction_Description" />
+    <event name="OnConnectionStatusChanged" display-name-key="OnConnectionStatusChanged_DisplayName" description-key="OnConnectionStatusChanged_Description" />
+    <resources>
+      <code path="index.ts" order="1" />
+      <css path="css/AgentChat.css" order="1" />
+      <resx path="strings/AgentChat.1033.resx" version="1.0.0" />
+      <platform-library name="React" version="16.14.0" />
+    </resources>
+  </control>
+</manifest>

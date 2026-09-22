@@ -1,0 +1,10 @@
+{
+  "$kind": "BotConfiguration",
+  "settings": {
+    "GenerativeActionsEnabled": true
+  },
+  "isAgentConnectable": true,
+  "recognizer": {
+    "$kind": "GenerativeAIRecognizer"
+  }
+}

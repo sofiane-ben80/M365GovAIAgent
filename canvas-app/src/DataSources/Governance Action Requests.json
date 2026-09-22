@@ -1,0 +1,179 @@
+[
+  {
+    "CdsFCBContext": "{\"FileType\":true,\"ImageExternalStorage\":true}",
+    "EntitySetName": "sb_governanceactionrequests",
+    "IsHidden": false,
+    "IsSampleData": false,
+    "IsWritable": true,
+    "LogicalName": "sb_governanceactionrequest",
+    "MaxGetRowsCount": 500,
+    "Name": "Governance Action Requests",
+    "NativeCDSDataSourceInfoNameMapping": {
+      "createdby": "Created By",
+      "createdon": "Created On",
+      "createdonbehalfby": "Created By (Delegate)",
+      "importsequencenumber": "Import Sequence Number",
+      "modifiedby": "Modified By",
+      "modifiedon": "Modified On",
+      "modifiedonbehalfby": "Modified By (Delegate)",
+      "organizationid": "Organization Id",
+      "overriddencreatedon": "Record Created On",
+      "sb_approvedat": "Approved At",
+      "sb_approvedbyupn": "Approved By UPN",
+      "sb_completedat": "Completed At",
+      "sb_confirmationmethod": "Confirmation Method",
+      "sb_externaloperationid": "External Operation ID",
+      "sb_failurecode": "Failure Code",
+      "sb_failuremessage": "Failure Message",
+      "sb_governanceactionevent_request": "Governance Action Events",
+      "sb_governanceactionrequest_AsyncOperations": "System Jobs",
+      "sb_governanceactionrequest_BulkDeleteFailures": "Bulk Delete Failures",
+      "sb_governanceactionrequest_MailboxTrackingFolders": "Mailbox Auto Tracking Folders",
+      "sb_governanceactionrequest_PrincipalObjectAttributeAccesses": "Field Sharing",
+      "sb_governanceactionrequest_ProcessSession": "Process Sessions",
+      "sb_governanceactionrequest_SyncErrors": "Sync Errors",
+      "sb_governanceactionrequestid": "Governance Action Request (sb_governanceactionrequestid)",
+      "sb_idempotencykey": "Governance Action Request (sb_idempotencykey)",
+      "sb_notificationdelivery_request": "Notification Deliveries",
+      "sb_reason": "Reason",
+      "sb_requestedat": "Requested At",
+      "sb_requestedbyobjectid": "Requested By Object ID",
+      "sb_requestedbyupn": "Requested By UPN",
+      "sb_requeststatus": "Request Status",
+      "sb_requesttype": "Request Type",
+      "sb_site": "Site",
+      "sb_targetownerupn": "Target Owner UPN",
+      "statecode": "Status",
+      "statuscode": "Status Reason",
+      "timezoneruleversionnumber": "Time Zone Rule Version Number",
+      "utcconversiontimezonecode": "UTC Conversion Time Zone Code",
+      "versionnumber": "Version Number"
+    },
+    "PreferredName": "Governance Action Requests",
+    "Type": "NativeCDSDataSourceInfo"
+  },
+  {
+    "DisplayName": "Governance Action Requests (Views)",
+    "Name": "_sb_governanceactionrequest_views",
+    "RelatedEntityName": "Governance Action Requests",
+    "TrimmedViewName": true,
+    "Type": "ViewInfo",
+    "ViewInfoNameMapping": {
+      "18dff075-e905-4767-ba6e-7df10b715488": "Governance Action Request Advanced Find View",
+      "232f9699-69f7-49b4-8f9f-d8f0e1d9df63": "Active Governance Action Requests",
+      "3565e2ac-dd15-48dc-846f-b775f2f51c00": "Governance Action Request Associated View",
+      "54abec1b-bb5f-4045-bd4c-b4ea7bf58fe5": "Inactive Governance Action Requests",
+      "942ef155-0719-413f-a6b1-e9d8eedaa3b7": "Governance Action Request Lookup View"
+    }
+  },
+  {
+    "DisplayName": "Confirmation Method (Governance Action Requests)",
+    "Name": "sb_governanceactionrequest_sb_confirmationmethod",
+    "OptionSetInfoNameMapping": {
+      "100000000": "Button",
+      "100000001": "TypedConfirm",
+      "100000002": "AdminApproval"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_confirmationmethod",
+        "OptionSetReferenceEntityName": "Governance Action Requests"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_confirmationmethod",
+    "RelatedEntityName": "Governance Action Requests",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Request Status (Governance Action Requests)",
+    "Name": "sb_governanceactionrequest_sb_requeststatus",
+    "OptionSetInfoNameMapping": {
+      "100000000": "Pending",
+      "100000001": "AwaitingApproval",
+      "100000002": "Approved",
+      "100000003": "InProgress",
+      "100000004": "Completed",
+      "100000005": "Rejected",
+      "100000006": "Cancelled",
+      "100000007": "Failed"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_requeststatus",
+        "OptionSetReferenceEntityName": "Governance Action Requests"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_requeststatus",
+    "RelatedEntityName": "Governance Action Requests",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Request Type (Governance Action Requests)",
+    "Name": "sb_governanceactionrequest_sb_requesttype",
+    "OptionSetInfoNameMapping": {
+      "100000000": "Certify",
+      "100000001": "Archive",
+      "100000002": "DeleteReview",
+      "100000003": "AssignOwner",
+      "100000004": "Support"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_requesttype",
+        "OptionSetReferenceEntityName": "Governance Action Requests"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_requesttype",
+    "RelatedEntityName": "Governance Action Requests",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Status (Governance Action Requests)",
+    "Name": "sb_governanceactionrequest_statecode",
+    "OptionSetInfoNameMapping": {
+      "0": "Active",
+      "1": "Inactive"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "statecode",
+        "OptionSetReferenceEntityName": "Governance Action Requests"
+      }
+    },
+    "OptionSetTypeKey": "StateType",
+    "RelatedColumnInvariantName": "statecode",
+    "RelatedEntityName": "Governance Action Requests",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Status Reason (Governance Action Requests)",
+    "Name": "sb_governanceactionrequest_statuscode",
+    "OptionSetInfoNameMapping": {
+      "1": "Active",
+      "2": "Inactive"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "statuscode",
+        "OptionSetReferenceEntityName": "Governance Action Requests"
+      }
+    },
+    "OptionSetTypeKey": "StatusType",
+    "RelatedColumnInvariantName": "statuscode",
+    "RelatedEntityName": "Governance Action Requests",
+    "Type": "OptionSetInfo"
+  }
+]

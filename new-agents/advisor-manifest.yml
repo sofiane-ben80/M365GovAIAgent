@@ -8,6 +8,7 @@ defaults:
   authenticationMode: Integrated
   authenticationTrigger: Always
   generativeOrchestration: true
+  isAgentConnectable: true
   conversationHistoryTransfer: false
   webBrowsing: false
   codeInterpreter: false

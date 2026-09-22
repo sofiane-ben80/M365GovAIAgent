@@ -1,0 +1,160 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: My Sites
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - show my sites
+      - my sites
+      - what sites do i own
+      - what do i own
+      - list my sharepoint sites
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_MySitesCallerUpn
+      variable: Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SetVariable
+      id: setVariable_RecordCount
+      variable: init:Topic.RecordCount
+      value: 0
+
+    - kind: SendActivity
+      id: sendActivity_MySitesLoading
+      activity: Loading your sites...
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_ListOwnerSites
+      input:
+        binding:
+          number: =20
+          text: =Topic.CallerUPN
+          text_2: =""
+
+      output:
+        binding:
+          continuationtoken: Topic.ContinuationToken
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          recordcount: Topic.RecordCount
+          status: Topic.ResultStatus
+          success: Topic.Success
+
+      flowId: 68784ae7-b8b3-f111-aaac-000d3a367627
+
+    - kind: ConditionGroup
+      id: conditionGroup_MySitesResult
+      conditions:
+        - id: conditionItem_MySitesFailed
+          condition: =Lower(Text(Topic.Success)) <> "true"
+          actions:
+            - kind: SendActivity
+              id: sendActivity_MySitesFailed
+              activity: |
+                I could not load your governed sites. {Topic.ResultMessage}
+                Status: {Topic.ResultStatus}
+                Correlation ID: {Topic.CorrelationId}
+
+        - id: conditionItem_NoSites
+          condition: =Topic.RecordCount = 0
+          actions:
+            - kind: SendActivity
+              id: sendActivity_NoSites
+              activity: No active Dataverse site-owner assignments were found for your signed-in account.
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_MySitesResult
+          activity:
+            attachments:
+              - kind: AdaptiveCardTemplate
+                cardContent: |-
+                  ={
+                    '$schema': "http://adaptivecards.io/schemas/adaptive-card.json",
+                    type: "AdaptiveCard",
+                    version: "1.5",
+                    body: Table(
+                      {
+                        type: "TextBlock",
+                        text: "Your governed sites",
+                        size: "Large",
+                        weight: "Bolder",
+                        wrap: true
+                      },
+                      {
+                        type: "TextBlock",
+                        text: Text(Topic.RecordCount) & " site(s) found",
+                        isSubtle: true,
+                        spacing: "None",
+                        wrap: true
+                      },
+                      {
+                        type: "Container",
+                        items: ForAll(
+                          FirstN(Table(ParseJSON(Topic.DataJson)), 10) As assignment,
+                          {
+                            type: "Container",
+                            separator: true,
+                            spacing: "Medium",
+                            items: Table(
+                              {
+                                type: "TextBlock",
+                                text: Text(assignment.Value.sb_site.sb_name),
+                                weight: "Bolder",
+                                wrap: true
+                              },
+                              {
+                                type: "FactSet",
+                                facts: Table(
+                                  {
+                                    title: "Compliance",
+                                    value: Switch(
+                                      Text(assignment.Value.sb_site.sb_compliancestatus),
+                                      "100000000", "Compliant",
+                                      "100000001", "Non-compliant",
+                                      "100000002", "Unknown",
+                                      "Not available"
+                                    )
+                                  },
+                                  {
+                                    title: "Last activity",
+                                    value: Coalesce(Text(assignment.Value.sb_site.sb_lastactivityat), "Not available")
+                                  },
+                                  {
+                                    title: "Recommended action",
+                                    value: Switch(
+                                      Text(assignment.Value.sb_site.sb_recommendedaction),
+                                      "100000000", "None",
+                                      "100000001", "Certify",
+                                      "100000002", "Archive",
+                                      "100000003", "Deletion review",
+                                      "100000004", "Assign owners",
+                                      "Not available"
+                                    )
+                                  }
+                                )
+                              },
+                              {
+                                type: "ActionSet",
+                                actions: Table(
+                                  {
+                                    type: "Action.OpenUrl",
+                                    title: "Open site",
+                                    url: Text(assignment.Value.sb_site.sb_siteurl)
+                                  }
+                                )
+                              }
+                            )
+                          }
+                        )
+                      }
+                    )
+                  }
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_MySites

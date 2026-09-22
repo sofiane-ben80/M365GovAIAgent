@@ -1,0 +1,59 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Sites Needing Attention
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - show sites needing attention
+      - sites needing attention
+      - show my non-compliant sites
+      - what needs attention
+      - at risk sites
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_AttentionRecordCount
+      variable: init:Topic.RecordCount
+      value: 0
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_ListOwnerAttentionSites
+      input:
+        binding:
+          number: =20
+          text: =System.User.PrincipalName
+          text_2: =""
+
+      output:
+        binding:
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          recordcount: Topic.RecordCount
+          status: Topic.ResultStatus
+          success: Topic.Success
+
+      flowId: 68784ae7-b8b3-f111-aaac-000d3a367627
+
+    - kind: ConditionGroup
+      id: conditionGroup_AttentionResult
+      conditions:
+        - id: conditionItem_AttentionFailed
+          condition: =Topic.Success <> true
+          actions:
+            - kind: SendActivity
+              id: sendActivity_AttentionFailed
+              activity: "{Topic.ResultMessage} Status: {Topic.ResultStatus}. Correlation ID: {Topic.CorrelationId}"
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_AttentionResult
+          activity: |
+            I loaded {Topic.RecordCount} owned site(s) from Dataverse.
+            Review the compliance status and recommended action in this authorized result:
+            {Topic.DataJson}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_Attention

@@ -1,0 +1,23 @@
+kind: AdaptiveDialog
+modelDescription: Initializes the bounded request context when Governor M365 invokes this connected agent.
+beginDialog:
+  kind: OnRedirect
+  id: main
+  actions:
+    - kind: SetVariable
+      id: setVariable_UserRequest
+      variable: Global.UserRequest
+      value: =Text(System.Activity.Value.UserRequest)
+
+    - kind: SetVariable
+      id: setVariable_ContextSummary
+      variable: Global.ContextSummary
+      value: =Text(System.Activity.Value.ContextSummary)
+
+    - kind: SetVariable
+      id: setVariable_DomainScope
+      variable: Global.DomainScope
+      value: =Text(System.Activity.Value.DomainScope)
+
+inputType: {}
+outputType: {}

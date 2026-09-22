@@ -14,17 +14,17 @@ Two similarly named solutions may appear in the development environment:
 | Solution | Version | Prefix | Tables | Status |
 |---|---:|---|---:|---|
 | `Governor365` | 1.0.0.0 | `sof` | 1 legacy SharePoint Sites table | Legacy proof of concept |
-| `M365Governance` | 2.0.0.0 | `sb` | 9 canonical governance tables | Current schema foundation |
+| `M365Governance` | 2.0.0.0 | `sb` | 10 canonical governance tables | Current integrated release |
 
 If you see only one table, you are looking at the legacy `Governor365`
-solution. Open or import `M365Governance` 2.0.0.0 instead. Its nine tables are
+solution. Open or import `M365Governance` 2.0.0.0 instead. Its 10 tables are
 listed in the [canonical data model](04-DataModel.md).
 
 ## 2. Release contents
 
 A deployable release consists of:
 
-1. `Governor365_<version>_managed.zip`, exported from the development
+1. `M365Governance_<version>_managed.zip`, exported from the development
    environment after all solution gates pass;
 2. `scripts/Test-Governor365SolutionPackage.ps1`;
 3. `scripts/Invoke-DataverseGovernanceScan.ps1`; and
@@ -32,7 +32,7 @@ A deployable release consists of:
 
 The managed solution must contain:
 
-- all nine Dataverse tables in the [canonical data model](04-DataModel.md);
+- all 10 Dataverse tables in the [canonical data model](04-DataModel.md);
 - choices, relationships, alternate keys, forms, views, security roles, and
   access-team configuration;
 - solution-aware Power Automate flows and child flows;
@@ -40,14 +40,15 @@ The managed solution must contain:
 - connection references and environment variable definitions; and
 - any Power Apps and Adaptive Card assets included in the release.
 
-The repository currently includes
-`release/M365Governance_2_0_0_0_managed.zip`. This managed schema-foundation
-package contains all nine tables, columns, choices, lookups, and alternate
-keys. It does not contain the replacement flows or reviewed agents.
+The repository includes the integrated
+`release/M365Governance_2_0_0_0_managed.zip` package. It contains 10 tables,
+five security roles, 11 distinct cloud flows, one Canvas app, eight agents,
+105 bot components, 11 environment variables, six connection references, one
+access-team template, and the Governor365 Agent Chat PCF control.
 
-> **Current functional-release gate:** an end-to-end deployment must wait for
-> the target flows and agents to be included and acceptance-tested. Do not
-> rename the schema-only or a legacy ZIP and treat it as the complete package.
+Five target-catalog flows remain design-only. Inventory Start Scan is packaged
+but intentionally off until Process Work Item and Finalize Scan are
+implemented and tested.
 
 ## 3. Prerequisites
 
@@ -72,29 +73,17 @@ those permissions.
 
 ## 4. Validate the release package
 
-Validate the currently published schema foundation with:
+Validate the published integrated release with:
 
 ```powershell
 .\scripts\Test-Governor365SolutionPackage.ps1 `
-  -Path .\release\M365Governance_2_0_0_0_managed.zip `
-  -ValidationProfile SchemaFoundation
+  -Path .\release\M365Governance_2_0_0_0_managed.zip
 ```
 
-This must report `Managed = True`, `RequiredTables = 9`, and
-`ValidationProfile = SchemaFoundation`.
-
-For a future complete package, use the default strict validation:
-
-From the repository root:
-
-```powershell
-.\scripts\Test-Governor365SolutionPackage.ps1 `
-  -Path .\release\Governor365_2_0_0_0_managed.zip
-```
-
-The command must report `Managed = True`, nine required tables, at least one
-cloud flow, at least one Copilot agent, and a SHA-256 hash. Compare the hash to
-the release notes. Stop if validation fails.
+The command must report `Managed = True`, 10 required tables, 11 cloud flows,
+eight Copilot agents, one Canvas app, 11 environment variables, six connection
+references, one PCF control, zero missing dependencies, and the SHA-256 hash
+published in `release/README.md`. Stop if validation fails.
 
 ## 5. Import the managed solution
 
@@ -129,23 +118,20 @@ store connection secrets or access tokens in the repository.
 
 ## 6. Configure and activate components
 
-1. Confirm that all nine tables exist and that their logical names, choices,
+1. Confirm that all 10 tables exist and that their logical names, choices,
    lookups, and alternate keys match the data model.
 2. Assign the Governor365 administrator and automation security roles.
 3. Configure the Governance Site access-team template if owner-facing Power
    Apps read Dataverse directly.
 4. Verify each connection reference and environment variable.
-5. Turn on child flows first, then request/notification flows, and finally:
-   - `Governor365 - Inventory - Process Work Item`;
-   - `Governor365 - Inventory - Finalize Scan`; and
-   - `Governor365 - Inventory - Start Scan`.
-6. Keep scheduled inventory disabled until the bootstrap scan and acceptance
-   tests succeed.
+5. Turn on child and agent-tool flows first, then the request processor.
+6. Keep `Governor365 - Inventory - Start Scan` disabled until Process Work
+   Item and Finalize Scan are implemented and the bootstrap acceptance tests
+   succeed.
 7. Open every imported Copilot Studio agent, resolve connection prompts, verify
    tool bindings, and publish only after authorization tests pass.
-
-Do not continue to flow and agent activation after importing the current
-schema-foundation package; those components are not included yet.
+8. Open the Canvas app, update the code component if prompted, review the five
+   medium App Checker formula warnings, save, and publish.
 
 ## 7. Run the backend inventory scanner
 

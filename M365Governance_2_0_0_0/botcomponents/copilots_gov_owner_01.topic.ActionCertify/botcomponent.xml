@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_owner_01.topic.ActionCertify">
+  <componenttype>9</componenttype>
+  <description>Action Agent scaffold for confirming and executing a certify request.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Action Certify</name>
+  <parentbotid>
+    <schemaname>copilots_gov_owner_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

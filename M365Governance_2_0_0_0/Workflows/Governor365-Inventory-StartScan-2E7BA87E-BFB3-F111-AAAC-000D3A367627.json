@@ -1,0 +1,219 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        },
+        "runtimeSource": "embedded"
+      },
+      "shared_sharepointonline": {
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedsharepointonline"
+        },
+        "api": {
+          "name": "shared_sharepointonline"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "sb_SharePointAdminUrl (sb_SharePointAdminUrl)": {
+          "defaultValue": "https://MngEnvMCAP733570-admin.sharepoint.com",
+          "type": "String"
+        },
+        "sb_InventoryBatchSize (sb_InventoryBatchSize)": {
+          "defaultValue": 100,
+          "type": "Int"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "actions": {
+        "Initialize_Run": {
+          "runAfter": {},
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "value": "@guid()",
+                "name": "runId",
+                "type": "string"
+              },
+              {
+                "value": "@int(parameters('sb_InventoryBatchSize (sb_InventoryBatchSize)'))",
+                "name": "batchSize",
+                "type": "integer"
+              }
+            ]
+          }
+        },
+        "Validate_Discovery": {
+          "else": {
+            "actions": {
+              "Fail_Invalid_Discovery": {
+                "runAfter": {},
+                "type": "Terminate",
+                "inputs": {
+                  "runError": {
+                    "message": "SharePoint site discovery returned no valid rows or the batch size is invalid.",
+                    "code": "DISCOVERY_COUNT_INVALID"
+                  },
+                  "runStatus": "Failed"
+                }
+              }
+            }
+          },
+          "actions": {
+            "Create_Page_Work_Items": {
+              "actions": {
+                "Create_Work_Item": {
+                  "runAfter": {},
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "authentication": "@parameters('')",
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "operationId": "CreateRecord",
+                      "connectionName": "shared_commondataserviceforapps"
+                    },
+                    "parameters": {
+                      "item/sb_attemptcount": 0,
+                      "item/sb_name": "@concat('Scan ', variables('runId'), ' page ', string(item()))",
+                      "item/sb_scanrun@odata.bind": "@concat('/sb_governancescanruns(', outputs('Create_Scan_Run')?['body']?['sb_governancescanrunid'], ')')",
+                      "entityName": "sb_scanworkitems",
+                      "item/sb_pagetoken": "@string(mul(item(), variables('batchSize')))",
+                      "item/sb_status": 100000000,
+                      "item/sb_discoveredcount": 0,
+                      "item/sb_idempotencykey": "@concat(variables('runId'), '-', string(mul(item(), variables('batchSize'))))",
+                      "item/sb_processedcount": 0
+                    }
+                  }
+                }
+              },
+              "foreach": "@range(0, div(add(int(coalesce(outputs('Count_Sites')?['body']?['PrimaryQueryResult']?['RelevantResults']?['TotalRows'], outputs('Count_Sites')?['body']?['d']?['query']?['PrimaryQueryResult']?['RelevantResults']?['TotalRows'], 0)), sub(variables('batchSize'), 1)), variables('batchSize')))",
+              "operationOptions": "Sequential",
+              "type": "Foreach",
+              "runAfter": {
+                "Create_Scan_Run": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Create_Scan_Run": {
+              "runAfter": {},
+              "type": "OpenApiConnection",
+              "inputs": {
+                "authentication": "@parameters('')",
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "operationId": "CreateRecord",
+                  "connectionName": "shared_commondataserviceforapps"
+                },
+                "parameters": {
+                  "item/sb_runid": "@variables('runId')",
+                  "item/sb_name": "@concat('Governor365 scan ', variables('runId'))",
+                  "item/sb_sitesprocessed": 0,
+                  "entityName": "sb_governancescanruns",
+                  "item/sb_sitesdiscovered": "@int(coalesce(outputs('Count_Sites')?['body']?['PrimaryQueryResult']?['RelevantResults']?['TotalRows'], outputs('Count_Sites')?['body']?['d']?['query']?['PrimaryQueryResult']?['RelevantResults']?['TotalRows'], 0))",
+                  "item/sb_status": 100000000,
+                  "item/sb_sourcewatermark": "@concat('sharepoint-search;total=', string(int(coalesce(outputs('Count_Sites')?['body']?['PrimaryQueryResult']?['RelevantResults']?['TotalRows'], outputs('Count_Sites')?['body']?['d']?['query']?['PrimaryQueryResult']?['RelevantResults']?['TotalRows'], 0))), ';batch=', string(variables('batchSize')))",
+                  "item/sb_startedat": "@utcNow()",
+                  "item/sb_recordsfailed": 0,
+                  "item/sb_correlationid": "@variables('runId')"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Count_Sites": [
+              "Succeeded"
+            ]
+          },
+          "type": "If",
+          "expression": {
+            "and": [
+              {
+                "greater": [
+                  "@int(coalesce(outputs('Count_Sites')?['body']?['PrimaryQueryResult']?['RelevantResults']?['TotalRows'], outputs('Count_Sites')?['body']?['d']?['query']?['PrimaryQueryResult']?['RelevantResults']?['TotalRows'], 0))",
+                  0
+                ]
+              },
+              {
+                "greater": [
+                  "@variables('batchSize')",
+                  0
+                ]
+              },
+              {
+                "lessOrEquals": [
+                  "@variables('batchSize')",
+                  500
+                ]
+              }
+            ]
+          }
+        },
+        "Count_Sites": {
+          "runAfter": {
+            "Initialize_Run": [
+              "Succeeded"
+            ]
+          },
+          "type": "OpenApiConnection",
+          "inputs": {
+            "authentication": "@parameters('')",
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_sharepointonline",
+              "operationId": "HttpRequest",
+              "connectionName": "shared_sharepointonline"
+            },
+            "parameters": {
+              "parameters/method": "GET",
+              "dataset": "@parameters('sb_SharePointAdminUrl (sb_SharePointAdminUrl)')",
+              "parameters/headers": {
+                "Accept": "application/json;odata=nometadata"
+              },
+              "parameters/uri": "_api/search/query?querytext='contentclass%3ASTS_Site'&rowlimit=1&trimduplicates=false"
+            }
+          }
+        }
+      },
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "outputs": {},
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "interval": 1,
+            "frequency": "Week",
+            "schedule": {
+              "hours": [
+                2
+              ],
+              "weekDays": [
+                "Sunday"
+              ],
+              "minutes": [
+                0
+              ]
+            }
+          },
+          "type": "Recurrence"
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

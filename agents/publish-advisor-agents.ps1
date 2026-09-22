@@ -211,6 +211,31 @@ function Write-AgentGptComponent {
         -Encoding UTF8
 }
 
+function Set-AgentConnectable {
+    param(
+        [hashtable]$Agent,
+        [string]$SolutionDirectory
+    )
+
+    $configurationPath = Join-Path `
+        $SolutionDirectory `
+        "bots\$($Agent.SchemaName)\configuration.json"
+    if (-not (Test-Path -Path $configurationPath -PathType Leaf)) {
+        throw "Agent configuration not found: $configurationPath"
+    }
+
+    $configuration = Get-Content -Path $configurationPath -Raw |
+        ConvertFrom-Json
+    $configuration |
+        Add-Member `
+            -NotePropertyName "isAgentConnectable" `
+            -NotePropertyValue $true `
+            -Force
+    $configuration |
+        ConvertTo-Json -Depth 20 |
+        Set-Content -Path $configurationPath -Encoding UTF8
+}
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $newAgentsRoot = Join-Path $repoRoot "new-agents"
 $outputRoot = Join-Path $PSScriptRoot "exports\advisor-publish"
@@ -362,6 +387,9 @@ if ($Publish) {
         Write-AgentGptComponent `
             -Agent $agent `
             -SourcePath $sourcePath `
+            -SolutionDirectory $solutionDirectory
+        Set-AgentConnectable `
+            -Agent $agent `
             -SolutionDirectory $solutionDirectory
     }
 

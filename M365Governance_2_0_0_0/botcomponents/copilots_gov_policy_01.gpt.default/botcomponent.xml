@@ -1,0 +1,13 @@
+<botcomponent schemaname="copilots_gov_policy_01.gpt.default">
+  <componenttype>15</componenttype>
+  <description>Advisory agent for Copilot governance maturity, policy-gap analysis, operating
+models, roadmaps, RACI, and draft governance artifacts based on approved
+sources and aggregate findings.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Governance Policy Advisor</name>
+  <parentbotid>
+    <schemaname>copilots_gov_policy_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

@@ -10,7 +10,8 @@ Microsoft 365 governance is frequently manual and fragmented. Sites become
 stale, lose owners, or miss certification while owners and governance teams
 work across spreadsheets, scripts, lists, and administration portals.
 Governor365 provides a role-aware conversational experience for identifying
-risk, explaining recommendations, and completing governed actions.
+risk, explaining recommendations, and completing governed actions, plus a
+visual dashboard for browsing, filtering, and acting without starting in chat.
 
 ## 2. Scope
 
@@ -21,7 +22,9 @@ risk, explaining recommendations, and completing governed actions.
   in Dataverse;
 - Power Automate inventory, action, approval, notification, and reconciliation
   flows;
-- optional Power Apps owner/admin dashboards;
+- a required Power Apps dashboard for owner and admin interactive journeys;
+- organizational deployment of the agent and dashboard in Microsoft Teams,
+  with browser/Microsoft 365 entry points where supported;
 - Microsoft Graph and SharePoint API integration through approved connectors;
 - configurable policy rules, human approval, audit, and managed-solution ALM.
 
@@ -38,7 +41,7 @@ risk, explaining recommendations, and completing governed actions.
 | Role | Description |
 |---|---|
 | Site Owner | User with an active normalized owner assignment for a governed site |
-| Governance Admin | User verified against the configured governance admin Entra group |
+| Governance Admin | User with an active, in-window GovernanceAdmin assignment in Dataverse |
 | Auditor | Read-only reviewer of requests, events, evidence, and scan outcomes |
 | Platform Maker | Authorized developer of solution components in development |
 | Flow Service Account | Least-privilege owner of production connection references and flows |
@@ -59,6 +62,7 @@ risk, explaining recommendations, and completing governed actions.
 | FR-OWN-08 | Submit a governance support request with optional site context. | Must |
 | FR-OWN-09 | Track the status of the caller's requests. | Must |
 | FR-OWN-10 | Receive and respond to actionable Teams notifications. | Should |
+| FR-OWN-11 | Browse, filter, inspect, and initiate governed actions from an owner-scoped Power Apps dashboard. | Must |
 
 ### Admin experience
 
@@ -72,6 +76,7 @@ risk, explaining recommendations, and completing governed actions.
 | FR-ADM-06 | Trigger a bounded site re-evaluation. | Should |
 | FR-ADM-07 | Receive scheduled Teams summaries with suppression and retry controls. | Must |
 | FR-ADM-08 | Review scan failures, stale evidence, and reconciliation exceptions. | Must |
+| FR-ADM-09 | Use a Power Apps dashboard for tenant summaries, filters, site detail, requests, and operational exceptions. | Must |
 
 ### Triage and evidence
 
@@ -88,7 +93,7 @@ risk, explaining recommendations, and completing governed actions.
 
 | ID | Requirement | Priority |
 |---|---|---|
-| FR-ACT-01 | Revalidate caller identity and authorization inside every tool flow. | Must |
+| FR-ACT-01 | Revalidate caller identity and owner/application-role authorization inside every tool flow. | Must |
 | FR-ACT-02 | Create a Dataverse request before an asynchronous operation. | Must |
 | FR-ACT-03 | Require approval for destructive or privileged changes. | Must |
 | FR-ACT-04 | Record every state transition as an append-only action event. | Must |
@@ -119,6 +124,8 @@ risk, explaining recommendations, and completing governed actions.
 | FR-PLT-04 | Tenant-specific values shall use environment variables. | Must |
 | FR-PLT-05 | Connectors shall comply with environment DLP policy. | Must |
 | FR-PLT-06 | Production connection references shall use approved least-privilege identities. | Must |
+| FR-PLT-07 | The Canvas app shall be modernized from the 1.0 proof of concept, included in the 2.0 managed solution, and use Dataverse only. | Must |
+| FR-PLT-08 | The dashboard and agent shall be distributed as one discoverable Microsoft Teams experience, with tested deep links between chat and app. | Must |
 
 ## 5. Non-functional requirements
 
@@ -141,7 +148,9 @@ risk, explaining recommendations, and completing governed actions.
 
 - Identity comes from Copilot Studio system context, not user prose.
 - Routing to the Admin Agent does not grant authorization.
-- Power Automate rechecks active owner assignment or admin group membership.
+- Power Automate rechecks active owner assignment or an active, in-window
+  Governance Role Assignment by immutable Entra object ID.
+- Role assignments cannot be self-granted through the agent or Canvas app.
 - Tools return minimized, caller-authorized records.
 - Recommendations identify their evidence and are not represented as executed
   actions.

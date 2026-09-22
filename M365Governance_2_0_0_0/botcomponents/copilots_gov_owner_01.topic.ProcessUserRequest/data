@@ -1,0 +1,16 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnActivity
+  id: main
+  condition: =System.Activity.Value = Blank()
+  type: Event
+  actions:
+    - kind: SendActivity
+      id: sendActivity_AyYvjA
+      activity: |-
+        Yoooooooooooooo
+
+        {System.Activity.Value}
+
+inputType: {}
+outputType: {}

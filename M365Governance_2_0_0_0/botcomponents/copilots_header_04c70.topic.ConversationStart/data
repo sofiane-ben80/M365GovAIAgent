@@ -1,0 +1,17 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnConversationStart
+  id: main
+  actions:
+    - kind: SendActivity
+      id: sendMessage_M0LuhV
+      activity:
+        text:
+          - Hi {System.User.DisplayName}, I am {System.Bot.Name}. I can help with operational governance and specialized advisory analysis.
+        speak:
+          - Hello {System.User.DisplayName}. I can help with operational governance and specialized advisory analysis.
+    - kind: SendActivity
+      id: sendActivity_RouteMenu
+      activity: |
+        Operational options: my sites, site details, certify, archive, deletion review, admin dashboard, orphaned sites, assign owner, or request status.
+        Advisory options: policy, Copilot readiness, data protection, identity governance, or security assurance.

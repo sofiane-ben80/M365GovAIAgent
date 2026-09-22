@@ -1,0 +1,71 @@
+<botcomponent_workflowset>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.ActionArchive" workflowid.workflowid="7f675f00-bab3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.ActionAssignOwners" workflowid.workflowid="7f675f00-bab3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.ActionCertify" workflowid.workflowid="7f675f00-bab3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.ActionDelete" workflowid.workflowid="7f675f00-bab3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.ActionStatus" workflowid.workflowid="e8e5cfdb-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.AdminDashboard" workflowid.workflowid="364a1e5b-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.ConversationStart" workflowid.workflowid="03fcfb0f-b6b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.NotAttestedSites" workflowid.workflowid="364a1e5b-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.OrphanedSites" workflowid.workflowid="364a1e5b-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_admin_01.topic.SiteDetail" workflowid.workflowid="4190243f-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_owner_01.topic.ActionStatus" workflowid.workflowid="e8e5cfdb-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_owner_01.topic.CertifySite" workflowid.workflowid="7f675f00-bab3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_owner_01.topic.FlagforDeletion" workflowid.workflowid="7f675f00-bab3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_owner_01.topic.MySites" workflowid.workflowid="68784ae7-b8b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_owner_01.topic.RequestArchival" workflowid.workflowid="7f675f00-bab3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_owner_01.topic.SiteDetail" workflowid.workflowid="4190243f-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_gov_owner_01.topic.SitesNeedingAttention" workflowid.workflowid="68784ae7-b8b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_header_04c70.topic.AdminDashboard" workflowid.workflowid="364a1e5b-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_header_04c70.topic.ChildAdminDashboard" workflowid.workflowid="364a1e5b-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_header_04c70.topic.MySites" workflowid.workflowid="68784ae7-b8b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_header_04c70.topic.OwnerMySites" workflowid.workflowid="68784ae7-b8b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_header_04c70.topic.OwnerSiteReview" workflowid.workflowid="4190243f-b9b3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+  <botcomponent_workflow botcomponentid.schemaname="copilots_header_04c70.topic.OwnerSiteReview" workflowid.workflowid="7f675f00-bab3-f111-aaac-000d3a367627">
+    <iscustomizable>1</iscustomizable>
+  </botcomponent_workflow>
+</botcomponent_workflowset>

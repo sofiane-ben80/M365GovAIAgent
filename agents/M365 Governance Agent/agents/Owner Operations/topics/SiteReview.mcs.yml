@@ -1,0 +1,503 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Site Review
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - review selected site
+      - assess selected site
+      - exact site governance review
+      - review governance site by ID
+      - explain this governance site
+      - recommend remediation for this site
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_SiteIdFromRequest
+      variable: Topic.SiteId
+      value: =Match(System.Activity.Text, "[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}").FullMatch
+
+    - kind: SetVariable
+      id: setVariable_IsActionRequest
+      variable: Topic.IsActionRequest
+      value: =IsMatch(Lower(System.Activity.Text), "governed action|take action|action intent|remediate")
+
+    - kind: Question
+      id: question_SiteId
+      alwaysPrompt: false
+      variable: init:Topic.SiteId
+      prompt: Which Governor365 Dataverse site ID should I review?
+      entity: StringPrebuiltEntity
+
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_GetSiteDetail
+      input:
+        binding:
+          text: =System.User.PrincipalName
+          text_1: =Topic.SiteId
+
+      output:
+        binding:
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          status: Topic.ResultStatus
+          success: Topic.Success
+
+      flowId: 4190243f-b9b3-f111-aaac-000d3a367627
+
+    - kind: ConditionGroup
+      id: conditionGroup_SiteReviewResult
+      conditions:
+        - id: conditionItem_SiteReviewFailed
+          condition: =Lower(Text(Topic.Success)) <> "true"
+          actions:
+            - kind: SendActivity
+              id: sendActivity_SiteReviewFailed
+              activity: |
+                I could not review that site. {Topic.ResultMessage}
+                Status: {Topic.ResultStatus}
+                Correlation ID: {Topic.CorrelationId}
+
+        - id: conditionItem_GovernedAction
+          condition: =Topic.IsActionRequest = true
+          actions:
+            - kind: SetVariable
+              id: setVariable_SiteName
+              variable: Topic.SiteName
+              value: =Text(ParseJSON(Topic.DataJson).sb_name)
+
+            - kind: SetVariable
+              id: setVariable_RecommendedAction
+              variable: Topic.RecommendedAction
+              value: =Switch(Text(ParseJSON(Topic.DataJson).sb_recommendedaction), "100000000", "None", "100000001", "Certify", "100000002", "Archive", "100000003", "Deletion review", "100000004", "Assign owners", "Not available")
+
+            - kind: SendActivity
+              id: sendActivity_ActionMenu
+              activity: |
+                I loaded and authorized **{Topic.SiteName}** (`{Topic.SiteId}`).
+                Stored policy recommendation: **{Topic.RecommendedAction}**.
+
+                Choose one governed action: **Certify**, **Archive**, **Deletion review**, **Assign owners**, or **Cancel**.
+
+            - kind: Question
+              id: question_Action
+              interruptionPolicy:
+                allowInterruption: false
+              alwaysPrompt: true
+              variable: init:Topic.Action
+              prompt: Choose a governed action.
+              entity:
+                kind: EmbeddedEntity
+                definition:
+                  kind: ClosedListEntity
+                  items:
+                    - id: Certify
+                      displayName: Certify
+
+                    - id: Archive
+                      displayName: Archive
+
+                    - id: DeletionReview
+                      displayName: Deletion review
+
+                    - id: AssignOwners
+                      displayName: Assign owners
+
+                    - id: Cancel
+                      displayName: Cancel
+
+            - kind: SetVariable
+              id: setVariable_NormalizedAction
+              variable: Topic.NormalizedAction
+              value: =Lower(Trim(Text(Topic.Action)))
+
+            - kind: SetVariable
+              id: setVariable_ShouldSubmit
+              variable: Topic.ShouldSubmit
+              value: =false
+
+            - kind: SetVariable
+              id: setVariable_TargetOwnerDefault
+              variable: Topic.TargetOwnerUPN
+              value: =""
+
+            - kind: ConditionGroup
+              id: conditionGroup_ActionIntent
+              conditions:
+                - id: conditionItem_Certify
+                  condition: =Topic.NormalizedAction = "certify" || Topic.NormalizedAction = "certification"
+                  actions:
+                    - kind: SetVariable
+                      id: setVariable_CertifyRequestType
+                      variable: Topic.RequestType
+                      value: ="CERTIFY"
+
+                    - kind: SetVariable
+                      id: setVariable_CertifyActionLabel
+                      variable: Topic.ActionLabel
+                      value: ="certification"
+
+                    - kind: SetVariable
+                      id: setVariable_CertifyShouldSubmit
+                      variable: Topic.ShouldSubmit
+                      value: =true
+
+                - id: conditionItem_Archive
+                  condition: =Topic.NormalizedAction = "archive" || Topic.NormalizedAction = "archival"
+                  actions:
+                    - kind: SetVariable
+                      id: setVariable_ArchiveRequestType
+                      variable: Topic.RequestType
+                      value: ="ARCHIVE"
+
+                    - kind: SetVariable
+                      id: setVariable_ArchiveActionLabel
+                      variable: Topic.ActionLabel
+                      value: ="archival"
+
+                    - kind: SetVariable
+                      id: setVariable_ArchiveShouldSubmit
+                      variable: Topic.ShouldSubmit
+                      value: =true
+
+                - id: conditionItem_Delete
+                  condition: =Topic.NormalizedAction = "delete" || Topic.NormalizedAction = "deletion" || Topic.NormalizedAction = "deletion review" || Topic.NormalizedAction = "deletionreview"
+                  actions:
+                    - kind: SetVariable
+                      id: setVariable_DeleteRequestType
+                      variable: Topic.RequestType
+                      value: ="DELETE_REVIEW"
+
+                    - kind: SetVariable
+                      id: setVariable_DeleteActionLabel
+                      variable: Topic.ActionLabel
+                      value: ="deletion review"
+
+                    - kind: SetVariable
+                      id: setVariable_DeleteShouldSubmit
+                      variable: Topic.ShouldSubmit
+                      value: =true
+
+                - id: conditionItem_AssignOwners
+                  condition: =Topic.NormalizedAction = "assign owner" || Topic.NormalizedAction = "assign owners" || Topic.NormalizedAction = "assignowners" || Topic.NormalizedAction = "owners"
+                  actions:
+                    - kind: SetVariable
+                      id: setVariable_AssignOwnerRequestType
+                      variable: Topic.RequestType
+                      value: ="ASSIGN_OWNER"
+
+                    - kind: SetVariable
+                      id: setVariable_AssignOwnerActionLabel
+                      variable: Topic.ActionLabel
+                      value: ="owner assignment"
+
+                    - kind: SetVariable
+                      id: setVariable_AssignOwnerShouldSubmit
+                      variable: Topic.ShouldSubmit
+                      value: =true
+
+                - id: conditionItem_Cancel
+                  condition: =Topic.NormalizedAction = "cancel"
+                  actions:
+                    - kind: SendActivity
+                      id: sendActivity_ActionCancelled
+                      activity: No action intent was recorded and no changes were made.
+
+              elseActions:
+                - kind: SendActivity
+                  id: sendActivity_UnsupportedAction
+                  activity: |
+                    I received `{Topic.Action}`, but the supported actions are Certify, Archive, Deletion review, Assign owners, or Cancel. No request was submitted and no changes were made.
+
+            - kind: ConditionGroup
+              id: conditionGroup_SubmitGovernedAction
+              conditions:
+                - id: conditionItem_SubmitGovernedAction
+                  condition: =Topic.ShouldSubmit = true
+                  actions:
+                    - kind: ConditionGroup
+                      id: conditionGroup_CollectTargetOwner
+                      conditions:
+                        - id: conditionItem_CollectTargetOwner
+                          condition: =Topic.RequestType = "ASSIGN_OWNER"
+                          actions:
+                            - kind: Question
+                              id: question_TargetOwner
+                              interruptionPolicy:
+                                allowInterruption: false
+                              alwaysPrompt: true
+                              variable: init:Topic.TargetOwnerUPN
+                              prompt: Enter the new owner's work email address. Only a GovernanceAdmin can submit this action.
+                              entity: StringPrebuiltEntity
+
+                    - kind: Question
+                      id: question_ActionReason
+                      interruptionPolicy:
+                        allowInterruption: false
+                      alwaysPrompt: true
+                      variable: init:Topic.ActionReason
+                      prompt: Briefly provide the business reason or supporting evidence for this {Topic.ActionLabel} request.
+                      entity: StringPrebuiltEntity
+
+                    - kind: ConditionGroup
+                      id: conditionGroup_CollectConfirmation
+                      conditions:
+                        - id: conditionItem_CollectTypedDeleteConfirmation
+                          condition: =Topic.RequestType = "DELETE_REVIEW"
+                          actions:
+                            - kind: Question
+                              id: question_DeleteConfirmation
+                              interruptionPolicy:
+                                allowInterruption: false
+                              alwaysPrompt: true
+                              variable: init:Topic.Confirmation
+                              prompt: This submits a deletion review; it does not delete the site. Type CONFIRM to continue.
+                              entity: StringPrebuiltEntity
+
+                      elseActions:
+                        - kind: Question
+                          id: question_ActionConfirmation
+                          interruptionPolicy:
+                            allowInterruption: false
+                          alwaysPrompt: true
+                          variable: init:Topic.ConfirmationChoice
+                          prompt: Submit this {Topic.ActionLabel} request?
+                          entity:
+                            kind: EmbeddedEntity
+                            definition:
+                              kind: ClosedListEntity
+                              items:
+                                - id: CONFIRM
+                                  displayName: Submit request
+                                  synonyms:
+                                    - confirm
+
+                                - id: CANCEL
+                                  displayName: Cancel
+
+                        - kind: SetVariable
+                          id: setVariable_ActionConfirmation
+                          variable: Topic.Confirmation
+                          value: =Text(Topic.ConfirmationChoice)
+
+                    - kind: ConditionGroup
+                      id: conditionGroup_ConfirmedGovernedAction
+                      conditions:
+                        - id: conditionItem_ConfirmedGovernedAction
+                          condition: =Upper(Trim(Text(Topic.Confirmation))) = "CONFIRM"
+                          actions:
+                            - kind: InvokeFlowAction
+                              id: invokeFlowAction_SubmitGovernedAction
+                              input:
+                                binding:
+                                  text: =System.User.PrincipalName
+                                  text_1: =Topic.RequestType
+                                  text_2: =Topic.SiteId
+                                  text_3: =Topic.ActionReason
+                                  text_4: =Upper(Trim(Text(Topic.Confirmation)))
+                                  text_5: =Text(GUID())
+                                  text_6: =Topic.TargetOwnerUPN
+
+                              output:
+                                binding:
+                                  correlationid: Topic.SubmitCorrelationId
+                                  message: Topic.SubmitMessage
+                                  requestid: Topic.RequestId
+                                  requeststatus: Topic.RequestStatus
+                                  status: Topic.SubmitStatus
+                                  success: Topic.SubmitSuccess
+
+                              flowId: 7f675f00-bab3-f111-aaac-000d3a367627
+
+                            - kind: ConditionGroup
+                              id: conditionGroup_SubmitResult
+                              conditions:
+                                - id: conditionItem_SubmitSucceeded
+                                  condition: =Lower(Text(Topic.SubmitSuccess)) = "true"
+                                  actions:
+                                    - kind: SendActivity
+                                      id: sendActivity_SubmitSucceeded
+                                      activity: |
+                                        {Topic.SubmitMessage}
+                                        Request ID: `{Topic.RequestId}`
+                                        Request status: **{Topic.RequestStatus}**
+                                        Correlation ID: `{Topic.SubmitCorrelationId}`
+
+                                        The request is recorded in Dataverse. This confirmation does not mean the underlying Microsoft 365 operation has completed. Certification is processed automatically; archive, deletion review, and owner assignment remain subject to policy checks, approval, and connector availability.
+
+                              elseActions:
+                                - kind: SendActivity
+                                  id: sendActivity_SubmitFailed
+                                  activity: |
+                                    I could not submit the {Topic.ActionLabel} request. {Topic.SubmitMessage}
+                                    Status: {Topic.SubmitStatus}
+                                    Correlation ID: {Topic.SubmitCorrelationId}
+
+                      elseActions:
+                        - kind: SendActivity
+                          id: sendActivity_SubmissionCancelled
+                          activity: No request was submitted and no changes were made.
+
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_SiteReviewResult
+          activity:
+            attachments:
+              - kind: AdaptiveCardTemplate
+                cardContent: |-
+                  =With(
+                    { site: ParseJSON(Topic.DataJson) },
+                    {
+                      '$schema': "http://adaptivecards.io/schemas/adaptive-card.json",
+                      type: "AdaptiveCard",
+                      version: "1.5",
+                      body: Table(
+                        {
+                          type: "TextBlock",
+                          text: "Governance review: " & Text(site.sb_name),
+                          size: "Large",
+                          weight: "Bolder",
+                          wrap: true
+                        },
+                        {
+                          type: "TextBlock",
+                          text: "Live Dataverse record " & Text(site.sb_governancesiteid),
+                          isSubtle: true,
+                          spacing: "None",
+                          wrap: true
+                        },
+                        {
+                          type: "TextBlock",
+                          text: "Evidence",
+                          weight: "Bolder",
+                          spacing: "Medium",
+                          wrap: true
+                        },
+                        {
+                          type: "FactSet",
+                          facts: Table(
+                            {
+                              title: "Compliance",
+                              value: Switch(
+                                Text(site.sb_compliancestatus),
+                                "100000000", "Compliant",
+                                "100000001", "Non-compliant",
+                                "100000002", "Unknown",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Effective owners",
+                              value: Coalesce(Text(site.sb_effectiveownercount), "0")
+                            },
+                            {
+                              title: "External sharing",
+                              value: Switch(
+                                Text(site.sb_externalsharing),
+                                "100000000", "Disabled",
+                                "100000001", "Existing guests",
+                                "100000002", "New and existing guests",
+                                "100000003", "Anyone",
+                                "100000004", "Unknown",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Last activity",
+                              value: Coalesce(Text(site.sb_lastactivityat), "Not available")
+                            },
+                            {
+                              title: "Attestation",
+                              value: Switch(
+                                Text(site.sb_attestationstatus),
+                                "100000000", "Not attested",
+                                "100000001", "Attested",
+                                "100000002", "Expired",
+                                "100000003", "Exempt",
+                                "100000004", "Unknown",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Last observed",
+                              value: Coalesce(Text(site.sb_lastobservedat), "Not available")
+                            }
+                          )
+                        },
+                        {
+                          type: "TextBlock",
+                          text: "Risk analysis",
+                          weight: "Bolder",
+                          spacing: "Medium",
+                          wrap: true
+                        },
+                        {
+                          type: "TextBlock",
+                          text: If(
+                            Text(site.sb_compliancestatus) = "100000001" || Coalesce(Value(site.sb_effectiveownercount), 0) = 0 || Text(site.sb_externalsharing) = "100000003",
+                            "High priority: the record shows non-compliance, no effective owner, or anonymous-link exposure. Validate the stored triage reason and contain access before lifecycle action.",
+                            Text(site.sb_compliancestatus) = "100000002" || Text(site.sb_attestationstatus) = "100000002" || Text(site.sb_attestationstatus) = "100000004" || Text(site.sb_externalsharing) = "100000004",
+                            "Moderate priority: one or more governance signals are unknown or stale. Refresh evidence and complete attestation before approving the recommended action.",
+                            "Routine priority: no high-risk condition is evident in the tracked fields. Continue with the stored recommendation and normal approval controls."
+                          ),
+                          wrap: true
+                        },
+                        {
+                          type: "TextBlock",
+                          text: "Policy recommendation",
+                          weight: "Bolder",
+                          spacing: "Medium",
+                          wrap: true
+                        },
+                        {
+                          type: "TextBlock",
+                          text: "The policy engine recommends " &
+                            Switch(
+                              Text(site.sb_recommendedaction),
+                              "100000000", "no action",
+                              "100000001", "certification",
+                              "100000002", "archive review",
+                              "100000003", "deletion review",
+                              "100000004", "assigning owners",
+                              "an undefined action"
+                            ) &
+                            ". Recorded basis: " & Coalesce(Text(site.sb_triagereason), "No triage reason is stored.") &
+                            " This comparison is limited to the live policy result stored on the site record.",
+                          wrap: true
+                        },
+                        {
+                          type: "TextBlock",
+                          text: "Prioritized remediation",
+                          weight: "Bolder",
+                          spacing: "Medium",
+                          wrap: true
+                        },
+                        {
+                          type: "TextBlock",
+                          text: Switch(
+                            Text(site.sb_recommendedaction),
+                            "100000001", "1. Confirm accountable owners and current business purpose. 2. Refresh evidence and attestation. 3. Submit certification through the governed approval path.",
+                            "100000002", "1. Confirm inactivity and retention requirements. 2. Validate owners and downstream dependencies. 3. Submit archive review through the governed approval path.",
+                            "100000003", "1. Contain risky sharing if present. 2. Validate retention, legal hold, ownership, and business need. 3. Submit deletion review; do not delete directly.",
+                            "100000004", "1. Identify at least two accountable owners. 2. Record and verify owner assignments. 3. Re-run compliance and attestation review.",
+                            "100000000", "1. Preserve the current control posture. 2. Monitor ownership, sharing, activity, and attestation on the normal review cadence.",
+                            "1. Refresh the site evidence. 2. Resolve unknown governance signals. 3. Re-run policy evaluation before taking action."
+                          ),
+                          wrap: true
+                        }
+                      ),
+                      actions: Table(
+                        {
+                          type: "Action.OpenUrl",
+                          title: "Open site",
+                          url: Text(site.sb_siteurl)
+                        }
+                      )
+                    }
+                  )
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_SiteReview

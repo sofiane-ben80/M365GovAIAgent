@@ -1,0 +1,260 @@
+[
+  {
+    "CdsFCBContext": "{\"FileType\":true,\"ImageExternalStorage\":true}",
+    "EntitySetName": "sb_governancesites",
+    "IsHidden": false,
+    "IsSampleData": false,
+    "IsWritable": true,
+    "LogicalName": "sb_governancesite",
+    "MaxGetRowsCount": 500,
+    "Name": "Governance Sites",
+    "NativeCDSDataSourceInfoNameMapping": {
+      "_ownerid_value": "Owner",
+      "createdby": "Created By",
+      "createdon": "Created On",
+      "createdonbehalfby": "Created By (Delegate)",
+      "importsequencenumber": "Import Sequence Number",
+      "modifiedby": "Modified By",
+      "modifiedon": "Modified On",
+      "modifiedonbehalfby": "Modified By (Delegate)",
+      "overriddencreatedon": "Record Created On",
+      "owningbusinessunit": "Owning Business Unit",
+      "owningteam": "Owning Team",
+      "owninguser": "Owning User",
+      "sb_attestationexpiresat": "Attestation Expires At",
+      "sb_attestationstatus": "Attestation Status",
+      "sb_compliancestatus": "Compliance Status",
+      "sb_createdat": "Created At",
+      "sb_directownercount": "Direct Owner Count",
+      "sb_effectiveownercount": "Effective Owner Count",
+      "sb_evidencesnapshot_site": "Evidence Snapshots",
+      "sb_externalsharing": "External Sharing",
+      "sb_governanceactionrequest_site": "Governance Action Requests",
+      "sb_governancesite_AsyncOperations": "System Jobs",
+      "sb_governancesite_BulkDeleteFailures": "Bulk Delete Failures",
+      "sb_governancesite_MailboxTrackingFolders": "Mailbox Auto Tracking Folders",
+      "sb_governancesite_PrincipalObjectAttributeAccesses": "Field Sharing",
+      "sb_governancesite_ProcessSession": "Process Sessions",
+      "sb_governancesite_SyncErrors": "Sync Errors",
+      "sb_governancesite_Teams": "Teams",
+      "sb_governancesiteid": "Governance Site (sb_governancesiteid)",
+      "sb_groupid": "Group ID",
+      "sb_groupownercount": "Group Owner Count",
+      "sb_lastactivityat": "Last Activity At",
+      "sb_lastcertifiedat": "Last Certified At",
+      "sb_lastobservedat": "Last Observed At",
+      "sb_lastscanrun": "Last Scan Run",
+      "sb_lifecyclestatus": "Lifecycle Status",
+      "sb_m365siteid": "Microsoft 365 Site ID",
+      "sb_name": "Governance Site (sb_name)",
+      "sb_office": "Office",
+      "sb_recommendedaction": "Recommended Action",
+      "sb_siteownerassignment_site": "Site Owner Assignments",
+      "sb_sitetype": "Site Type",
+      "sb_siteurl": "Site URL",
+      "sb_sourceetag": "Source ETag",
+      "sb_storageusagemb": "Storage Usage MB",
+      "sb_suboffice": "Suboffice",
+      "sb_suppressnotificationsuntil": "Suppress Notifications Until",
+      "sb_tenantid": "Tenant ID",
+      "sb_triagereason": "Triage Reason",
+      "sb_webid": "Web ID",
+      "statecode": "Status",
+      "statuscode": "Status Reason",
+      "timezoneruleversionnumber": "Time Zone Rule Version Number",
+      "utcconversiontimezonecode": "UTC Conversion Time Zone Code",
+      "versionnumber": "Version Number"
+    },
+    "PreferredName": "Governance Sites",
+    "Type": "NativeCDSDataSourceInfo"
+  },
+  {
+    "DisplayName": "Governance Sites (Views)",
+    "Name": "_sb_governancesite_views",
+    "RelatedEntityName": "Governance Sites",
+    "TrimmedViewName": true,
+    "Type": "ViewInfo",
+    "ViewInfoNameMapping": {
+      "02824fa9-bfd5-4f5c-8a0a-e2f107bd9341": "Inactive Governance Sites",
+      "132198d8-b03d-402f-bbcf-3a06af4e4921": "Active Governance Sites",
+      "13edb6e4-33d7-4e04-a22e-4b6e29911d73": "Governance Site Lookup View",
+      "a87104a0-e160-427d-9663-c4fb5f1ffd8a": "Governance Site Advanced Find View",
+      "b6a373c4-89a1-4dd1-bbc3-aba93288dd7d": "Governance Site Associated View"
+    }
+  },
+  {
+    "DisplayName": "Attestation Status (Governance Sites)",
+    "Name": "sb_governancesite_sb_attestationstatus",
+    "OptionSetInfoNameMapping": {
+      "100000000": "NotAttested",
+      "100000001": "Attested",
+      "100000002": "Expired",
+      "100000003": "Exempt",
+      "100000004": "Unknown"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_attestationstatus",
+        "OptionSetReferenceEntityName": "Governance Sites"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_attestationstatus",
+    "RelatedEntityName": "Governance Sites",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Compliance Status (Governance Sites)",
+    "Name": "sb_governancesite_sb_compliancestatus",
+    "OptionSetInfoNameMapping": {
+      "100000000": "Compliant",
+      "100000001": "NonCompliant",
+      "100000002": "Unknown"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_compliancestatus",
+        "OptionSetReferenceEntityName": "Governance Sites"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_compliancestatus",
+    "RelatedEntityName": "Governance Sites",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "External Sharing (Governance Sites)",
+    "Name": "sb_governancesite_sb_externalsharing",
+    "OptionSetInfoNameMapping": {
+      "100000000": "Disabled",
+      "100000001": "ExistingGuests",
+      "100000002": "NewAndExistingGuests",
+      "100000003": "Anyone",
+      "100000004": "Unknown"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_externalsharing",
+        "OptionSetReferenceEntityName": "Governance Sites"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_externalsharing",
+    "RelatedEntityName": "Governance Sites",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Lifecycle Status (Governance Sites)",
+    "Name": "sb_governancesite_sb_lifecyclestatus",
+    "OptionSetInfoNameMapping": {
+      "100000000": "Active",
+      "100000001": "ReadOnly",
+      "100000002": "Archived",
+      "100000003": "Deleted",
+      "100000004": "Unknown"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_lifecyclestatus",
+        "OptionSetReferenceEntityName": "Governance Sites"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_lifecyclestatus",
+    "RelatedEntityName": "Governance Sites",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Recommended Action (Governance Sites)",
+    "Name": "sb_governancesite_sb_recommendedaction",
+    "OptionSetInfoNameMapping": {
+      "100000000": "None",
+      "100000001": "Certify",
+      "100000002": "Archive",
+      "100000003": "DeleteReview",
+      "100000004": "AssignOwners"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_recommendedaction",
+        "OptionSetReferenceEntityName": "Governance Sites"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_recommendedaction",
+    "RelatedEntityName": "Governance Sites",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Site Type (Governance Sites)",
+    "Name": "sb_governancesite_sb_sitetype",
+    "OptionSetInfoNameMapping": {
+      "100000000": "Group",
+      "100000001": "Communication",
+      "100000002": "Classic",
+      "100000003": "Other"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_sitetype",
+        "OptionSetReferenceEntityName": "Governance Sites"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_sitetype",
+    "RelatedEntityName": "Governance Sites",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Status (Governance Sites)",
+    "Name": "sb_governancesite_statecode",
+    "OptionSetInfoNameMapping": {
+      "0": "Active",
+      "1": "Inactive"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "statecode",
+        "OptionSetReferenceEntityName": "Governance Sites"
+      }
+    },
+    "OptionSetTypeKey": "StateType",
+    "RelatedColumnInvariantName": "statecode",
+    "RelatedEntityName": "Governance Sites",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Status Reason (Governance Sites)",
+    "Name": "sb_governancesite_statuscode",
+    "OptionSetInfoNameMapping": {
+      "1": "Active",
+      "2": "Inactive"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "statuscode",
+        "OptionSetReferenceEntityName": "Governance Sites"
+      }
+    },
+    "OptionSetTypeKey": "StatusType",
+    "RelatedColumnInvariantName": "statuscode",
+    "RelatedEntityName": "Governance Sites",
+    "Type": "OptionSetInfo"
+  }
+]

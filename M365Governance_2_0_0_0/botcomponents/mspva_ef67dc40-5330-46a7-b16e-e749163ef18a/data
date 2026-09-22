@@ -1,0 +1,8 @@
+kind: EvaluationData
+rows:
+  - source: Imported
+    expectedOutput: Use the Governance Owner Agent and ask for the site ID, reason, and explicit CONFIRM. Explain that archival creates a governed request and may make the site read-only after approval.
+    input: Archive my site.
+
+extensionData:
+  displayOrder: "1789908703010"

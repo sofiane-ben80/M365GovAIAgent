@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="sb_GovernanceAdminGroupId">
+  <description default="Environment-specific Entra group object ID used for fail-closed admin authorization.">
+    <label description="Environment-specific Entra group object ID used for fail-closed admin authorization." languagecode="1033" />
+  </description>
+  <displayname default="Governance Admin Group ID">
+    <label description="Governance Admin Group ID" languagecode="1033" />
+  </displayname>
+  <introducedversion>2.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

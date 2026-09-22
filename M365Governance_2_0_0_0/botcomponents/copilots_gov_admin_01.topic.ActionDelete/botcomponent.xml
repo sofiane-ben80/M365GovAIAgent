@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_admin_01.topic.ActionDelete">
+  <componenttype>9</componenttype>
+  <description>Action Agent scaffold for confirming and executing a deletion request review.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Action Delete</name>
+  <parentbotid>
+    <schemaname>copilots_gov_admin_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

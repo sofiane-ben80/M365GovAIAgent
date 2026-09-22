@@ -335,6 +335,7 @@ function Get-SiteOwners {
             -ClientId $ClientId `
             -Tenant $TenantId `
             -Interactive `
+            -PersistLogin `
             -ReturnConnection
 
         $ownerGroup = Get-PnPGroup -AssociatedOwnerGroup -Connection $siteConnection
@@ -432,7 +433,7 @@ function Get-ExistingSite {
 
     $tenant = Escape-ODataString $TenantId
     $siteId = Escape-ODataString $M365SiteId
-    $query = "$GovernanceSiteEntitySet?" +
+    $query = "${GovernanceSiteEntitySet}?" +
         "`$select=sb_governancesiteid,sb_lastcertifiedat" +
         "&`$filter=sb_tenantid eq '$tenant' and sb_m365siteid eq '$siteId'"
     $response = Invoke-DataverseRequest -Method GET -RelativeUrl $query
@@ -449,7 +450,7 @@ function Get-ExistingSite {
 function Set-OwnerAssignments {
     param(
         [Parameter(Mandatory)][guid] $GovernanceSiteId,
-        [Parameter(Mandatory)][object[]] $Owners
+        [Parameter(Mandatory)][AllowEmptyCollection()][object[]] $Owners
     )
 
     $sourceValues = @{
@@ -469,7 +470,7 @@ function Set-OwnerAssignments {
         $ownerKey = "$sourceValue|$($owner.UPN)"
         $observedKeys[$ownerKey] = $true
         $escapedUpn = Escape-ODataString $owner.UPN
-        $query = "$OwnerAssignmentEntitySet?" +
+        $query = "${OwnerAssignmentEntitySet}?" +
             "`$select=sb_siteownerassignmentid" +
             "&`$filter=_sb_site_value eq $GovernanceSiteId" +
             " and sb_principalupn eq '$escapedUpn'" +
@@ -512,7 +513,7 @@ function Set-OwnerAssignments {
         }
     }
 
-    $activeQuery = "$OwnerAssignmentEntitySet?" +
+    $activeQuery = "${OwnerAssignmentEntitySet}?" +
         "`$select=sb_siteownerassignmentid,sb_principalupn,sb_ownershipsource" +
         "&`$filter=_sb_site_value eq $GovernanceSiteId and sb_isactive eq true"
     $activeAssignments = @((
@@ -540,7 +541,7 @@ function Set-UnobservedSitesUnknown {
         -ColumnLogicalName "sb_lifecyclestatus" `
         -Label "Unknown"
     $tenant = Escape-ODataString $TenantId
-    $relativeUrl = "$GovernanceSiteEntitySet?" +
+    $relativeUrl = "${GovernanceSiteEntitySet}?" +
         "`$select=sb_governancesiteid" +
         "&`$filter=sb_tenantid eq '$tenant'" +
         " and (_sb_lastscanrun_value ne $scanRunId or _sb_lastscanrun_value eq null)"
@@ -556,8 +557,9 @@ function Set-UnobservedSitesUnknown {
         }
 
         $relativeUrl = $null
-        if ($null -ne $response.'@odata.nextLink') {
-            $relativeUrl = ([string]$response.'@odata.nextLink').Replace("$apiRoot/", "")
+        $nextLinkProperty = $response.PSObject.Properties['@odata.nextLink']
+        if ($null -ne $nextLinkProperty) {
+            $relativeUrl = ([string]$nextLinkProperty.Value).Replace("$apiRoot/", "")
         }
     }
 }
@@ -572,6 +574,7 @@ $adminConnection = Connect-PnPOnline `
     -ClientId $ClientId `
     -Tenant $TenantId `
     -Interactive `
+    -PersistLogin `
     -ReturnConnection
 
 $sites = @(Get-PnPTenantSite `
@@ -580,7 +583,7 @@ $sites = @(Get-PnPTenantSite `
     -Connection $adminConnection |
     Where-Object {
         -not [string]::IsNullOrWhiteSpace([string]$_.Url) -and
-        $_.Url -notmatch '-my\.sharepoint\.com/personal/'
+        $_.Url -notmatch '-my\.sharepoint\.com(?:/|$)'
     })
 if ($SiteLimit -gt 0) {
     $sites = @($sites | Select-Object -First $SiteLimit)
@@ -661,7 +664,11 @@ try {
             $lastActivityAt = Get-PnPPropertyValue `
                 -InputObject $site `
                 -Names @("LastContentModifiedDate", "LastContentModifiedDateTime")
-            $effectiveOwnerCount = @($owners.UPN | Sort-Object -Unique).Count
+            $effectiveOwnerCount = @(
+                $owners |
+                    ForEach-Object { $_.UPN } |
+                    Sort-Object -Unique
+            ).Count
             $recommendation = Get-GovernanceRecommendation `
                 -OwnerCount $effectiveOwnerCount `
                 -LastActivityAt $lastActivityAt `

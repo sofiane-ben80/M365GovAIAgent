@@ -1,0 +1,38 @@
+App As appinfo:
+    BackEnabled: =true
+    OnStart: |-
+        =Set(varChatContextVersion, 1);
+        Set(varChatPromptVersion, 0);
+        Set(varChatPromptText, "");
+        Set(varOwnerBriefingShown, false);
+        Set(varAdminBriefingShown, false);
+        Set(
+            varCopilotMobileTokenEndpoint,
+            "https://9417045e87bbeac8bda1850674b114.05.environment.api.powerplatform.com/powervirtualagents/botsbyschema/copilots_header_04c70/directline/token?api-version=2022-03-01-preview"
+        )
+    StartScreen: |
+        =If(
+            IfError(
+                !IsBlank(
+                    LookUp(
+                        'Governance Role Assignments',
+                        Lower(sb_principalobjectid) = Lower(Text(User().EntraObjectId)) &&
+                        sb_isactive &&
+                        (IsBlank(sb_validfrom) || sb_validfrom <= Now()) &&
+                        (IsBlank(sb_validuntil) || sb_validuntil >= Now())
+                    )
+                ),
+                false
+            ),
+            scrAdminDashboard,
+            scrDashboard
+        )
+    Theme: =PowerAppsTheme
+
+    Host As hostControl.DefaultHostControlVariant:
+        OnCancel: =false
+        OnEdit: =false
+        OnNew: =false
+        OnSave: =false
+        OnView: =false
+

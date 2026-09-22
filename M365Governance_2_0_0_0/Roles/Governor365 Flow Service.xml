@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Role id="{7e8fa43b-bbb3-f111-aaac-000d3a367627}" name="Governor365 Flow Service" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <IsCustomizable>1</IsCustomizable>
+  <IsAutoAssigned>0</IsAutoAssigned>
+  <RolePrivileges>
+    <RolePrivilege name="prvAppendsb_evidencesnapshot" level="Global" />
+    <RolePrivilege name="prvAppendsb_governanceactionevent" level="Global" />
+    <RolePrivilege name="prvAppendsb_governanceactionrequest" level="Global" />
+    <RolePrivilege name="prvAppendsb_GovernanceRoleAssignment" level="Global" />
+    <RolePrivilege name="prvAppendsb_governancescanrun" level="Global" />
+    <RolePrivilege name="prvAppendsb_governancesite" level="Global" />
+    <RolePrivilege name="prvAppendsb_notificationdelivery" level="Global" />
+    <RolePrivilege name="prvAppendsb_scanworkitem" level="Global" />
+    <RolePrivilege name="prvAppendsb_siteownerassignment" level="Global" />
+    <RolePrivilege name="prvAppendTosb_evidencesnapshot" level="Global" />
+    <RolePrivilege name="prvAppendTosb_governanceactionevent" level="Global" />
+    <RolePrivilege name="prvAppendTosb_governanceactionrequest" level="Global" />
+    <RolePrivilege name="prvAppendTosb_GovernanceRoleAssignment" level="Global" />
+    <RolePrivilege name="prvAppendTosb_governancescanrun" level="Global" />
+    <RolePrivilege name="prvAppendTosb_governancesite" level="Global" />
+    <RolePrivilege name="prvAppendTosb_notificationdelivery" level="Global" />
+    <RolePrivilege name="prvAppendTosb_scanworkitem" level="Global" />
+    <RolePrivilege name="prvAppendTosb_siteownerassignment" level="Global" />
+    <RolePrivilege name="prvAssignsb_governancesite" level="Global" />
+    <RolePrivilege name="prvCreatesb_evidencesnapshot" level="Global" />
+    <RolePrivilege name="prvCreatesb_governanceactionevent" level="Global" />
+    <RolePrivilege name="prvCreatesb_governanceactionrequest" level="Global" />
+    <RolePrivilege name="prvCreatesb_GovernanceRoleAssignment" level="Global" />
+    <RolePrivilege name="prvCreatesb_governancescanrun" level="Global" />
+    <RolePrivilege name="prvCreatesb_governancesite" level="Global" />
+    <RolePrivilege name="prvCreatesb_notificationdelivery" level="Global" />
+    <RolePrivilege name="prvCreatesb_scanworkitem" level="Global" />
+    <RolePrivilege name="prvCreatesb_siteownerassignment" level="Global" />
+    <RolePrivilege name="prvCreateSharePointData" level="Global" />
+    <RolePrivilege name="prvDeletesb_evidencesnapshot" level="Global" />
+    <RolePrivilege name="prvDeletesb_governancescanrun" level="Global" />
+    <RolePrivilege name="prvDeletesb_governancesite" level="Global" />
+    <RolePrivilege name="prvDeletesb_notificationdelivery" level="Global" />
+    <RolePrivilege name="prvDeletesb_scanworkitem" level="Global" />
+    <RolePrivilege name="prvDeletesb_siteownerassignment" level="Global" />
+    <RolePrivilege name="prvReadPluginAssembly" level="Global" />
+    <RolePrivilege name="prvReadPluginType" level="Global" />
+    <RolePrivilege name="prvReadsb_evidencesnapshot" level="Global" />
+    <RolePrivilege name="prvReadsb_governanceactionevent" level="Global" />
+    <RolePrivilege name="prvReadsb_governanceactionrequest" level="Global" />
+    <RolePrivilege name="prvReadsb_governancepolicysetting" level="Global" />
+    <RolePrivilege name="prvReadsb_GovernanceRoleAssignment" level="Global" />
+    <RolePrivilege name="prvReadsb_governancescanrun" level="Global" />
+    <RolePrivilege name="prvReadsb_governancesite" level="Global" />
+    <RolePrivilege name="prvReadsb_notificationdelivery" level="Global" />
+    <RolePrivilege name="prvReadsb_scanworkitem" level="Global" />
+    <RolePrivilege name="prvReadsb_siteownerassignment" level="Global" />
+    <RolePrivilege name="prvReadSdkMessage" level="Global" />
+    <RolePrivilege name="prvReadSdkMessageProcessingStep" level="Global" />
+    <RolePrivilege name="prvReadSdkMessageProcessingStepImage" level="Global" />
+    <RolePrivilege name="prvReadSharePointData" level="Global" />
+    <RolePrivilege name="prvReadSharePointDocument" level="Global" />
+    <RolePrivilege name="prvSharesb_governancesite" level="Global" />
+    <RolePrivilege name="prvWritesb_evidencesnapshot" level="Global" />
+    <RolePrivilege name="prvWritesb_governanceactionrequest" level="Global" />
+    <RolePrivilege name="prvWritesb_GovernanceRoleAssignment" level="Global" />
+    <RolePrivilege name="prvWritesb_governancescanrun" level="Global" />
+    <RolePrivilege name="prvWritesb_governancesite" level="Global" />
+    <RolePrivilege name="prvWritesb_notificationdelivery" level="Global" />
+    <RolePrivilege name="prvWritesb_scanworkitem" level="Global" />
+    <RolePrivilege name="prvWritesb_siteownerassignment" level="Global" />
+    <RolePrivilege name="prvWriteSharePointData" level="Global" />
+  </RolePrivileges>
+</Role>

@@ -1,0 +1,468 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_office365users": {
+        "runtimeSource": "embedded",
+        "api": {
+          "name": "shared_office365users"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedoffice365users"
+        }
+      },
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedcommondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "outputs": {},
+      "contentVersion": "1.0.0.0",
+      "actions": {
+        "Catch": {
+          "actions": {
+            "Respond_Verification_Failed": {
+              "inputs": {
+                "schema": {
+                  "properties": {
+                    "correlationid": {
+                      "x-ms-content-hint": "TEXT",
+                      "x-ms-dynamically-added": true,
+                      "title": "CorrelationId",
+                      "type": "string"
+                    },
+                    "success": {
+                      "x-ms-content-hint": "BOOLEAN",
+                      "x-ms-dynamically-added": true,
+                      "title": "Success",
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "x-ms-content-hint": "TEXT",
+                      "x-ms-dynamically-added": true,
+                      "title": "Status",
+                      "type": "string"
+                    },
+                    "isadmin": {
+                      "x-ms-content-hint": "BOOLEAN",
+                      "x-ms-dynamically-added": true,
+                      "title": "IsAdmin",
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "x-ms-content-hint": "TEXT",
+                      "x-ms-dynamically-added": true,
+                      "title": "Message",
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": {},
+                  "type": "object"
+                },
+                "body": {
+                  "correlationid": "@variables('correlationId')",
+                  "success": false,
+                  "status": "VERIFICATION_FAILED",
+                  "isadmin": false,
+                  "message": "Admin access could not be verified. Use the correlation ID for support."
+                },
+                "statusCode": 200
+              },
+              "kind": "Skills",
+              "runAfter": {},
+              "type": "Response"
+            }
+          },
+          "runAfter": {
+            "Try": [
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "type": "Scope"
+        },
+        "Validate_Caller": {
+          "expression": {
+            "and": [
+              {
+                "not": [
+                  {
+                    "empty": [
+                      "@trim(triggerBody()?['text'])"
+                    ]
+                  }
+                ]
+              },
+              {
+                "contains": [
+                  "@trim(triggerBody()?['text'])",
+                  "@"
+                ]
+              }
+            ]
+          },
+          "else": {
+            "actions": {
+              "Respond_Validation_Failed": {
+                "inputs": {
+                  "schema": {
+                    "properties": {
+                      "correlationid": {
+                        "x-ms-content-hint": "TEXT",
+                        "x-ms-dynamically-added": true,
+                        "title": "CorrelationId",
+                        "type": "string"
+                      },
+                      "success": {
+                        "x-ms-content-hint": "BOOLEAN",
+                        "x-ms-dynamically-added": true,
+                        "title": "Success",
+                        "type": "boolean"
+                      },
+                      "status": {
+                        "x-ms-content-hint": "TEXT",
+                        "x-ms-dynamically-added": true,
+                        "title": "Status",
+                        "type": "string"
+                      },
+                      "isadmin": {
+                        "x-ms-content-hint": "BOOLEAN",
+                        "x-ms-dynamically-added": true,
+                        "title": "IsAdmin",
+                        "type": "boolean"
+                      },
+                      "message": {
+                        "x-ms-content-hint": "TEXT",
+                        "x-ms-dynamically-added": true,
+                        "title": "Message",
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": {},
+                    "type": "object"
+                  },
+                  "body": {
+                    "correlationid": "@variables('correlationId')",
+                    "success": false,
+                    "status": "VALIDATION_FAILED",
+                    "isadmin": false,
+                    "message": "The signed-in caller identity is missing or malformed."
+                  },
+                  "statusCode": 200
+                },
+                "kind": "Skills",
+                "runAfter": {},
+                "type": "Response"
+              }
+            }
+          },
+          "runAfter": {
+            "Initialize_Correlation": [
+              "Succeeded"
+            ]
+          },
+          "actions": {},
+          "type": "If"
+        },
+        "Initialize_Correlation": {
+          "inputs": {
+            "variables": [
+              {
+                "name": "correlationId",
+                "value": "@guid()",
+                "type": "string"
+              }
+            ]
+          },
+          "runAfter": {},
+          "type": "InitializeVariable"
+        },
+        "Try": {
+          "actions": {
+            "Evaluate_Admin_Assignment": {
+              "expression": {
+                "and": [
+                  {
+                    "equals": [
+                      "@length(outputs('List_Admin_Role_Assignments')?['body']?['value'])",
+                      1
+                    ]
+                  }
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Check_Duplicate_Assignments": {
+                    "expression": {
+                      "and": [
+                        {
+                          "greater": [
+                            "@length(outputs('List_Admin_Role_Assignments')?['body']?['value'])",
+                            1
+                          ]
+                        }
+                      ]
+                    },
+                    "else": {
+                      "actions": {
+                        "Respond_Not_Authorized": {
+                          "inputs": {
+                            "schema": {
+                              "properties": {
+                                "correlationid": {
+                                  "x-ms-content-hint": "TEXT",
+                                  "x-ms-dynamically-added": true,
+                                  "title": "CorrelationId",
+                                  "type": "string"
+                                },
+                                "success": {
+                                  "x-ms-content-hint": "BOOLEAN",
+                                  "x-ms-dynamically-added": true,
+                                  "title": "Success",
+                                  "type": "boolean"
+                                },
+                                "status": {
+                                  "x-ms-content-hint": "TEXT",
+                                  "x-ms-dynamically-added": true,
+                                  "title": "Status",
+                                  "type": "string"
+                                },
+                                "isadmin": {
+                                  "x-ms-content-hint": "BOOLEAN",
+                                  "x-ms-dynamically-added": true,
+                                  "title": "IsAdmin",
+                                  "type": "boolean"
+                                },
+                                "message": {
+                                  "x-ms-content-hint": "TEXT",
+                                  "x-ms-dynamically-added": true,
+                                  "title": "Message",
+                                  "type": "string"
+                                }
+                              },
+                              "additionalProperties": {},
+                              "type": "object"
+                            },
+                            "body": {
+                              "correlationid": "@variables('correlationId')",
+                              "success": true,
+                              "status": "NOT_AUTHORIZED",
+                              "isadmin": false,
+                              "message": "No active GovernanceAdmin role assignment was found."
+                            },
+                            "statusCode": 200
+                          },
+                          "kind": "Skills",
+                          "runAfter": {},
+                          "type": "Response"
+                        }
+                      }
+                    },
+                    "runAfter": {},
+                    "actions": {
+                      "Respond_Data_Integrity_Error": {
+                        "inputs": {
+                          "schema": {
+                            "properties": {
+                              "correlationid": {
+                                "x-ms-content-hint": "TEXT",
+                                "x-ms-dynamically-added": true,
+                                "title": "CorrelationId",
+                                "type": "string"
+                              },
+                              "success": {
+                                "x-ms-content-hint": "BOOLEAN",
+                                "x-ms-dynamically-added": true,
+                                "title": "Success",
+                                "type": "boolean"
+                              },
+                              "status": {
+                                "x-ms-content-hint": "TEXT",
+                                "x-ms-dynamically-added": true,
+                                "title": "Status",
+                                "type": "string"
+                              },
+                              "isadmin": {
+                                "x-ms-content-hint": "BOOLEAN",
+                                "x-ms-dynamically-added": true,
+                                "title": "IsAdmin",
+                                "type": "boolean"
+                              },
+                              "message": {
+                                "x-ms-content-hint": "TEXT",
+                                "x-ms-dynamically-added": true,
+                                "title": "Message",
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": {},
+                            "type": "object"
+                          },
+                          "body": {
+                            "correlationid": "@variables('correlationId')",
+                            "success": false,
+                            "status": "ROLE_DATA_INTEGRITY_ERROR",
+                            "isadmin": false,
+                            "message": "Admin access could not be verified because role assignment data is inconsistent."
+                          },
+                          "statusCode": 200
+                        },
+                        "kind": "Skills",
+                        "runAfter": {},
+                        "type": "Response"
+                      }
+                    },
+                    "type": "If"
+                  }
+                }
+              },
+              "runAfter": {
+                "List_Admin_Role_Assignments": [
+                  "Succeeded"
+                ]
+              },
+              "actions": {
+                "Respond_Authorized": {
+                  "inputs": {
+                    "schema": {
+                      "properties": {
+                        "correlationid": {
+                          "x-ms-content-hint": "TEXT",
+                          "x-ms-dynamically-added": true,
+                          "title": "CorrelationId",
+                          "type": "string"
+                        },
+                        "success": {
+                          "x-ms-content-hint": "BOOLEAN",
+                          "x-ms-dynamically-added": true,
+                          "title": "Success",
+                          "type": "boolean"
+                        },
+                        "status": {
+                          "x-ms-content-hint": "TEXT",
+                          "x-ms-dynamically-added": true,
+                          "title": "Status",
+                          "type": "string"
+                        },
+                        "isadmin": {
+                          "x-ms-content-hint": "BOOLEAN",
+                          "x-ms-dynamically-added": true,
+                          "title": "IsAdmin",
+                          "type": "boolean"
+                        },
+                        "message": {
+                          "x-ms-content-hint": "TEXT",
+                          "x-ms-dynamically-added": true,
+                          "title": "Message",
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": {},
+                      "type": "object"
+                    },
+                    "body": {
+                      "correlationid": "@variables('correlationId')",
+                      "success": true,
+                      "status": "AUTHORIZED",
+                      "isadmin": true,
+                      "message": "Governance administrator access verified."
+                    },
+                    "statusCode": 200
+                  },
+                  "kind": "Skills",
+                  "runAfter": {},
+                  "type": "Response"
+                }
+              },
+              "type": "If"
+            },
+            "Resolve_Caller": {
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_office365users",
+                  "operationId": "UserProfile_V2",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users"
+                },
+                "authentication": "@parameters('')",
+                "parameters": {
+                  "id": "@toLower(trim(triggerBody()?['text']))"
+                }
+              },
+              "runAfter": {},
+              "type": "OpenApiConnection"
+            },
+            "List_Admin_Role_Assignments": {
+              "inputs": {
+                "host": {
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "ListRecords",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                },
+                "authentication": "@parameters('')",
+                "parameters": {
+                  "$select": "sb_governanceroleassignmentid,sb_principalobjectid,sb_role,sb_isactive,sb_validfrom,sb_validuntil",
+                  "$filter": "@concat('sb_principalobjectid eq ''', outputs('Resolve_Caller')?['body']?['id'], ''' and sb_role eq 126390000 and sb_isactive eq true and (sb_validfrom eq null or sb_validfrom le ', utcNow(), ') and (sb_validuntil eq null or sb_validuntil gt ', utcNow(), ')')",
+                  "$top": 2,
+                  "entityName": "sb_governanceroleassignments"
+                }
+              },
+              "runAfter": {
+                "Resolve_Caller": [
+                  "Succeeded"
+                ]
+              },
+              "type": "OpenApiConnection"
+            }
+          },
+          "runAfter": {
+            "Validate_Caller": [
+              "Succeeded"
+            ]
+          },
+          "type": "Scope"
+        }
+      },
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "parameters": {
+        "$authentication": {
+          "type": "SecureObject",
+          "defaultValue": {}
+        },
+        "$connections": {
+          "type": "Object",
+          "defaultValue": {}
+        }
+      },
+      "triggers": {
+        "manual": {
+          "inputs": {
+            "schema": {
+              "properties": {
+                "text": {
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true,
+                  "title": "callerUPN",
+                  "description": "Signed-in caller UPN from system context",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "text"
+              ],
+              "type": "object"
+            }
+          },
+          "kind": "Skills",
+          "type": "Request"
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

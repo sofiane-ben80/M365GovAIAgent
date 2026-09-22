@@ -1,59 +1,119 @@
-mcs.metadata:
-  componentName: Action Status
-  description: Action Agent scaffold for checking the result of a previous governance action.
 kind: AdaptiveDialog
 beginDialog:
   kind: OnRecognizedIntent
   id: main
   intent:
-    displayName: Action Status
-    includeInOnSelectIntent: false
+    displayName: Request Status
     triggerQueries:
-      - action status
-      - did my archive go through
-      - what is the status of my deletion request
-      - what is the status of my support request
-      - check my action status
-
+      - request status
+      - check my request
+      - track request
   actions:
-    - kind: SetVariable
-      id: setVariable_ActionStatusCallerUpn
-      variable: init:Topic.CallerUPN
-      value: =System.User.PrincipalName
+    - kind: Question
+      id: question_RequestId
+      alwaysPrompt: true
+      variable: init:Topic.RequestId
+      prompt: Enter the Governor365 request ID.
+      entity: StringPrebuiltEntity
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_GetRequestStatus
+      input:
+        binding:
+          text: =System.User.PrincipalName
+          text_1: =Topic.RequestId
+      output:
+        binding:
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          status: Topic.ResultStatus
+          success: Topic.Success
+      flowId: e8e5cfdb-b9b3-f111-aaac-000d3a367627
+    - kind: ConditionGroup
+      id: conditionGroup_RequestStatusResult
+      conditions:
+        - id: conditionItem_RequestStatusFailed
+          condition: =Topic.Success <> true
+          actions:
+            - kind: SendActivity
+              id: sendActivity_RequestStatusFailed
+              activity: "{Topic.ResultMessage} Status: {Topic.ResultStatus}. Correlation ID: {Topic.CorrelationId}"
 
-    - kind: SetTextVariable
-      id: setTextVariable_ActionType
-      variable: Topic.ActionType
-      value: ACTION-STATUS
-
-    - kind: SetTextVariable
-      id: setTextVariable_ActionStatus
-      variable: Topic.ActionStatus
-      value: LOOKUP-REQUESTED
-
-    - kind: SetTextVariable
-      id: setTextVariable_ActionStatusSiteUrl
-      variable: Topic.SelectedSiteUrl
-      value: <selected-site-url>
-
-    - kind: SetTextVariable
-      id: setTextVariable_ActionStatusSiteTitle
-      variable: Topic.SelectedSiteTitle
-      value: <selected-site-title>
-
-    - kind: SendActivity
-      id: sendActivity_ActionStatusIntro
-      activity: |
-        This topic is reserved for the Action Agent handoff.
-        It will query the latest governance action log entries for the caller.
-
-    - kind: SendActivity
-      id: sendActivity_ActionStatusPending
-      activity: |
-        Planned inputs:
-        - Caller UPN: {Topic.CallerUPN}
-        - Site URL: {Topic.SelectedSiteUrl}
-        - Site Title: {Topic.SelectedSiteTitle}
-
+      elseActions:
+        - kind: SendActivity
+          id: sendActivity_RequestStatus
+          activity:
+            attachments:
+              - kind: AdaptiveCardTemplate
+                cardContent: |-
+                  =With(
+                    { request: ParseJSON(Topic.DataJson) },
+                    {
+                      '$schema': "http://adaptivecards.io/schemas/adaptive-card.json",
+                      type: "AdaptiveCard",
+                      version: "1.5",
+                      body: Table(
+                        {
+                          type: "TextBlock",
+                          text: "Governance request",
+                          size: "Large",
+                          weight: "Bolder",
+                          wrap: true
+                        },
+                        {
+                          type: "FactSet",
+                          facts: Table(
+                            {
+                              title: "Request ID",
+                              value: Text(request.sb_governanceactionrequestid)
+                            },
+                            {
+                              title: "Type",
+                              value: Switch(
+                                Text(request.sb_requesttype),
+                                "100000000", "Certification",
+                                "100000001", "Archive",
+                                "100000002", "Deletion review",
+                                "100000003", "Assign owner",
+                                "100000004", "Support",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Status",
+                              value: Switch(
+                                Text(request.sb_requeststatus),
+                                "100000000", "Pending",
+                                "100000001", "Awaiting approval",
+                                "100000002", "Approved",
+                                "100000003", "In progress",
+                                "100000004", "Completed",
+                                "100000005", "Rejected",
+                                "100000006", "Cancelled",
+                                "100000007", "Failed",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Requested",
+                              value: Coalesce(Text(request.sb_requestedat), "Not available")
+                            },
+                            {
+                              title: "Reason",
+                              value: Coalesce(Text(request.sb_reason), "Not provided")
+                            },
+                            {
+                              title: "Completed",
+                              value: Coalesce(Text(request.sb_completedat), "Not completed")
+                            },
+                            {
+                              title: "Failure",
+                              value: Coalesce(Text(request.sb_failuremessage), "None")
+                            }
+                          )
+                        }
+                      )
+                    }
+                  )
     - kind: CancelAllDialogs
-      id: cancelAllDialogs_ActionStatus
+      id: cancelAllDialogs_RequestStatus

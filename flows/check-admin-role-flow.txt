@@ -1,7 +1,8 @@
 ================================================================================
   POWER AUTOMATE FLOW CONTRACT — Governor365 - Child - Verify Admin
-  Purpose: Verify the signed-in caller against the configured governance admin
-           Entra group. Routing to the Admin Agent is never authorization.
+  Purpose: Verify the signed-in caller against an active GovernanceAdmin role
+           assignment in Dataverse. Routing to the Admin Agent is never
+           authorization.
   Trigger: Child flow or Copilot Studio tool
 ================================================================================
 
@@ -19,12 +20,12 @@ OUTPUTS
 
 CONFIGURATION
 
-- Governance Admin Group ID: Power Platform environment variable
-- Tenant ID: Power Platform environment variable
-- Graph connection: approved custom connector or HTTP with Microsoft Entra ID
-  connection reference
-- Required delegated/application permission: the minimum approved permission
-  capable of checking membership in the configured group
+- Dataverse connection reference: least-privilege read access to Governance
+  Role Assignment
+- Microsoft 365 Users or approved Entra connector: resolve the system-provided
+  signed-in identity to its immutable Entra object ID
+- Optional Governance Admin Group ID: migration/reconciliation input only; it
+  is not the runtime authorization source
 
 Do not put client secrets, tenant IDs, group IDs, URLs, or connection IDs in
 flow actions. Credentials belong to the governed connection.
@@ -33,23 +34,29 @@ FLOW STEPS
 
 1. Validate callerUPN, normalize it with toLower(trim(...)), and create a
    correlation GUID.
-2. Read the Governance Admin Group ID environment variable. If blank, fail
-   closed with success=false, isAdmin=false, status=CONFIGURATION_ERROR.
-3. Resolve the signed-in user through the approved Entra connector operation.
-4. Check direct or transitive membership according to the organization's
-   approved admin-group policy.
-5. Return success=true, isAdmin=true only for a confirmed match.
-6. Catch failed, timed-out, and skipped connector actions. Return
+2. Resolve the signed-in user through the approved Entra connector operation
+   and retain the immutable object ID. Do not authorize by a model-provided UPN.
+3. Query Governance Role Assignment server-side for that exact object ID,
+   Role = GovernanceAdmin, Is Active = true, Valid From empty or not later than
+   now, and Valid Until empty or later than now.
+4. Return success=true, isAdmin=true only when exactly one valid assignment is
+   found. Zero rows denies access. Duplicate rows fail closed as a data
+   integrity error.
+5. Catch failed, timed-out, and skipped connector/Dataverse actions. Return
    success=false, isAdmin=false, status=VERIFICATION_FAILED, and the correlation
    ID. Never treat verification failure as a non-error success.
-7. Enable secure inputs/outputs for identity and connector actions.
+6. Enable secure inputs/outputs for identity and connector actions.
 
 ACCEPTANCE TESTS
 
-1. Known member returns success=true and isAdmin=true.
-2. Known non-member returns success=true and isAdmin=false.
+1. Active, in-window GovernanceAdmin assignment returns
+   success=true and isAdmin=true.
+2. Missing assignment returns success=true and isAdmin=false.
 3. Blank/malformed identity returns validation failure.
-4. Missing group configuration fails closed.
-5. Connector timeout/failure returns success=false and isAdmin=false.
-6. Group routing alone never bypasses this flow.
-7. No governance SharePoint list, SQL connector, or embedded secret is used.
+4. Inactive, future, and expired assignments return isAdmin=false.
+5. Duplicate assignments and Dataverse/identity connector failure return
+   success=false and isAdmin=false.
+6. A changed UPN with the same resolved object ID remains authorized and the
+   display UPN can be reconciled separately.
+7. Agent routing and Canvas screen visibility never bypass this flow.
+8. No governance SharePoint list, SQL connector, or embedded secret is used.

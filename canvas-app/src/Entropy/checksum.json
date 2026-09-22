@@ -1,0 +1,26 @@
+{
+  "ClientPerFileChecksums": {
+    "AppCheckerResult.sarif": "C8_LrVqYOwtyJZOzETf19riy+eAeaz/sgLK3KFeBMeNHTc=",
+    "Controls\\1.json": "C8_yePYF/MV1Huu7Dyn5/+2n1r7B6gR9BKyaiGD8VALG28=",
+    "Controls\\4.json": "C8_kpaz8iqAOh5Zd1GsC6mNd4zuQ4CK+fJicpQg1iLx9fA=",
+    "Controls\\64.json": "C8_wj+QWUCjJHX6kRyYP0udgM6c8McQwoxGfXk2rAdEH/c=",
+    "Header.json": "C8_hsW1lPM6JIcp26d5HtevF4Mfr2xan6m+bXWjYCqrA8M=",
+    "Properties.json": "C8_7C9CGE6pGM4Sg8f2C0POpVM004QsTYVtIluOX/J6HuQ=",
+    "References\\DataSources.json": "C8_mfE15Ruem23q5UCwPeBy9tI+Jntu8l8YC6Y5SAfiFSk=",
+    "References\\ModernThemes.json": "C8_KDQJ/3t27vgKx25iCQB/PGqxkWE34ZB7Eyb+RxNxY0k=",
+    "References\\QualifiedValues.json": "C8_kU0eNlwapcrcAVWjhQVjhsdqq8KAUPrub9hDNh2XGtE=",
+    "References\\Resources.json": "C8_s+se9qfOYnCKwfIt6gbv1FGBHW47JCt5d/CkUpqbcjk=",
+    "References\\Templates.json": "C8_3/+Ytv3hm/UzJPphXEc+A99eNdc0dxmkBz1FIRKn5yQ=",
+    "References\\Themes.json": "C8_DwkkMNV1j+tD94nbLPmC4Lq2wvPVfUT0BRPDe6aP2rM=",
+    "Resources\\Controls\\css\\Governor365.AgentChat.AgentChat.css": "C8_pRgtLIDxisXinz7vY8gMoVfu7y5KUGzT5Ez0+lYR68U=",
+    "Resources\\Controls\\Governor365.AgentChat.bundle.js": "C8_yj5xeUJlz3ndwGG1vRsosdeRMRBZlsXqTz/HIAHJVm8=",
+    "Resources\\Controls\\strings\\Governor365.AgentChat.AgentChat.1033.json": "C8_c8Rm8E83KUtPUOCTiddknT+OK7azwE3Kdo98XXqnsFQ=",
+    "Resources\\Controls\\strings\\Governor365.AgentChat.AgentChat.1033.resx": "C8_AZYIy96f+MbaCvCq5ONZpyDZCW8PbeJ1wrU+bOYPgGs=",
+    "Resources\\PublishInfo.json": "C8_W8w82+S0KPP4tXYuKBk2l74CSysHGdFXFVzVl2dlAfc=",
+    "Src\\_EditorState.pa.yaml": "C8_iJbtsvhNwnvy5coV+C9L1MVYfyRvZv568I6YPpUxWXI=",
+    "Src\\App.pa.yaml": "C8_WSvQg2oO3DnOZB77aEl528GYWulMhKfqEnadljT+yCg=",
+    "Src\\scrAdminDashboard.pa.yaml": "C8_1KOEb93PzCgzgKbOl4X8SfPCzQS2d1nmaTKQ/29v5Pc=",
+    "Src\\scrDashboard.pa.yaml": "C8_Jr8HiTbn6Ngfmamqgt1l41n2MaarsX/792m1B7ZKTWg="
+  },
+  "ClientStampedChecksum": "C8_kR6F25kNv4fq5/gfNE1PxpBM/nW91AYaq4+csVP6pGs="
+}

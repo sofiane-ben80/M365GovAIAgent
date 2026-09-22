@@ -32,22 +32,28 @@ Each document maps to a specific aspect of the solution and serves as both a blu
 | 21 | [21-SQL-Canvas-Design-Audit.md](21-SQL-Canvas-Design-Audit.md) | Live SQL and latest Canvas package audit for large-inventory owner/all-site filtering | SQL remediated; Canvas rebind pending |
 | 22 | [22-Agent-Orchestration-Architecture.md](22-Agent-Orchestration-Architecture.md) | GitHub- and portal-ready Power Platform orchestration overview | Approved target |
 | 23 | [23-Power-Platform-Refactor.md](23-Power-Platform-Refactor.md) | Architecture decision, current-to-target mapping, and migration controls | Approved |
-| 24 | [24-Hackathon-Project-Summary.md](24-Hackathon-Project-Summary.md) | Hackathon pitch, demo story, innovation, and success measures | Ready for submission |
+| 24 | [24-Hackathon-Project-Summary.md](24-Hackathon-Project-Summary.md) | Copy-ready hackathon project page, demo story, innovation, build details, and success measures | Ready for submission |
 | 25 | [25-Deployment-Status-and-Runbook.md](25-Deployment-Status-and-Runbook.md) | Current tenant/GitHub release status, safe deployment sequence, validation, and rollback | Active release record |
-| 26 | [26-Deployment-Guide.md](26-Deployment-Guide.md) | Package validation, solution import, configuration, inventory bootstrap, acceptance tests, and rollback | Ready; package export gated |
+| 26 | [26-Deployment-Guide.md](26-Deployment-Guide.md) | Managed-package validation, import, configuration, activation, and acceptance sequence | Active deployment guide |
+| 26 | [26-Development-Backlog.md](26-Development-Backlog.md) | GitHub-ready implementation issues, milestones, dependencies, ownership lanes, and acceptance criteria | Active backlog |
+| 27 | [27-Implementation-Handoff.md](27-Implementation-Handoff.md) | Cross-thread decisions, deployed inventory, evidence, blockers, continuation order, and copy-ready prompts | Start here for implementation |
+| 28 | [28-PCF-Agent-Chat-Integration.md](28-PCF-Agent-Chat-Integration.md) | PCF Web Chat architecture, protocol, build, deployment, Power Fx wiring, and security controls | Implemented; tenant wiring pending |
+| 29 | [29-Agent-Architecture-Review.md](29-Agent-Architecture-Review.md) | Live and exported-solution review of orchestrator boundaries, agent composition, authentication, and recommended target state | Current assessment |
 
 ---
 
 ## Solution Overview
 
 **Name:** M365 Governance AI Agent  
-**Platform:** Microsoft Copilot Studio (multi-agent)  
+**Primary Experience:** Power Apps Canvas app with integrated Copilot agent  
+**AI Platform:** Microsoft Copilot Studio (multi-agent)  
 **Data Platform:** Microsoft Dataverse  
 **Automation:** Power Automate solution-aware cloud flows  
 **Governed Sources:** Microsoft Graph and SharePoint Online APIs  
-**Channels:** Microsoft Teams (chat + proactive notifications)  
+**Channels:** Power Apps and Microsoft Teams (app access, chat, and proactive notifications)  
 **Publisher / Prefix:** SofianeB / `sb`  
-**Current Version:** Legacy proof of concept plus approved 2.0 Power Platform target
+**Current Version:** Governor365 2.0 Canvas-first AI experience implemented in
+the development solution; tenant acceptance and managed deployment pending
 
 ---
 
@@ -57,14 +63,15 @@ Each document maps to a specific aspect of the solution and serves as both a blu
 |------|---------------|
 | Site Owner | Certified owner of one or more SPO sites |
 | Tenant Admin | M365/SharePoint admin with visibility across all sites |
-| Governance Bot | The Copilot Studio agent serving as the primary interface |
+| Governor365 Canvas app | Primary visual interface for role-aware governance work |
+| Governance Agent | Integrated Copilot Studio assistant for briefings, explanation, and guided actions |
 | Automation Service | Power Automate flows that inventory, authorize, approve, notify, and reconcile |
 
 ---
 
 ## Architecture Status
 
-Documents 1-6, 12, and 22-26 describe the approved Power Platform target.
+Documents 1-6, 12, and 22-27 describe the approved Power Platform target.
 Documents 7-11 and 13-21 contain useful implementation evidence from the
 legacy SharePoint/SQL proof of concept. Where they conflict, the target
 architecture and migration decision in document 23 take precedence.

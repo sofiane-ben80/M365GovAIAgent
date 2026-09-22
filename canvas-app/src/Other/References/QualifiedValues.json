@@ -1,0 +1,39 @@
+{
+  "QualifiedValues": [
+    {
+      "Kind": "default.cds_sb_governancesite_forms",
+      "Namespace": "Governance Sites (Forms)",
+      "Values": {
+        "Information": "9cb8ec3f-214c-4ea0-af86-8e0d2db5aba9"
+      }
+    },
+    {
+      "Kind": "default.cds_sb_governanceactionrequest_forms",
+      "Namespace": "Governance Action Requests (Forms)",
+      "Values": {
+        "Information": "6cd45673-65a3-49eb-90a7-5b097226de0c"
+      }
+    },
+    {
+      "Kind": "default.cds_sb_governanceroleassignment_forms",
+      "Namespace": "Governance Role Assignments (Forms)",
+      "Values": {
+        "Information": "28ab13b6-ae7a-424a-b676-eb0a402189e3"
+      }
+    },
+    {
+      "Kind": "default.cds_environmentvariabledefinition_forms",
+      "Namespace": "Environment Variable Definitions (Forms)",
+      "Values": {
+        "Information": "3853733b-a351-455d-b686-d2d05027ba4d"
+      }
+    },
+    {
+      "Kind": "default.cds_environmentvariablevalue_forms",
+      "Namespace": "Environment Variable Values (Forms)",
+      "Values": {
+        "Information": "f574a3ab-1060-43ee-a95f-9aa922b497db"
+      }
+    }
+  ]
+}

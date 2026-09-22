@@ -16,6 +16,8 @@
 5. Alternate keys and idempotency keys make Power Automate upserts safe.
 6. Environment variables hold deployment configuration; policy tables hold
    business settings that administrators may change at runtime.
+7. Tenant-wide application roles are explicit Dataverse assignments. Site
+   ownership remains a separate, resource-scoped authorization relationship.
 
 ## 2. Table catalog
 
@@ -23,6 +25,7 @@
 |---|---|---|---|
 | Governance Site | `sb_governancesite` | User or team | Current site inventory and compliance snapshot; owned by the governance operations team and shared read-only through per-site owner access teams when direct Power Apps access is enabled |
 | Site Owner Assignment | `sb_siteownerassignment` | Organization | Normalized owner-to-site relationship |
+| Governance Role Assignment | `sb_governanceroleassignment` | Organization | Authoritative tenant-wide application role assignment for privileged Governor365 capabilities |
 | Governance Action Request | `sb_governanceactionrequest` | Organization | User/admin request and approval lifecycle |
 | Governance Action Event | `sb_governanceactionevent` | Organization | Append-only business audit trail |
 | Governance Policy Setting | `sb_governancepolicysetting` | Organization | Runtime triage and notification policy |
@@ -69,6 +72,31 @@ Primary name: `sb_name`
 Alternate key: `(sb_tenantid, sb_m365siteid)`.  
 Secondary searchable key: `(sb_tenantid, sb_siteurl)`.
 
+### 3.1 Planned dashboard classification fields
+
+The persona dashboard currently filters existing ownership, recommendation,
+sharing-policy, compliance, and attestation columns. Add the following
+inventory-populated fields before exposing exact oversharing, external-user,
+memberless, or persisted stale classifications:
+
+| Planned column | Type | Inventory semantics |
+|---|---|---|
+| `sb_membercount` | Whole number | Current members of the connected group/team, or the approved equivalent for non-group sites |
+| `sb_externalusercount` | Whole number | Actual external users with effective membership/access in the supported inventory scope |
+| `sb_broadsharingprincipalcount` | Whole number | Effective broad principals such as Everyone or Everyone Except External Users |
+| `sb_isovershared` | Yes/No | Policy result derived from broad principals and other approved oversharing rules |
+| `sb_isstale` | Yes/No | Policy result derived from authoritative activity and the configured staleness threshold |
+| `sb_isbelowownerstandard` | Yes/No | Policy result derived from effective owners and the configured minimum |
+| `sb_hasexternalusers` | Yes/No | True when actual external-user evidence exists; distinct from sharing capability |
+| `sb_ismemberless` | Yes/No | True when the applicable membership source is authoritative and contains no members |
+
+These are not client-calculated security fields. Process Work Item must write
+them from a successful, timestamped inventory observation. Unknown or partial
+source reads must remain distinguishable from a confirmed zero/false result.
+The requested dashboard threshold is two owners, while historical
+initialization sets `MinOwnerCount = 1`; resolve the policy value before
+persisting `sb_isbelowownerstandard`.
+
 ## 4. Site Owner Assignment
 
 | Column | Type | Required | Notes |
@@ -91,7 +119,47 @@ never scan a text field on Governance Site. A direct owner Power App may rely on
 Dataverse row sharing through an access-team template; an app filter alone is
 not an authorization boundary.
 
-## 5. Governance Action Request
+## 5. Governance Role Assignment
+
+This table replaces the legacy SharePoint admin-role list and is the
+authoritative application-level registry for tenant-wide Governor365 roles.
+Regular-user access is implicit after sign-in, and owner capability is derived
+from active Site Owner Assignment rows rather than duplicated here.
+
+| Column | Type | Required | Notes |
+|---|---|---:|---|
+| `sb_governanceroleassignmentid` | Unique identifier | Yes | Primary key |
+| `sb_name` | Text (300) | Yes | Display name generated from principal and role |
+| `sb_principalobjectid` | Text (36) | Yes | Immutable Entra object ID used for authorization |
+| `sb_principalupn` | Text (320) | Yes | Normalized lowercase UPN for display and audit |
+| `sb_displayname` | Text (300) | No | Display only |
+| `sb_role` | Choice | Yes | GovernanceAdmin, GovernanceAuditor, GovernanceOperator, RequestApprover, SupportAgent |
+| `sb_isactive` | Yes/No | Yes | Explicit enable/disable state |
+| `sb_validfrom` | Date/time | No | Optional activation boundary |
+| `sb_validuntil` | Date/time | No | Optional expiry boundary |
+| `sb_assignmentsource` | Choice | Yes | ApprovedRequest, EntraGroupSync, Migration, BreakGlass |
+| `sb_sourcegroupobjectid` | Text (36) | No | Source Entra group when synchronized |
+| `sb_grantedbyobjectid` | Text (36) | No | Granting actor or service identity |
+| `sb_grantedbyupn` | Text (320) | No | Granting actor display/audit value |
+| `sb_grantedat` | Date/time | Yes | UTC assignment time |
+| `sb_lastvalidatedat` | Date/time | No | Latest source reconciliation time |
+| `sb_reason` | Multiline text | No | Approved business justification |
+
+Alternate key: `(sb_principalobjectid, sb_role)`.
+
+Authorization flows resolve the signed-in caller to an Entra object ID and
+require one exact active assignment whose validity window includes the current
+time. A missing, inactive, expired, duplicated, or unreadable assignment denies
+privileged access. The UPN is never the primary authorization key.
+
+The table is not self-service editable. Only a restricted platform identity or
+an approved role-assignment request processor may create, activate, deactivate,
+or extend rows. A GovernanceAdmin assignment does not grant permission to
+grant roles or approve the same user's elevation. Entra groups may feed a
+reconciliation flow, but the reconciled Dataverse row remains the runtime
+authorization record.
+
+## 6. Governance Action Request
 
 | Column | Type | Required | Notes |
 |---|---|---:|---|
@@ -115,7 +183,7 @@ not an authorization boundary.
 
 Alternate key: `sb_idempotencykey`.
 
-## 6. Governance Action Event
+## 7. Governance Action Event
 
 Action events are append-only from the application perspective.
 
@@ -134,7 +202,7 @@ Action events are append-only from the application perspective.
 Use a Dataverse security role that allows create/read but not update/delete for
 flow service accounts and governance reviewers.
 
-## 7. Policy, scan, work, and notification tables
+## 8. Policy, scan, work, and notification tables
 
 ### Governance Policy Setting
 
@@ -200,11 +268,12 @@ classification, correlation ID, and minimized JSON payload. Large documents
 remain in an approved governed repository and are referenced, not copied into
 general agent knowledge.
 
-## 8. Relationships
+## 9. Relationships
 
 ```mermaid
 erDiagram
     GOVERNANCE_SITE ||--o{ SITE_OWNER_ASSIGNMENT : has
+    GOVERNANCE_ROLE_ASSIGNMENT }o--|| ENTRA_PRINCIPAL : authorizes
     GOVERNANCE_SITE ||--o{ GOVERNANCE_ACTION_REQUEST : receives
     GOVERNANCE_ACTION_REQUEST ||--o{ GOVERNANCE_ACTION_EVENT : records
     GOVERNANCE_SITE ||--o{ EVIDENCE_SNAPSHOT : supports
@@ -214,28 +283,28 @@ erDiagram
     GOVERNANCE_ACTION_REQUEST ||--o{ NOTIFICATION_DELIVERY : notifies
 ```
 
-## 9. Security roles
+## 10. Security roles
 
 | Role | Access |
 |---|---|
 | Governor365 Owner App User | User-level read on Governance Site; shared records only through per-site owner access teams; requests through flows |
-| Governor365 Governance Admin | Read all operational tables; update approved policy/site fields; approve governed requests |
+| Governor365 Governance Admin | Read all operational tables; update approved policy/site fields; approve governed requests; read but not grant Governance Role Assignment |
 | Governor365 Auditor | Read sites, requests, events, scans, and evidence; no write/delete |
 | Governor365 Flow Service | Least-privilege create/read/write required by each connection reference; no action-event update/delete |
 | Governor365 Maker | Development environment customization only |
 
 Agents do not rely on these roles alone. Each Power Automate tool rechecks the
-signed-in caller against assignment or admin membership.
+signed-in caller against Site Owner Assignment or Governance Role Assignment.
 
 When direct owner Power Apps access is enabled, an assignment reconciliation
 flow must add/remove licensed Dataverse users from the site's read-only access
 team as active owner assignments change. Without that control, the owner app
 must use the same owner-scoped Power Automate read tools as Copilot Studio.
 
-## 10. Retention and auditing
+## 11. Retention and auditing
 
 - Enable Dataverse auditing for policy settings, sites, owner assignments, and
-  requests.
+  role assignments, and requests.
 - Retain action events according to the organization's governance record
   schedule.
 - Minimize personal data to object ID, UPN, display name, and action evidence

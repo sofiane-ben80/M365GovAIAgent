@@ -58,19 +58,24 @@ this repository are migration sources and historical proof-of-concept assets.
 | `scripts` | Solution-package preflight and Dataverse inventory bootstrap tools |
 | `release` | Validated managed solution packages, scope notes, and checksums |
 | `docs` | Canonical architecture, implementation, release, and hackathon documentation |
+| `M365Governance_2_0_0_0` | Canonical unpacked Power Platform solution source |
+| `canvas-app` | Editable Governor365 Canvas app source |
+| `pcf` | Governor365 Agent Chat PCF source and integrated solution project |
+| `.azure` | Unpopulated deployment-settings template |
 
 ## Current state
 
-The repository contains the reviewed agent source, Dataverse schema,
-Power Automate contracts, deployment tools, and a working proof of concept.
-Tenant implementation follows the phased migration in the
-[roadmap](docs/05-Roadmap.md). Do not treat legacy SQL or SharePoint-list
-deployment artifacts as the production target.
+The repository contains the canonical Governor365 2.0 solution, editable
+Canvas source, Copilot Studio agents, the `Governor365.AgentChat` PCF control,
+Power Automate flows and contracts, deployment tools, and release
+documentation. Do not treat legacy SQL or SharePoint-list artifacts as the
+production target.
 
-The 2026-09-17 release aligns the deployable Owner and Admin agent instructions
-with the Dataverse and Power Automate target and removes legacy fallback
-behavior. The target Dataverse tables and replacement tool flows must still be
-provisioned and acceptance-tested before the functional cutover. See the
+The reviewed integrated release contains 10 Dataverse tables, five security
+roles, 11 distinct cloud flows, one Canvas app, eight Copilot Studio agents,
+105 bot components, 11 environment variables, six connection references, one
+access-team template, and one PCF control. The earlier count of 22 refers to
+unique flow-bound agent components, not distinct flows. See the
 [deployment status and runbook](docs/25-Deployment-Status-and-Runbook.md).
 
 For inventory bootstrap and migration testing, use
@@ -78,8 +83,8 @@ For inventory bootstrap and migration testing, use
 uses the solution-aware three-flow pipeline documented in the Power Automate
 build guide.
 
-The repository contains a managed 2.0 schema-foundation package with all nine
-canonical Dataverse tables. It does not yet contain the replacement flows and
-reviewed agents required for a complete application release. Follow the
-[deployment guide](docs/26-Deployment-Guide.md), use the correct validation
-profile, and do not represent the schema-only package as a functional cutover.
+The [managed 2.0 release package](release/M365Governance_2_0_0_0_managed.zip)
+is the artifact to import into downstream test and production environments.
+Follow the [deployment guide](docs/26-Deployment-Guide.md), bind every
+connection reference, provide receiving-environment settings, and complete
+the documented acceptance gates before sharing the app or agents with users.

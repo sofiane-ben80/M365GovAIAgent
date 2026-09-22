@@ -1,0 +1,952 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedcommondataserviceforapps"
+        }
+      },
+      "shared_office365users": {
+        "runtimeSource": "embedded",
+        "api": {
+          "name": "shared_office365users"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedoffice365users"
+        }
+      }
+    },
+    "definition": {
+      "actions": {
+        "Validate_Input": {
+          "else": {
+            "actions": {
+              "Respond_Validation_Failed": {
+                "kind": "Skills",
+                "type": "Response",
+                "inputs": {
+                  "schema": {
+                    "properties": {
+                      "correlationid": {
+                        "x-ms-content-hint": "TEXT",
+                        "type": "string",
+                        "title": "CorrelationId",
+                        "x-ms-dynamically-added": true
+                      },
+                      "requestid": {
+                        "x-ms-content-hint": "TEXT",
+                        "type": "string",
+                        "title": "RequestId",
+                        "x-ms-dynamically-added": true
+                      },
+                      "success": {
+                        "x-ms-content-hint": "BOOLEAN",
+                        "type": "boolean",
+                        "title": "Success",
+                        "x-ms-dynamically-added": true
+                      },
+                      "status": {
+                        "x-ms-content-hint": "TEXT",
+                        "type": "string",
+                        "title": "Status",
+                        "x-ms-dynamically-added": true
+                      },
+                      "message": {
+                        "x-ms-content-hint": "TEXT",
+                        "type": "string",
+                        "title": "Message",
+                        "x-ms-dynamically-added": true
+                      },
+                      "requeststatus": {
+                        "x-ms-content-hint": "TEXT",
+                        "type": "string",
+                        "title": "RequestStatus",
+                        "x-ms-dynamically-added": true
+                      }
+                    },
+                    "type": "object",
+                    "additionalProperties": {}
+                  },
+                  "body": {
+                    "correlationid": "@variables('correlationId')",
+                    "requestid": "",
+                    "success": false,
+                    "status": "VALIDATION_FAILED",
+                    "message": "Request inputs or confirmation are invalid.",
+                    "requeststatus": ""
+                  },
+                  "statusCode": 200
+                },
+                "runAfter": {}
+              }
+            }
+          },
+          "expression": {
+            "and": [
+              {
+                "contains": [
+                  "@toLower(trim(triggerBody()?['text']))",
+                  "@"
+                ]
+              },
+              {
+                "not": [
+                  {
+                    "contains": [
+                      "@triggerBody()?['text_5']",
+                      "'"
+                    ]
+                  }
+                ]
+              },
+              {
+                "lessOrEquals": [
+                  "@length(triggerBody()?['text_5'])",
+                  200
+                ]
+              },
+              {
+                "or": [
+                  {
+                    "equals": [
+                      "@toUpper(triggerBody()?['text_1'])",
+                      "SUPPORT"
+                    ]
+                  },
+                  {
+                    "and": [
+                      {
+                        "not": [
+                          {
+                            "empty": [
+                              "@trim(triggerBody()?['text_2'])"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@triggerBody()?['text_4']",
+                          "CONFIRM"
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@length(trim(triggerBody()?['text_2']))",
+                          36
+                        ]
+                      },
+                      {
+                        "equals": [
+                          "@length(replace(trim(triggerBody()?['text_2']), '-', ''))",
+                          32
+                        ]
+                      },
+                      {
+                        "or": [
+                          {
+                            "not": [
+                              {
+                                "equals": [
+                                  "@toUpper(triggerBody()?['text_1'])",
+                                  "ASSIGN_OWNER"
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "contains": [
+                              "@toLower(trim(triggerBody()?['text_6']))",
+                              "@"
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "or": [
+                          {
+                            "equals": [
+                              "@toUpper(triggerBody()?['text_1'])",
+                              "CERTIFY"
+                            ]
+                          },
+                          {
+                            "equals": [
+                              "@toUpper(triggerBody()?['text_1'])",
+                              "ARCHIVE"
+                            ]
+                          },
+                          {
+                            "equals": [
+                              "@toUpper(triggerBody()?['text_1'])",
+                              "DELETE_REVIEW"
+                            ]
+                          },
+                          {
+                            "equals": [
+                              "@toUpper(triggerBody()?['text_1'])",
+                              "ASSIGN_OWNER"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "type": "If",
+          "actions": {},
+          "runAfter": {
+            "Initialize_Correlation": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Catch": {
+          "type": "Scope",
+          "actions": {
+            "Respond_Failure": {
+              "kind": "Skills",
+              "type": "Response",
+              "inputs": {
+                "schema": {
+                  "properties": {
+                    "correlationid": {
+                      "x-ms-content-hint": "TEXT",
+                      "type": "string",
+                      "title": "CorrelationId",
+                      "x-ms-dynamically-added": true
+                    },
+                    "requestid": {
+                      "x-ms-content-hint": "TEXT",
+                      "type": "string",
+                      "title": "RequestId",
+                      "x-ms-dynamically-added": true
+                    },
+                    "success": {
+                      "x-ms-content-hint": "BOOLEAN",
+                      "type": "boolean",
+                      "title": "Success",
+                      "x-ms-dynamically-added": true
+                    },
+                    "status": {
+                      "x-ms-content-hint": "TEXT",
+                      "type": "string",
+                      "title": "Status",
+                      "x-ms-dynamically-added": true
+                    },
+                    "message": {
+                      "x-ms-content-hint": "TEXT",
+                      "type": "string",
+                      "title": "Message",
+                      "x-ms-dynamically-added": true
+                    },
+                    "requeststatus": {
+                      "x-ms-content-hint": "TEXT",
+                      "type": "string",
+                      "title": "RequestStatus",
+                      "x-ms-dynamically-added": true
+                    }
+                  },
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                "body": {
+                  "correlationid": "@variables('correlationId')",
+                  "requestid": "",
+                  "success": false,
+                  "status": "CONNECTOR_FAILED",
+                  "message": "The governance request could not be submitted.",
+                  "requeststatus": ""
+                },
+                "statusCode": 200
+              },
+              "runAfter": {}
+            }
+          },
+          "runAfter": {
+            "Try": [
+              "Failed",
+              "TimedOut"
+            ]
+          }
+        },
+        "Initialize_Correlation": {
+          "type": "InitializeVariable",
+          "inputs": {
+            "variables": [
+              {
+                "value": "@guid()",
+                "type": "string",
+                "name": "correlationId"
+              },
+              {
+                "value": "",
+                "type": "string",
+                "name": "requestId"
+              },
+              {
+                "value": "@if(equals(toUpper(triggerBody()?['text_1']), 'CERTIFY'), 100000000, if(equals(toUpper(triggerBody()?['text_1']), 'ARCHIVE'), 100000001, if(equals(toUpper(triggerBody()?['text_1']), 'DELETE_REVIEW'), 100000002, if(equals(toUpper(triggerBody()?['text_1']), 'ASSIGN_OWNER'), 100000003, 100000004))))",
+                "type": "integer",
+                "name": "requestTypeValue"
+              },
+              {
+                "value": "@if(equals(toUpper(triggerBody()?['text_1']), 'DELETE_REVIEW'), 100000001, if(equals(toUpper(triggerBody()?['text_1']), 'ASSIGN_OWNER'), 100000002, 100000000))",
+                "type": "integer",
+                "name": "confirmationMethodValue"
+              }
+            ]
+          },
+          "runAfter": {}
+        },
+        "Try": {
+          "type": "Scope",
+          "actions": {
+            "Authorize": {
+              "else": {
+                "actions": {
+                  "Respond_Unauthorized": {
+                    "kind": "Skills",
+                    "type": "Response",
+                    "inputs": {
+                      "schema": {
+                        "properties": {
+                          "correlationid": {
+                            "x-ms-content-hint": "TEXT",
+                            "type": "string",
+                            "title": "CorrelationId",
+                            "x-ms-dynamically-added": true
+                          },
+                          "requestid": {
+                            "x-ms-content-hint": "TEXT",
+                            "type": "string",
+                            "title": "RequestId",
+                            "x-ms-dynamically-added": true
+                          },
+                          "success": {
+                            "x-ms-content-hint": "BOOLEAN",
+                            "type": "boolean",
+                            "title": "Success",
+                            "x-ms-dynamically-added": true
+                          },
+                          "status": {
+                            "x-ms-content-hint": "TEXT",
+                            "type": "string",
+                            "title": "Status",
+                            "x-ms-dynamically-added": true
+                          },
+                          "message": {
+                            "x-ms-content-hint": "TEXT",
+                            "type": "string",
+                            "title": "Message",
+                            "x-ms-dynamically-added": true
+                          },
+                          "requeststatus": {
+                            "x-ms-content-hint": "TEXT",
+                            "type": "string",
+                            "title": "RequestStatus",
+                            "x-ms-dynamically-added": true
+                          }
+                        },
+                        "type": "object",
+                        "additionalProperties": {}
+                      },
+                      "body": {
+                        "correlationid": "@variables('correlationId')",
+                        "requestid": "",
+                        "success": false,
+                        "status": "UNAUTHORIZED",
+                        "message": "You are not authorized to submit this request.",
+                        "requeststatus": ""
+                      },
+                      "statusCode": 200
+                    },
+                    "runAfter": {}
+                  }
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "lessOrEquals": [
+                      "@length(outputs('List_Admin_Authorization')?['body']?['value'])",
+                      1
+                    ]
+                  },
+                  {
+                    "or": [
+                      {
+                        "equals": [
+                          "@toUpper(triggerBody()?['text_1'])",
+                          "SUPPORT"
+                        ]
+                      },
+                      {
+                        "and": [
+                          {
+                            "equals": [
+                              "@toUpper(triggerBody()?['text_1'])",
+                              "ASSIGN_OWNER"
+                            ]
+                          },
+                          {
+                            "equals": [
+                              "@length(outputs('List_Admin_Authorization')?['body']?['value'])",
+                              1
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "and": [
+                          {
+                            "or": [
+                              {
+                                "equals": [
+                                  "@length(outputs('List_Owner_Authorization')?['body']?['value'])",
+                                  1
+                                ]
+                              },
+                              {
+                                "equals": [
+                                  "@length(outputs('List_Admin_Authorization')?['body']?['value'])",
+                                  1
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "or": [
+                              {
+                                "equals": [
+                                  "@toUpper(triggerBody()?['text_1'])",
+                                  "CERTIFY"
+                                ]
+                              },
+                              {
+                                "equals": [
+                                  "@toUpper(triggerBody()?['text_1'])",
+                                  "ARCHIVE"
+                                ]
+                              },
+                              {
+                                "equals": [
+                                  "@toUpper(triggerBody()?['text_1'])",
+                                  "DELETE_REVIEW"
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": "If",
+              "actions": {
+                "Find_Existing_Request": {
+                  "type": "OpenApiConnection",
+                  "inputs": {
+                    "parameters": {
+                      "$filter": "@concat('sb_idempotencykey eq ''', trim(triggerBody()?['text_5']), '''')",
+                      "$top": 2,
+                      "$select": "sb_governanceactionrequestid,sb_requeststatus",
+                      "entityName": "sb_governanceactionrequests"
+                    },
+                    "authentication": "@parameters('')",
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "operationId": "ListRecords"
+                    }
+                  },
+                  "runAfter": {}
+                },
+                "Handle_Idempotency": {
+                  "else": {
+                    "actions": {
+                      "Check_Existing_Request_Integrity": {
+                        "else": {
+                          "actions": {
+                            "Respond_Idempotency_Error": {
+                              "kind": "Skills",
+                              "type": "Response",
+                              "inputs": {
+                                "schema": {
+                                  "properties": {
+                                    "correlationid": {
+                                      "x-ms-content-hint": "TEXT",
+                                      "type": "string",
+                                      "title": "CorrelationId",
+                                      "x-ms-dynamically-added": true
+                                    },
+                                    "requestid": {
+                                      "x-ms-content-hint": "TEXT",
+                                      "type": "string",
+                                      "title": "RequestId",
+                                      "x-ms-dynamically-added": true
+                                    },
+                                    "success": {
+                                      "x-ms-content-hint": "BOOLEAN",
+                                      "type": "boolean",
+                                      "title": "Success",
+                                      "x-ms-dynamically-added": true
+                                    },
+                                    "status": {
+                                      "x-ms-content-hint": "TEXT",
+                                      "type": "string",
+                                      "title": "Status",
+                                      "x-ms-dynamically-added": true
+                                    },
+                                    "message": {
+                                      "x-ms-content-hint": "TEXT",
+                                      "type": "string",
+                                      "title": "Message",
+                                      "x-ms-dynamically-added": true
+                                    },
+                                    "requeststatus": {
+                                      "x-ms-content-hint": "TEXT",
+                                      "type": "string",
+                                      "title": "RequestStatus",
+                                      "x-ms-dynamically-added": true
+                                    }
+                                  },
+                                  "type": "object",
+                                  "additionalProperties": {}
+                                },
+                                "body": {
+                                  "correlationid": "@variables('correlationId')",
+                                  "requestid": "",
+                                  "success": false,
+                                  "status": "DATA_INTEGRITY_ERROR",
+                                  "message": "Duplicate request records were found for the idempotency key.",
+                                  "requeststatus": ""
+                                },
+                                "statusCode": 200
+                              },
+                              "runAfter": {}
+                            }
+                          }
+                        },
+                        "expression": {
+                          "and": [
+                            {
+                              "equals": [
+                                "@length(outputs('Find_Existing_Request')?['body']?['value'])",
+                                1
+                              ]
+                            }
+                          ]
+                        },
+                        "type": "If",
+                        "actions": {
+                          "Respond_Existing_Request": {
+                            "kind": "Skills",
+                            "type": "Response",
+                            "inputs": {
+                              "schema": {
+                                "properties": {
+                                  "correlationid": {
+                                    "x-ms-content-hint": "TEXT",
+                                    "type": "string",
+                                    "title": "CorrelationId",
+                                    "x-ms-dynamically-added": true
+                                  },
+                                  "requestid": {
+                                    "x-ms-content-hint": "TEXT",
+                                    "type": "string",
+                                    "title": "RequestId",
+                                    "x-ms-dynamically-added": true
+                                  },
+                                  "success": {
+                                    "x-ms-content-hint": "BOOLEAN",
+                                    "type": "boolean",
+                                    "title": "Success",
+                                    "x-ms-dynamically-added": true
+                                  },
+                                  "status": {
+                                    "x-ms-content-hint": "TEXT",
+                                    "type": "string",
+                                    "title": "Status",
+                                    "x-ms-dynamically-added": true
+                                  },
+                                  "message": {
+                                    "x-ms-content-hint": "TEXT",
+                                    "type": "string",
+                                    "title": "Message",
+                                    "x-ms-dynamically-added": true
+                                  },
+                                  "requeststatus": {
+                                    "x-ms-content-hint": "TEXT",
+                                    "type": "string",
+                                    "title": "RequestStatus",
+                                    "x-ms-dynamically-added": true
+                                  }
+                                },
+                                "type": "object",
+                                "additionalProperties": {}
+                              },
+                              "body": {
+                                "correlationid": "@variables('correlationId')",
+                                "requestid": "@first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_governanceactionrequestid']",
+                                "success": true,
+                                "status": "@if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000000), 'PENDING', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000001), 'AWAITING_APPROVAL', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000002), 'APPROVED', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000003), 'IN_PROGRESS', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000004), 'COMPLETED', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000005), 'REJECTED', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000006), 'CANCELLED', 'FAILED')))))))",
+                                "message": "The existing request was returned for this idempotency key.",
+                                "requeststatus": "@if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000000), 'PENDING', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000001), 'AWAITING_APPROVAL', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000002), 'APPROVED', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000003), 'IN_PROGRESS', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000004), 'COMPLETED', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000005), 'REJECTED', if(equals(first(outputs('Find_Existing_Request')?['body']?['value'])?['sb_requeststatus'], 100000006), 'CANCELLED', 'FAILED')))))))"
+                              },
+                              "statusCode": 200
+                            },
+                            "runAfter": {}
+                          }
+                        },
+                        "runAfter": {}
+                      }
+                    }
+                  },
+                  "expression": {
+                    "and": [
+                      {
+                        "equals": [
+                          "@length(outputs('Find_Existing_Request')?['body']?['value'])",
+                          0
+                        ]
+                      }
+                    ]
+                  },
+                  "type": "If",
+                  "actions": {
+                    "Create_Request": {
+                      "else": {
+                        "actions": {
+                          "Create_Request_With_Site": {
+                            "type": "OpenApiConnection",
+                            "inputs": {
+                              "parameters": {
+                                "item/sb_requestedat": "@utcNow()",
+                                "item/sb_requeststatus": 100000000,
+                                "item/sb_reason": "@triggerBody()?['text_3']",
+                                "item/sb_requestedbyobjectid": "@outputs('Resolve_Caller')?['body']?['id']",
+                                "item/sb_requesttype": "@variables('requestTypeValue')",
+                                "item/sb_idempotencykey": "@trim(triggerBody()?['text_5'])",
+                                "entityName": "sb_governanceactionrequests",
+                                "item/sb_confirmationmethod": "@variables('confirmationMethodValue')",
+                                "item/sb_requestedbyupn": "@toLower(trim(triggerBody()?['text']))",
+                                "item/sb_targetownerupn": "@if(empty(triggerBody()?['text_6']), null, toLower(trim(triggerBody()?['text_6'])))",
+                                "item/sb_site@odata.bind": "@concat('/sb_governancesites(', triggerBody()?['text_2'], ')')"
+                              },
+                              "authentication": "@parameters('')",
+                              "host": {
+                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                "connectionName": "shared_commondataserviceforapps",
+                                "operationId": "CreateRecord"
+                              }
+                            },
+                            "runAfter": {}
+                          },
+                          "Set_Created_Request_Id_With_Site": {
+                            "type": "SetVariable",
+                            "inputs": {
+                              "value": "@outputs('Create_Request_With_Site')?['body']?['sb_governanceactionrequestid']",
+                              "name": "requestId"
+                            },
+                            "runAfter": {
+                              "Create_Request_With_Site": [
+                                "Succeeded"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "empty": [
+                              "@trim(coalesce(triggerBody()?['text_2'], ''))"
+                            ]
+                          }
+                        ]
+                      },
+                      "type": "If",
+                      "actions": {
+                        "Set_Created_Request_Id_Without_Site": {
+                          "type": "SetVariable",
+                          "inputs": {
+                            "value": "@outputs('Create_Request_Without_Site')?['body']?['sb_governanceactionrequestid']",
+                            "name": "requestId"
+                          },
+                          "runAfter": {
+                            "Create_Request_Without_Site": [
+                              "Succeeded"
+                            ]
+                          }
+                        },
+                        "Create_Request_Without_Site": {
+                          "type": "OpenApiConnection",
+                          "inputs": {
+                            "parameters": {
+                              "item/sb_requestedat": "@utcNow()",
+                              "item/sb_requeststatus": 100000000,
+                              "item/sb_reason": "@triggerBody()?['text_3']",
+                              "item/sb_requestedbyobjectid": "@outputs('Resolve_Caller')?['body']?['id']",
+                              "item/sb_requesttype": "@variables('requestTypeValue')",
+                              "item/sb_idempotencykey": "@trim(triggerBody()?['text_5'])",
+                              "entityName": "sb_governanceactionrequests",
+                              "item/sb_confirmationmethod": "@variables('confirmationMethodValue')",
+                              "item/sb_requestedbyupn": "@toLower(trim(triggerBody()?['text']))",
+                              "item/sb_targetownerupn": "@if(empty(triggerBody()?['text_6']), null, toLower(trim(triggerBody()?['text_6'])))"
+                            },
+                            "authentication": "@parameters('')",
+                            "host": {
+                              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                              "connectionName": "shared_commondataserviceforapps",
+                              "operationId": "CreateRecord"
+                            }
+                          },
+                          "runAfter": {}
+                        }
+                      },
+                      "runAfter": {}
+                    },
+                    "Append_Submitted_Event": {
+                      "type": "OpenApiConnection",
+                      "inputs": {
+                        "parameters": {
+                          "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', variables('requestId'), ')')",
+                          "item/sb_newstate": "Pending",
+                          "entityName": "sb_governanceactionevents",
+                          "item/sb_correlationid": "@variables('correlationId')",
+                          "item/sb_actorupn": "@toLower(trim(triggerBody()?['text']))",
+                          "item/sb_eventat": "@utcNow()",
+                          "item/sb_eventtype": 100000000,
+                          "item/sb_message": "Governance request submitted."
+                        },
+                        "authentication": "@parameters('')",
+                        "host": {
+                          "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                          "connectionName": "shared_commondataserviceforapps",
+                          "operationId": "CreateRecord"
+                        }
+                      },
+                      "runAfter": {
+                        "Create_Request": [
+                          "Succeeded"
+                        ]
+                      }
+                    },
+                    "Respond_New_Request": {
+                      "kind": "Skills",
+                      "type": "Response",
+                      "inputs": {
+                        "schema": {
+                          "properties": {
+                            "correlationid": {
+                              "x-ms-content-hint": "TEXT",
+                              "type": "string",
+                              "title": "CorrelationId",
+                              "x-ms-dynamically-added": true
+                            },
+                            "requestid": {
+                              "x-ms-content-hint": "TEXT",
+                              "type": "string",
+                              "title": "RequestId",
+                              "x-ms-dynamically-added": true
+                            },
+                            "success": {
+                              "x-ms-content-hint": "BOOLEAN",
+                              "type": "boolean",
+                              "title": "Success",
+                              "x-ms-dynamically-added": true
+                            },
+                            "status": {
+                              "x-ms-content-hint": "TEXT",
+                              "type": "string",
+                              "title": "Status",
+                              "x-ms-dynamically-added": true
+                            },
+                            "message": {
+                              "x-ms-content-hint": "TEXT",
+                              "type": "string",
+                              "title": "Message",
+                              "x-ms-dynamically-added": true
+                            },
+                            "requeststatus": {
+                              "x-ms-content-hint": "TEXT",
+                              "type": "string",
+                              "title": "RequestStatus",
+                              "x-ms-dynamically-added": true
+                            }
+                          },
+                          "type": "object",
+                          "additionalProperties": {}
+                        },
+                        "body": {
+                          "correlationid": "@variables('correlationId')",
+                          "requestid": "@variables('requestId')",
+                          "success": true,
+                          "status": "PENDING",
+                          "message": "Governance request submitted.",
+                          "requeststatus": "PENDING"
+                        },
+                        "statusCode": 200
+                      },
+                      "runAfter": {
+                        "Append_Submitted_Event": [
+                          "Succeeded"
+                        ]
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Find_Existing_Request": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "runAfter": {
+                "List_Admin_Authorization": [
+                  "Succeeded"
+                ],
+                "List_Owner_Authorization": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Resolve_Caller": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "id": "@toLower(trim(triggerBody()?['text']))"
+                },
+                "authentication": "@parameters('')",
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users",
+                  "connectionName": "shared_office365users",
+                  "operationId": "UserProfile_V2"
+                }
+              },
+              "runAfter": {}
+            },
+            "List_Owner_Authorization": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "$filter": "@concat('_sb_site_value eq ', coalesce(triggerBody()?['text_2'], '00000000-0000-0000-0000-000000000000'), ' and sb_isactive eq true and (sb_principalobjectid eq ''', outputs('Resolve_Caller')?['body']?['id'], ''' or (sb_principalobjectid eq null and sb_principalupn eq ''', toLower(trim(triggerBody()?['text'])), '''))')",
+                  "$top": 1,
+                  "$select": "sb_siteownerassignmentid",
+                  "entityName": "sb_siteownerassignments"
+                },
+                "authentication": "@parameters('')",
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "ListRecords"
+                }
+              },
+              "runAfter": {
+                "Resolve_Caller": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "List_Admin_Authorization": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "parameters": {
+                  "$filter": "@concat('sb_principalobjectid eq ''', outputs('Resolve_Caller')?['body']?['id'], ''' and sb_role eq 126390000 and sb_isactive eq true and (sb_validfrom eq null or sb_validfrom le ', utcNow(), ') and (sb_validuntil eq null or sb_validuntil gt ', utcNow(), ')')",
+                  "$top": 2,
+                  "$select": "sb_governanceroleassignmentid",
+                  "entityName": "sb_governanceroleassignments"
+                },
+                "authentication": "@parameters('')",
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "ListRecords"
+                }
+              },
+              "runAfter": {
+                "Resolve_Caller": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "runAfter": {
+            "Validate_Input": [
+              "Succeeded"
+            ]
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "kind": "Skills",
+          "type": "Request",
+          "inputs": {
+            "schema": {
+              "required": [
+                "text",
+                "text_1",
+                "text_5"
+              ],
+              "properties": {
+                "text_1": {
+                  "title": "requestType",
+                  "type": "string"
+                },
+                "text_6": {
+                  "title": "targetOwnerUPN",
+                  "type": "string"
+                },
+                "text_5": {
+                  "title": "idempotencyKey",
+                  "type": "string"
+                },
+                "text_3": {
+                  "title": "reason",
+                  "type": "string"
+                },
+                "text_4": {
+                  "title": "confirmation",
+                  "type": "string"
+                },
+                "text_2": {
+                  "title": "siteId",
+                  "type": "string"
+                },
+                "text": {
+                  "title": "callerUPN",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          }
+        }
+      },
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      },
+      "contentVersion": "1.0.0.0",
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

@@ -1,17 +1,13 @@
 displayName: Governance Owner Agent
 schemaName: copilots_gov_owner_01
-accessControlPolicy: Any
+accessControlPolicy: GroupMembership
 authenticationMode: Integrated
 authenticationTrigger: Always
 configuration:
-  channels:
-    - channelId: MsTeams
-
-    - channelId: Microsoft365Copilot
-
   settings:
     GenerativeActionsEnabled: true
 
+  isAgentConnectable: true
   publishOnImport: true
   isLightweightBot: false
   recognizer:

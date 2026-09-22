@@ -1,0 +1,302 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedcommondataserviceforapps"
+        },
+        "runtimeSource": "embedded",
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "actions": {
+        "Catch": {
+          "actions": {
+            "Respond_Event_Failure": {
+              "type": "Response",
+              "inputs": {
+                "body": {
+                  "success": false,
+                  "status": "CONNECTOR_FAILED",
+                  "message": "Action event could not be appended.",
+                  "eventid": ""
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "eventid": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "statusCode": 500
+              },
+              "runAfter": {}
+            }
+          },
+          "type": "Scope",
+          "runAfter": {
+            "Try": [
+              "Failed",
+              "TimedOut"
+            ]
+          }
+        },
+        "Try": {
+          "actions": {
+            "Respond_Event_Created": {
+              "type": "Response",
+              "inputs": {
+                "body": {
+                  "success": true,
+                  "status": "CREATED",
+                  "message": "Action event appended.",
+                  "eventid": "@outputs('Create_Action_Event')?['body']?['sb_governanceactioneventid']"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "eventid": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "statusCode": 200
+              },
+              "runAfter": {
+                "Create_Action_Event": [
+                  "Succeeded"
+                ]
+              }
+            },
+            "Get_Request": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "authentication": "@parameters('')",
+                "parameters": {
+                  "recordId": "@triggerBody()?['requestId']",
+                  "$select": "sb_governanceactionrequestid",
+                  "entityName": "sb_governanceactionrequests"
+                },
+                "host": {
+                  "operationId": "GetItem",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps"
+                }
+              },
+              "runAfter": {}
+            },
+            "Create_Action_Event": {
+              "type": "OpenApiConnection",
+              "inputs": {
+                "authentication": "@parameters('')",
+                "parameters": {
+                  "item/sb_eventtype": "@triggerBody()?['eventType']",
+                  "item/sb_previousstate": "@if(empty(triggerBody()?['previousState']), null, triggerBody()?['previousState'])",
+                  "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', outputs('Get_Request')?['body']?['sb_governanceactionrequestid'], ')')",
+                  "entityName": "sb_governanceactionevents",
+                  "item/sb_actorupn": "@toLower(trim(triggerBody()?['actorUpn']))",
+                  "item/sb_message": "@triggerBody()?['message']",
+                  "item/sb_correlationid": "@triggerBody()?['correlationId']",
+                  "item/sb_newstate": "@triggerBody()?['newState']",
+                  "item/sb_eventat": "@utcNow()"
+                },
+                "host": {
+                  "operationId": "CreateRecord",
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps"
+                }
+              },
+              "runAfter": {
+                "Get_Request": [
+                  "Succeeded"
+                ]
+              }
+            }
+          },
+          "type": "Scope",
+          "runAfter": {
+            "Validate_Event_Input": [
+              "Succeeded"
+            ]
+          }
+        },
+        "Validate_Event_Input": {
+          "actions": {},
+          "type": "If",
+          "runAfter": {},
+          "else": {
+            "actions": {
+              "Respond_Invalid_Event": {
+                "type": "Response",
+                "inputs": {
+                  "body": {
+                    "success": false,
+                    "status": "VALIDATION_FAILED",
+                    "message": "Action event input is invalid.",
+                    "eventid": ""
+                  },
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "eventid": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "statusCode": 400
+                },
+                "runAfter": {}
+              }
+            }
+          },
+          "expression": {
+            "and": [
+              {
+                "not": [
+                  {
+                    "empty": [
+                      "@triggerBody()?['requestId']"
+                    ]
+                  }
+                ]
+              },
+              {
+                "greaterOrEquals": [
+                  "@triggerBody()?['eventType']",
+                  100000000
+                ]
+              },
+              {
+                "lessOrEquals": [
+                  "@triggerBody()?['eventType']",
+                  100000008
+                ]
+              },
+              {
+                "contains": [
+                  "@toLower(triggerBody()?['actorUpn'])",
+                  "@"
+                ]
+              },
+              {
+                "not": [
+                  {
+                    "empty": [
+                      "@triggerBody()?['correlationId']"
+                    ]
+                  }
+                ]
+              },
+              {
+                "not": [
+                  {
+                    "empty": [
+                      "@triggerBody()?['message']"
+                    ]
+                  }
+                ]
+              },
+              {
+                "not": [
+                  {
+                    "empty": [
+                      "@triggerBody()?['newState']"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "outputs": {},
+      "contentVersion": "1.0.0.0",
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Button",
+          "inputs": {
+            "schema": {
+              "required": [
+                "requestId",
+                "eventType",
+                "actorUpn",
+                "correlationId",
+                "message",
+                "newState"
+              ],
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                },
+                "correlationId": {
+                  "type": "string"
+                },
+                "eventType": {
+                  "type": "integer"
+                },
+                "requestId": {
+                  "type": "string"
+                },
+                "actorUpn": {
+                  "type": "string"
+                },
+                "previousState": {
+                  "type": "string"
+                },
+                "newState": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": {
+        "$connections": {
+          "type": "Object",
+          "defaultValue": {}
+        },
+        "$authentication": {
+          "type": "SecureObject",
+          "defaultValue": {}
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

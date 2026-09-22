@@ -1,0 +1,170 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_office365users": {
+        "api": {
+          "name": "shared_office365users"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedoffice365users"
+        },
+        "runtimeSource": "embedded"
+      },
+      "shared_commondataserviceforapps": {
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedcommondataserviceforapps"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "contentVersion": "1.0.0.0",
+      "parameters": {
+        "$authentication": {
+          "type": "SecureObject",
+          "defaultValue": {}
+        },
+        "$connections": {
+          "type": "Object",
+          "defaultValue": {}
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "description": "Signed-in caller UPN from system context",
+                  "title": "callerUPN",
+                  "type": "string",
+                  "x-ms-content-hint": "TEXT",
+                  "x-ms-dynamically-added": true
+                }
+              },
+              "required": [
+                "text"
+              ]
+            }
+          }
+        }
+      },
+      "actions": {
+        "Try": {
+          "type": "Scope",
+          "runAfter": {},
+          "actions": {
+            "Resolve_Caller": {
+              "type": "OpenApiConnection",
+              "runAfter": {},
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users",
+                  "operationId": "UserProfile_V2",
+                  "connectionName": "shared_office365users"
+                },
+                "authentication": "@parameters('')",
+                "parameters": {
+                  "id": "@toLower(trim(triggerBody()?['text']))"
+                }
+              }
+            },
+            "List_Admin_Role_Assignments": {
+              "type": "OpenApiConnection",
+              "runAfter": {
+                "Resolve_Caller": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "operationId": "ListRecords",
+                  "connectionName": "shared_commondataserviceforapps"
+                },
+                "authentication": "@parameters('')",
+                "parameters": {
+                  "entityName": "sb_governanceroleassignments",
+                  "$select": "sb_governanceroleassignmentid",
+                  "$filter": "@concat('sb_principalobjectid eq ''', outputs('Resolve_Caller')?['body']?['id'], ''' and sb_role eq 126390000 and sb_isactive eq true and (sb_validfrom eq null or sb_validfrom le ', utcNow(), ') and (sb_validuntil eq null or sb_validuntil gt ', utcNow(), ')')",
+                  "$top": 2
+                }
+              }
+            },
+            "Respond_to_agent": {
+              "type": "Response",
+              "kind": "Skills",
+              "runAfter": {
+                "List_Admin_Role_Assignments": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isadmin": {
+                      "title": "IsAdmin",
+                      "type": "boolean",
+                      "x-ms-content-hint": "BOOLEAN",
+                      "x-ms-dynamically-added": true
+                    }
+                  },
+                  "additionalProperties": {}
+                },
+                "statusCode": 200,
+                "body": {
+                  "isadmin": "@equals(length(outputs('List_Admin_Role_Assignments')?['body']?['value']), 1)"
+                }
+              }
+            }
+          }
+        },
+        "Catch": {
+          "type": "Scope",
+          "runAfter": {
+            "Try": [
+              "Failed",
+              "TimedOut"
+            ]
+          },
+          "actions": {
+            "Respond_Verification_Failed": {
+              "type": "Response",
+              "kind": "Skills",
+              "runAfter": {},
+              "inputs": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isadmin": {
+                      "title": "IsAdmin",
+                      "type": "boolean",
+                      "x-ms-content-hint": "BOOLEAN",
+                      "x-ms-dynamically-added": true
+                    }
+                  },
+                  "additionalProperties": {}
+                },
+                "statusCode": 200,
+                "body": {
+                  "isadmin": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "outputs": {}
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

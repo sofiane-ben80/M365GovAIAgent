@@ -1,0 +1,61 @@
+kind: AdaptiveDialog
+modelDescription: "This tool can handle queries like these: execute archive, action archive, confirm archive"
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Action Archive
+    includeInOnSelectIntent: false
+    triggerQueries:
+      - execute archive
+      - action archive
+      - confirm archive
+
+  actions:
+    - kind: SetVariable
+      id: setVariable_ActionArchiveCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionType
+      variable: Topic.ActionType
+      value: ARCHIVE
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionStatus
+      variable: Topic.ActionStatus
+      value: READY
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionArchiveSiteUrl
+      variable: Topic.SelectedSiteUrl
+      value: <selected-site-url>
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionArchiveSiteTitle
+      variable: Topic.SelectedSiteTitle
+      value: <selected-site-title>
+
+    - kind: SetTextVariable
+      id: setTextVariable_ActionArchiveSiteItemId
+      variable: Topic.SelectedSiteItemId
+      value: <selected-site-item-id>
+
+    - kind: SendActivity
+      id: sendActivity_ActionArchiveIntro
+      activity: |
+        This topic is reserved for the Action Agent handoff.
+        It will prepare the archival request, update the record, and write the audit log entry.
+
+    - kind: SendActivity
+      id: sendActivity_ActionArchivePending
+      activity: |
+        Planned inputs:
+        - Caller UPN: {Topic.CallerUPN}
+        - Site URL: {Topic.SelectedSiteUrl}
+        - Site Title: {Topic.SelectedSiteTitle}
+        - Site Item ID: {Topic.SelectedSiteItemId}
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_ActionArchive

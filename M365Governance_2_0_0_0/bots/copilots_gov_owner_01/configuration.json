@@ -1,0 +1,13 @@
+{
+  "$kind": "BotConfiguration",
+  "settings": {
+    "GenerativeActionsEnabled": true
+  },
+  "isAgentConnectable": true,
+  "publishOnImport": true,
+  "isLightweightBot": false,
+  "recognizer": {
+    "$kind": "GenerativeAIRecognizer"
+  },
+  "deferredProvisioning": false
+}

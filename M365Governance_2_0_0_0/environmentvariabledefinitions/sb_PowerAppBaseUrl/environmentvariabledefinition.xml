@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="sb_PowerAppBaseUrl">
+  <description default="Environment-specific launch URL for the Governor365 dashboard.">
+    <label description="Environment-specific launch URL for the Governor365 dashboard." languagecode="1033" />
+  </description>
+  <displayname default="Governor365 Power App Base URL">
+    <label description="Governor365 Power App Base URL" languagecode="1033" />
+  </displayname>
+  <introducedversion>2.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

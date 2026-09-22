@@ -1,0 +1,9 @@
+<botcomponent schemaname="copilots_header_04c70.BotSettingsComponent.ContentModeration">
+  <componenttype>18</componenttype>
+  <iscustomizable>0</iscustomizable>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

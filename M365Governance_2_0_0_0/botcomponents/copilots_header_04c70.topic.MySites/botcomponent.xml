@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.topic.MySites">
+  <componenttype>9</componenttype>
+  <description>Returns the signed-in user's governed SharePoint sites from Dataverse.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>My Sites</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>1</statecode>
+  <statuscode>2</statuscode>
+</botcomponent>

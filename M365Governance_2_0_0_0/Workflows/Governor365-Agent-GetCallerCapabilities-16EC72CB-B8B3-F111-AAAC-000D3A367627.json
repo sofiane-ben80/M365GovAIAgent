@@ -1,0 +1,450 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_office365users": {
+        "runtimeSource": "embedded",
+        "api": {
+          "name": "shared_office365users"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedoffice365users"
+        }
+      },
+      "shared_commondataserviceforapps": {
+        "runtimeSource": "embedded",
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        },
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedcommondataserviceforapps"
+        }
+      }
+    },
+    "definition": {
+      "parameters": {
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        },
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        }
+      },
+      "contentVersion": "1.0.0.0",
+      "outputs": {},
+      "actions": {
+        "Initialize_Correlation": {
+          "type": "InitializeVariable",
+          "runAfter": {},
+          "inputs": {
+            "variables": [
+              {
+                "type": "string",
+                "value": "@guid()",
+                "name": "correlationId"
+              }
+            ]
+          }
+        },
+        "Catch": {
+          "type": "Scope",
+          "actions": {
+            "Respond_Capability_Failure": {
+              "type": "Response",
+              "kind": "Skills",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "isadmin": false,
+                  "correlationid": "@variables('correlationId')",
+                  "message": "Caller capabilities could not be verified.",
+                  "isowner": false,
+                  "success": false,
+                  "status": "VERIFICATION_FAILED"
+                },
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "properties": {
+                    "isadmin": {
+                      "type": "boolean",
+                      "title": "IsAdmin",
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "BOOLEAN"
+                    },
+                    "correlationid": {
+                      "type": "string",
+                      "title": "CorrelationId",
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "TEXT"
+                    },
+                    "message": {
+                      "type": "string",
+                      "title": "Message",
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "TEXT"
+                    },
+                    "isowner": {
+                      "type": "boolean",
+                      "title": "IsOwner",
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "BOOLEAN"
+                    },
+                    "success": {
+                      "type": "boolean",
+                      "title": "Success",
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "BOOLEAN"
+                    },
+                    "status": {
+                      "type": "string",
+                      "title": "Status",
+                      "x-ms-dynamically-added": true,
+                      "x-ms-content-hint": "TEXT"
+                    }
+                  }
+                }
+              },
+              "runAfter": {}
+            }
+          },
+          "runAfter": {
+            "Try": [
+              "Failed",
+              "TimedOut"
+            ]
+          }
+        },
+        "Validate_Caller": {
+          "type": "If",
+          "actions": {},
+          "runAfter": {
+            "Initialize_Correlation": [
+              "Succeeded"
+            ]
+          },
+          "expression": {
+            "and": [
+              {
+                "not": [
+                  {
+                    "empty": [
+                      "@trim(triggerBody()?['text'])"
+                    ]
+                  }
+                ]
+              },
+              {
+                "contains": [
+                  "@trim(triggerBody()?['text'])",
+                  "@"
+                ]
+              }
+            ]
+          },
+          "else": {
+            "actions": {
+              "Respond_Validation_Failed": {
+                "type": "Response",
+                "kind": "Skills",
+                "inputs": {
+                  "statusCode": 200,
+                  "body": {
+                    "isadmin": false,
+                    "correlationid": "@variables('correlationId')",
+                    "message": "The signed-in caller identity is missing or malformed.",
+                    "isowner": false,
+                    "success": false,
+                    "status": "VALIDATION_FAILED"
+                  },
+                  "schema": {
+                    "type": "object",
+                    "additionalProperties": {},
+                    "properties": {
+                      "isadmin": {
+                        "type": "boolean",
+                        "title": "IsAdmin",
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "BOOLEAN"
+                      },
+                      "correlationid": {
+                        "type": "string",
+                        "title": "CorrelationId",
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "TEXT"
+                      },
+                      "message": {
+                        "type": "string",
+                        "title": "Message",
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "TEXT"
+                      },
+                      "isowner": {
+                        "type": "boolean",
+                        "title": "IsOwner",
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "BOOLEAN"
+                      },
+                      "success": {
+                        "type": "boolean",
+                        "title": "Success",
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "BOOLEAN"
+                      },
+                      "status": {
+                        "type": "string",
+                        "title": "Status",
+                        "x-ms-dynamically-added": true,
+                        "x-ms-content-hint": "TEXT"
+                      }
+                    }
+                  }
+                },
+                "runAfter": {}
+              }
+            }
+          }
+        },
+        "Try": {
+          "type": "Scope",
+          "actions": {
+            "List_Admin_Role_Assignments": {
+              "type": "OpenApiConnection",
+              "runAfter": {
+                "Resolve_Caller": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "authentication": "@parameters('')",
+                "parameters": {
+                  "$select": "sb_governanceroleassignmentid",
+                  "entityName": "sb_governanceroleassignments",
+                  "$top": 2,
+                  "$filter": "@concat('sb_principalobjectid eq ''', outputs('Resolve_Caller')?['body']?['id'], ''' and sb_role eq 126390000 and sb_isactive eq true and (sb_validfrom eq null or sb_validfrom le ', utcNow(), ') and (sb_validuntil eq null or sb_validuntil gt ', utcNow(), ')')"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "ListRecords"
+                }
+              }
+            },
+            "Check_Role_Integrity": {
+              "type": "If",
+              "actions": {
+                "Respond_Role_Data_Error": {
+                  "type": "Response",
+                  "kind": "Skills",
+                  "inputs": {
+                    "statusCode": 200,
+                    "body": {
+                      "isadmin": false,
+                      "correlationid": "@variables('correlationId')",
+                      "message": "Caller capabilities could not be determined because role data is inconsistent.",
+                      "isowner": false,
+                      "success": false,
+                      "status": "ROLE_DATA_INTEGRITY_ERROR"
+                    },
+                    "schema": {
+                      "type": "object",
+                      "additionalProperties": {},
+                      "properties": {
+                        "isadmin": {
+                          "type": "boolean",
+                          "title": "IsAdmin",
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "BOOLEAN"
+                        },
+                        "correlationid": {
+                          "type": "string",
+                          "title": "CorrelationId",
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "TEXT"
+                        },
+                        "message": {
+                          "type": "string",
+                          "title": "Message",
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "TEXT"
+                        },
+                        "isowner": {
+                          "type": "boolean",
+                          "title": "IsOwner",
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "BOOLEAN"
+                        },
+                        "success": {
+                          "type": "boolean",
+                          "title": "Success",
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "BOOLEAN"
+                        },
+                        "status": {
+                          "type": "string",
+                          "title": "Status",
+                          "x-ms-dynamically-added": true,
+                          "x-ms-content-hint": "TEXT"
+                        }
+                      }
+                    }
+                  },
+                  "runAfter": {}
+                }
+              },
+              "runAfter": {
+                "List_Owner_Assignments": [
+                  "Succeeded"
+                ],
+                "List_Admin_Role_Assignments": [
+                  "Succeeded"
+                ]
+              },
+              "expression": {
+                "and": [
+                  {
+                    "greater": [
+                      "@length(outputs('List_Admin_Role_Assignments')?['body']?['value'])",
+                      1
+                    ]
+                  }
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Respond_Capabilities": {
+                    "type": "Response",
+                    "kind": "Skills",
+                    "inputs": {
+                      "statusCode": 200,
+                      "body": {
+                        "isadmin": "@equals(length(outputs('List_Admin_Role_Assignments')?['body']?['value']), 1)",
+                        "correlationid": "@variables('correlationId')",
+                        "message": "Caller capabilities resolved.",
+                        "isowner": "@greater(length(outputs('List_Owner_Assignments')?['body']?['value']), 0)",
+                        "success": true,
+                        "status": "COMPLETED"
+                      },
+                      "schema": {
+                        "type": "object",
+                        "additionalProperties": {},
+                        "properties": {
+                          "isadmin": {
+                            "type": "boolean",
+                            "title": "IsAdmin",
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "BOOLEAN"
+                          },
+                          "correlationid": {
+                            "type": "string",
+                            "title": "CorrelationId",
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "TEXT"
+                          },
+                          "message": {
+                            "type": "string",
+                            "title": "Message",
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "TEXT"
+                          },
+                          "isowner": {
+                            "type": "boolean",
+                            "title": "IsOwner",
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "BOOLEAN"
+                          },
+                          "success": {
+                            "type": "boolean",
+                            "title": "Success",
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "BOOLEAN"
+                          },
+                          "status": {
+                            "type": "string",
+                            "title": "Status",
+                            "x-ms-dynamically-added": true,
+                            "x-ms-content-hint": "TEXT"
+                          }
+                        }
+                      }
+                    },
+                    "runAfter": {}
+                  }
+                }
+              }
+            },
+            "Resolve_Caller": {
+              "type": "OpenApiConnection",
+              "runAfter": {},
+              "inputs": {
+                "authentication": "@parameters('')",
+                "parameters": {
+                  "id": "@toLower(trim(triggerBody()?['text']))"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_office365users",
+                  "connectionName": "shared_office365users",
+                  "operationId": "UserProfile_V2"
+                }
+              }
+            },
+            "List_Owner_Assignments": {
+              "type": "OpenApiConnection",
+              "runAfter": {
+                "Resolve_Caller": [
+                  "Succeeded"
+                ]
+              },
+              "inputs": {
+                "authentication": "@parameters('')",
+                "parameters": {
+                  "$select": "sb_siteownerassignmentid",
+                  "entityName": "sb_siteownerassignments",
+                  "$top": 1,
+                  "$filter": "@concat('sb_isactive eq true and (sb_principalobjectid eq ''', outputs('Resolve_Caller')?['body']?['id'], ''' or (sb_principalobjectid eq null and sb_principalupn eq ''', toLower(trim(triggerBody()?['text'])), '''))')"
+                },
+                "host": {
+                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                  "connectionName": "shared_commondataserviceforapps",
+                  "operationId": "ListRecords"
+                }
+              }
+            }
+          },
+          "runAfter": {
+            "Validate_Caller": [
+              "Succeeded"
+            ]
+          }
+        }
+      },
+      "triggers": {
+        "manual": {
+          "type": "Request",
+          "kind": "Skills",
+          "inputs": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "text"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "title": "callerUPN",
+                  "x-ms-dynamically-added": true,
+                  "x-ms-content-hint": "TEXT",
+                  "description": "Signed-in caller UPN from system context"
+                }
+              }
+            }
+          }
+        }
+      },
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#"
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

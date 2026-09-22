@@ -1,0 +1,14 @@
+<botcomponent schemaname="copilots_header_04c70.topic.OwnerSiteReview">
+  <componenttype>9</componenttype>
+  <description>Child-owned exact-site review and governed request submission with independent authorization.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>Site Review</name>
+  <parentbotcomponentid>
+    <schemaname>copilots_header_04c70.agent.Agent</schemaname>
+  </parentbotcomponentid>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

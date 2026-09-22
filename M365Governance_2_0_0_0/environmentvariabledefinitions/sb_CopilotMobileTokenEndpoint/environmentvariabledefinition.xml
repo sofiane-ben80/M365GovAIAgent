@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="sb_CopilotMobileTokenEndpoint">
+  <description default="Environment-specific Mobile App channel token endpoint for the Governor365 Copilot Studio agent.">
+    <label description="Environment-specific Mobile App channel token endpoint for the Governor365 Copilot Studio agent." languagecode="1033" />
+  </description>
+  <displayname default="Governor365 Copilot Mobile Token Endpoint">
+    <label description="Governor365 Copilot Mobile Token Endpoint" languagecode="1033" />
+  </displayname>
+  <introducedversion>2.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

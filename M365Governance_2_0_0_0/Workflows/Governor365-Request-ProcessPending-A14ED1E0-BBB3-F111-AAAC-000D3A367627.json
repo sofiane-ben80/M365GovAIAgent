@@ -1,0 +1,598 @@
+{
+  "properties": {
+    "connectionReferences": {
+      "shared_commondataserviceforapps": {
+        "connection": {
+          "connectionReferenceLogicalName": "sb_sharedcommondataserviceforapps"
+        },
+        "api": {
+          "name": "shared_commondataserviceforapps"
+        },
+        "runtimeSource": "embedded"
+      }
+    },
+    "definition": {
+      "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+      "outputs": {},
+      "actions": {
+        "List_Pending_Requests": {
+          "type": "OpenApiConnection",
+          "runAfter": {},
+          "inputs": {
+            "host": {
+              "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+              "operationId": "ListRecords",
+              "connectionName": "shared_commondataserviceforapps"
+            },
+            "authentication": "@parameters('')",
+            "parameters": {
+              "$orderby": "sb_requestedat asc",
+              "$top": 100,
+              "$select": "sb_governanceactionrequestid,sb_requesttype,sb_requestedbyobjectid,sb_requestedbyupn,_sb_site_value",
+              "$filter": "sb_requeststatus eq 100000000",
+              "entityName": "sb_governanceactionrequests"
+            }
+          }
+        },
+        "For_Each_Request": {
+          "type": "Foreach",
+          "foreach": "@outputs('List_Pending_Requests')?['body']?['value']",
+          "actions": {
+            "Catch_Process_Request": {
+              "runAfter": {
+                "Try_Process_Request": [
+                  "Failed",
+                  "TimedOut"
+                ]
+              },
+              "actions": {
+                "Append_Processor_Connector_Failed": {
+                  "runAfter": {
+                    "Mark_Processor_Connector_Failed": [
+                      "Succeeded"
+                    ]
+                  },
+                  "inputs": {
+                    "host": {
+                      "operationId": "CreateRecord",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                    },
+                    "parameters": {
+                      "item/sb_eventat": "@utcNow()",
+                      "item/sb_message": "Request processing failed because a connector or persistence step failed.",
+                      "item/sb_correlationid": "@concat('processor-', workflow()?['run']?['name'])",
+                      "item/sb_eventtype": 100000007,
+                      "item/sb_actorupn": "@items('For_Each_Request')?['sb_requestedbyupn']",
+                      "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', items('For_Each_Request')?['sb_governanceactionrequestid'], ')')",
+                      "entityName": "sb_governanceactionevents",
+                      "item/sb_newstate": "Failed"
+                    },
+                    "authentication": "@parameters('')"
+                  },
+                  "type": "OpenApiConnection"
+                },
+                "Mark_Processor_Connector_Failed": {
+                  "runAfter": {},
+                  "inputs": {
+                    "host": {
+                      "operationId": "UpdateOnlyRecord",
+                      "connectionName": "shared_commondataserviceforapps",
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps"
+                    },
+                    "parameters": {
+                      "item/sb_completedat": "@utcNow()",
+                      "item/sb_failuremessage": "A connector or persistence step failed while processing the request.",
+                      "entityName": "sb_governanceactionrequests",
+                      "item/sb_requeststatus": 100000007,
+                      "item/sb_failurecode": "PROCESSOR_CONNECTOR_FAILED",
+                      "recordId": "@items('For_Each_Request')?['sb_governanceactionrequestid']"
+                    },
+                    "authentication": "@parameters('')"
+                  },
+                  "type": "OpenApiConnection"
+                }
+              },
+              "type": "Scope"
+            },
+            "Try_Process_Request": {
+              "runAfter": {},
+              "actions": {
+                "List_Fresh_Admin_Authorization": {
+                  "type": "OpenApiConnection",
+                  "runAfter": {},
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "operationId": "ListRecords",
+                      "connectionName": "shared_commondataserviceforapps"
+                    },
+                    "authentication": "@parameters('')",
+                    "parameters": {
+                      "$top": 2,
+                      "$select": "sb_governanceroleassignmentid",
+                      "$filter": "@concat('sb_principalobjectid eq ''', items('For_Each_Request')?['sb_requestedbyobjectid'], ''' and sb_role eq 126390000 and sb_isactive eq true and (sb_validfrom eq null or sb_validfrom le ', utcNow(), ') and (sb_validuntil eq null or sb_validuntil gt ', utcNow(), ')')",
+                      "entityName": "sb_governanceroleassignments"
+                    }
+                  }
+                },
+                "List_Fresh_Owner_Authorization": {
+                  "type": "OpenApiConnection",
+                  "runAfter": {},
+                  "inputs": {
+                    "host": {
+                      "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                      "operationId": "ListRecords",
+                      "connectionName": "shared_commondataserviceforapps"
+                    },
+                    "authentication": "@parameters('')",
+                    "parameters": {
+                      "$top": 1,
+                      "$select": "sb_siteownerassignmentid",
+                      "$filter": "@concat('_sb_site_value eq ', coalesce(items('For_Each_Request')?['_sb_site_value'], '00000000-0000-0000-0000-000000000000'), ' and sb_isactive eq true and (sb_principalobjectid eq ''', items('For_Each_Request')?['sb_requestedbyobjectid'], ''' or (sb_principalobjectid eq null and sb_principalupn eq ''', items('For_Each_Request')?['sb_requestedbyupn'], '''))')",
+                      "entityName": "sb_siteownerassignments"
+                    }
+                  }
+                },
+                "Authorize_Request": {
+                  "type": "If",
+                  "else": {
+                    "actions": {
+                      "Fail_Unauthorized_Request": {
+                        "type": "OpenApiConnection",
+                        "runAfter": {},
+                        "inputs": {
+                          "host": {
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                            "operationId": "UpdateOnlyRecord",
+                            "connectionName": "shared_commondataserviceforapps"
+                          },
+                          "authentication": "@parameters('')",
+                          "parameters": {
+                            "item/sb_requeststatus": 100000007,
+                            "item/sb_completedat": "@utcNow()",
+                            "item/sb_failuremessage": "Authorization was not valid when the request was processed.",
+                            "item/sb_failurecode": "AUTHORIZATION_REVOKED",
+                            "recordId": "@items('For_Each_Request')?['sb_governanceactionrequestid']",
+                            "entityName": "sb_governanceactionrequests"
+                          }
+                        }
+                      },
+                      "Append_Authorization_Failed": {
+                        "type": "OpenApiConnection",
+                        "runAfter": {
+                          "Fail_Unauthorized_Request": [
+                            "Succeeded"
+                          ]
+                        },
+                        "inputs": {
+                          "host": {
+                            "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                            "operationId": "CreateRecord",
+                            "connectionName": "shared_commondataserviceforapps"
+                          },
+                          "authentication": "@parameters('')",
+                          "parameters": {
+                            "item/sb_actorupn": "@items('For_Each_Request')?['sb_requestedbyupn']",
+                            "entityName": "sb_governanceactionevents",
+                            "item/sb_message": "Request failed because fresh authorization was not valid.",
+                            "item/sb_eventat": "@utcNow()",
+                            "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', items('For_Each_Request')?['sb_governanceactionrequestid'], ')')",
+                            "item/sb_previousstate": "Pending",
+                            "item/sb_newstate": "Failed",
+                            "item/sb_eventtype": 100000007,
+                            "item/sb_correlationid": "@concat('processor-', workflow()?['run']?['name'])"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "actions": {
+                    "Route_Authorized_Request": {
+                      "type": "Switch",
+                      "default": {
+                        "actions": {
+                          "Fail_Approval_Dependent_Request": {
+                            "type": "OpenApiConnection",
+                            "runAfter": {},
+                            "inputs": {
+                              "host": {
+                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                "operationId": "UpdateOnlyRecord",
+                                "connectionName": "shared_commondataserviceforapps"
+                              },
+                              "authentication": "@parameters('')",
+                              "parameters": {
+                                "item/sb_requeststatus": 100000007,
+                                "item/sb_completedat": "@utcNow()",
+                                "item/sb_failuremessage": "The request was not executed because the Approvals connection is unavailable.",
+                                "item/sb_failurecode": "APPROVAL_CONNECTION_UNAVAILABLE",
+                                "recordId": "@items('For_Each_Request')?['sb_governanceactionrequestid']",
+                                "entityName": "sb_governanceactionrequests"
+                              }
+                            }
+                          },
+                          "Append_Approval_Dependency_Failed": {
+                            "type": "OpenApiConnection",
+                            "runAfter": {
+                              "Fail_Approval_Dependent_Request": [
+                                "Succeeded"
+                              ]
+                            },
+                            "inputs": {
+                              "host": {
+                                "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                "operationId": "CreateRecord",
+                                "connectionName": "shared_commondataserviceforapps"
+                              },
+                              "authentication": "@parameters('')",
+                              "parameters": {
+                                "item/sb_actorupn": "@items('For_Each_Request')?['sb_requestedbyupn']",
+                                "entityName": "sb_governanceactionevents",
+                                "item/sb_message": "Approval-dependent request failed closed because the Approvals connection is unavailable.",
+                                "item/sb_eventat": "@utcNow()",
+                                "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', items('For_Each_Request')?['sb_governanceactionrequestid'], ')')",
+                                "item/sb_previousstate": "Pending",
+                                "item/sb_newstate": "Failed",
+                                "item/sb_eventtype": 100000007,
+                                "item/sb_correlationid": "@concat('processor-', workflow()?['run']?['name'])"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "runAfter": {},
+                      "expression": "@items('For_Each_Request')?['sb_requesttype']",
+                      "cases": {
+                        "Certification": {
+                          "case": 100000000,
+                          "actions": {
+                            "Update_Site_Certification": {
+                              "type": "OpenApiConnection",
+                              "runAfter": {
+                                "Append_Certification_Execution_Started": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "inputs": {
+                                "host": {
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                  "operationId": "UpdateOnlyRecord",
+                                  "connectionName": "shared_commondataserviceforapps"
+                                },
+                                "authentication": "@parameters('')",
+                                "parameters": {
+                                  "item/sb_lastcertifiedat": "@utcNow()",
+                                  "item/sb_attestationstatus": 100000001,
+                                  "entityName": "sb_governancesites",
+                                  "recordId": "@items('For_Each_Request')?['_sb_site_value']"
+                                }
+                              }
+                            },
+                            "Append_Certification_Authorized": {
+                              "type": "OpenApiConnection",
+                              "runAfter": {
+                                "Mark_Certification_In_Progress": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "inputs": {
+                                "host": {
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                  "operationId": "CreateRecord",
+                                  "connectionName": "shared_commondataserviceforapps"
+                                },
+                                "authentication": "@parameters('')",
+                                "parameters": {
+                                  "item/sb_actorupn": "@items('For_Each_Request')?['sb_requestedbyupn']",
+                                  "entityName": "sb_governanceactionevents",
+                                  "item/sb_message": "Certification request authorized.",
+                                  "item/sb_eventat": "@utcNow()",
+                                  "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', items('For_Each_Request')?['sb_governanceactionrequestid'], ')')",
+                                  "item/sb_previousstate": "Pending",
+                                  "item/sb_newstate": "Pending",
+                                  "item/sb_eventtype": 100000001,
+                                  "item/sb_correlationid": "@concat('processor-', workflow()?['run']?['name'])"
+                                }
+                              }
+                            },
+                            "Complete_Certification_Request": {
+                              "type": "OpenApiConnection",
+                              "runAfter": {
+                                "Update_Site_Certification": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "inputs": {
+                                "host": {
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                  "operationId": "UpdateOnlyRecord",
+                                  "connectionName": "shared_commondataserviceforapps"
+                                },
+                                "authentication": "@parameters('')",
+                                "parameters": {
+                                  "item/sb_requeststatus": 100000004,
+                                  "item/sb_completedat": "@utcNow()",
+                                  "item/sb_failuremessage": null,
+                                  "item/sb_failurecode": null,
+                                  "recordId": "@items('For_Each_Request')?['sb_governanceactionrequestid']",
+                                  "entityName": "sb_governanceactionrequests"
+                                }
+                              }
+                            },
+                            "Mark_Certification_In_Progress": {
+                              "type": "OpenApiConnection",
+                              "runAfter": {},
+                              "inputs": {
+                                "host": {
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                  "operationId": "UpdateOnlyRecord",
+                                  "connectionName": "shared_commondataserviceforapps"
+                                },
+                                "authentication": "@parameters('')",
+                                "parameters": {
+                                  "item/sb_requeststatus": 100000003,
+                                  "entityName": "sb_governanceactionrequests",
+                                  "recordId": "@items('For_Each_Request')?['sb_governanceactionrequestid']"
+                                }
+                              }
+                            },
+                            "Append_Certification_Completed": {
+                              "type": "OpenApiConnection",
+                              "runAfter": {
+                                "Complete_Certification_Request": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "inputs": {
+                                "host": {
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                  "operationId": "CreateRecord",
+                                  "connectionName": "shared_commondataserviceforapps"
+                                },
+                                "authentication": "@parameters('')",
+                                "parameters": {
+                                  "item/sb_actorupn": "@items('For_Each_Request')?['sb_requestedbyupn']",
+                                  "entityName": "sb_governanceactionevents",
+                                  "item/sb_message": "Certification completed.",
+                                  "item/sb_eventat": "@utcNow()",
+                                  "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', items('For_Each_Request')?['sb_governanceactionrequestid'], ')')",
+                                  "item/sb_previousstate": "InProgress",
+                                  "item/sb_newstate": "Completed",
+                                  "item/sb_eventtype": 100000006,
+                                  "item/sb_correlationid": "@concat('processor-', workflow()?['run']?['name'])"
+                                }
+                              }
+                            },
+                            "Append_Certification_Execution_Started": {
+                              "type": "OpenApiConnection",
+                              "runAfter": {
+                                "Append_Certification_Authorized": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "inputs": {
+                                "host": {
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                  "operationId": "CreateRecord",
+                                  "connectionName": "shared_commondataserviceforapps"
+                                },
+                                "authentication": "@parameters('')",
+                                "parameters": {
+                                  "item/sb_actorupn": "@items('For_Each_Request')?['sb_requestedbyupn']",
+                                  "entityName": "sb_governanceactionevents",
+                                  "item/sb_message": "Certification execution started.",
+                                  "item/sb_eventat": "@utcNow()",
+                                  "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', items('For_Each_Request')?['sb_governanceactionrequestid'], ')')",
+                                  "item/sb_previousstate": "Pending",
+                                  "item/sb_newstate": "InProgress",
+                                  "item/sb_eventtype": 100000005,
+                                  "item/sb_correlationid": "@concat('processor-', workflow()?['run']?['name'])"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "Support": {
+                          "case": 100000004,
+                          "actions": {
+                            "Append_Support_Started": {
+                              "type": "OpenApiConnection",
+                              "runAfter": {
+                                "Append_Support_Authorized": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "inputs": {
+                                "host": {
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                  "operationId": "CreateRecord",
+                                  "connectionName": "shared_commondataserviceforapps"
+                                },
+                                "authentication": "@parameters('')",
+                                "parameters": {
+                                  "item/sb_actorupn": "@items('For_Each_Request')?['sb_requestedbyupn']",
+                                  "entityName": "sb_governanceactionevents",
+                                  "item/sb_message": "Support handling started.",
+                                  "item/sb_eventat": "@utcNow()",
+                                  "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', items('For_Each_Request')?['sb_governanceactionrequestid'], ')')",
+                                  "item/sb_previousstate": "Pending",
+                                  "item/sb_newstate": "InProgress",
+                                  "item/sb_eventtype": 100000005,
+                                  "item/sb_correlationid": "@concat('processor-', workflow()?['run']?['name'])"
+                                }
+                              }
+                            },
+                            "Append_Support_Authorized": {
+                              "type": "OpenApiConnection",
+                              "runAfter": {
+                                "Start_Support_Request": [
+                                  "Succeeded"
+                                ]
+                              },
+                              "inputs": {
+                                "host": {
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                  "operationId": "CreateRecord",
+                                  "connectionName": "shared_commondataserviceforapps"
+                                },
+                                "authentication": "@parameters('')",
+                                "parameters": {
+                                  "item/sb_actorupn": "@items('For_Each_Request')?['sb_requestedbyupn']",
+                                  "entityName": "sb_governanceactionevents",
+                                  "item/sb_message": "Support request accepted into the support queue.",
+                                  "item/sb_eventat": "@utcNow()",
+                                  "item/sb_request@odata.bind": "@concat('/sb_governanceactionrequests(', items('For_Each_Request')?['sb_governanceactionrequestid'], ')')",
+                                  "item/sb_previousstate": "Pending",
+                                  "item/sb_newstate": "Pending",
+                                  "item/sb_eventtype": 100000001,
+                                  "item/sb_correlationid": "@concat('processor-', workflow()?['run']?['name'])"
+                                }
+                              }
+                            },
+                            "Start_Support_Request": {
+                              "type": "OpenApiConnection",
+                              "runAfter": {},
+                              "inputs": {
+                                "host": {
+                                  "apiId": "/providers/Microsoft.PowerApps/apis/shared_commondataserviceforapps",
+                                  "operationId": "UpdateOnlyRecord",
+                                  "connectionName": "shared_commondataserviceforapps"
+                                },
+                                "authentication": "@parameters('')",
+                                "parameters": {
+                                  "item/sb_requeststatus": 100000003,
+                                  "entityName": "sb_governanceactionrequests",
+                                  "recordId": "@items('For_Each_Request')?['sb_governanceactionrequestid']"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "expression": {
+                    "and": [
+                      {
+                        "lessOrEquals": [
+                          "@length(outputs('List_Fresh_Admin_Authorization')?['body']?['value'])",
+                          1
+                        ]
+                      },
+                      {
+                        "or": [
+                          {
+                            "equals": [
+                              "@items('For_Each_Request')?['sb_requesttype']",
+                              100000004
+                            ]
+                          },
+                          {
+                            "and": [
+                              {
+                                "equals": [
+                                  "@items('For_Each_Request')?['sb_requesttype']",
+                                  100000003
+                                ]
+                              },
+                              {
+                                "equals": [
+                                  "@length(outputs('List_Fresh_Admin_Authorization')?['body']?['value'])",
+                                  1
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "and": [
+                              {
+                                "or": [
+                                  {
+                                    "equals": [
+                                      "@length(outputs('List_Fresh_Owner_Authorization')?['body']?['value'])",
+                                      1
+                                    ]
+                                  },
+                                  {
+                                    "equals": [
+                                      "@length(outputs('List_Fresh_Admin_Authorization')?['body']?['value'])",
+                                      1
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "or": [
+                                  {
+                                    "equals": [
+                                      "@items('For_Each_Request')?['sb_requesttype']",
+                                      100000000
+                                    ]
+                                  },
+                                  {
+                                    "equals": [
+                                      "@items('For_Each_Request')?['sb_requesttype']",
+                                      100000001
+                                    ]
+                                  },
+                                  {
+                                    "equals": [
+                                      "@items('For_Each_Request')?['sb_requesttype']",
+                                      100000002
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "runAfter": {
+                    "List_Fresh_Admin_Authorization": [
+                      "Succeeded"
+                    ],
+                    "List_Fresh_Owner_Authorization": [
+                      "Succeeded"
+                    ]
+                  }
+                }
+              },
+              "type": "Scope"
+            }
+          },
+          "operationOptions": "Sequential",
+          "runAfter": {
+            "List_Pending_Requests": [
+              "Succeeded"
+            ]
+          }
+        }
+      },
+      "contentVersion": "1.0.0.0",
+      "triggers": {
+        "Recurrence": {
+          "recurrence": {
+            "interval": 15,
+            "frequency": "Minute"
+          },
+          "type": "Recurrence"
+        }
+      },
+      "parameters": {
+        "$connections": {
+          "defaultValue": {},
+          "type": "Object"
+        },
+        "$authentication": {
+          "defaultValue": {},
+          "type": "SecureObject"
+        }
+      }
+    },
+    "templateName": null
+  },
+  "schemaVersion": "1.0.0.0"
+}

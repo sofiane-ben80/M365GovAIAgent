@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="sb_Governor365TenantId">
+  <description default="Environment-specific Microsoft Entra tenant ID used by Governor365 flows.">
+    <label description="Environment-specific Microsoft Entra tenant ID used by Governor365 flows." languagecode="1033" />
+  </description>
+  <displayname default="Governor365 Tenant ID">
+    <label description="Governor365 Tenant ID" languagecode="1033" />
+  </displayname>
+  <introducedversion>2.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

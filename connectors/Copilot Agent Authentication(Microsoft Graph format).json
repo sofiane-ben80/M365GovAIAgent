@@ -1,0 +1,139 @@
+{
+	"id": "908b0b20-f7e1-47b1-8482-ca57eb83c895",
+	"deletedDateTime": null,
+	"appId": "5ed8c4be-0464-434a-b2b6-55bc6953ce3b",
+	"applicationTemplateId": null,
+	"disabledByMicrosoftStatus": null,
+	"createdByAppId": "18ed3507-a475-4ccb-b669-d66bc9f2a36e",
+	"createdDateTime": "2026-09-19T20:09:04Z",
+	"displayName": "Copilot Agent Authentication",
+	"description": null,
+	"groupMembershipClaims": null,
+	"identifierUris": [
+		"api://5ed8c4be-0464-434a-b2b6-55bc6953ce3b"
+	],
+	"isDeviceOnlyAuthSupported": null,
+	"isDisabled": null,
+	"isFallbackPublicClient": null,
+	"nativeAuthenticationApisEnabled": null,
+	"notes": null,
+	"publisherDomain": "MngEnvMCAP733570.onmicrosoft.com",
+	"serviceManagementReference": null,
+	"signInAudience": "AzureADMyOrg",
+	"tags": [],
+	"tokenEncryptionKeyId": null,
+	"samlMetadataUrl": null,
+	"defaultRedirectUri": null,
+	"certification": null,
+	"optionalClaims": null,
+	"requestSignatureVerification": null,
+	"addIns": [],
+	"api": {
+		"acceptMappedClaims": null,
+		"knownClientApplications": [],
+		"requestedAccessTokenVersion": null,
+		"oauth2PermissionScopes": [
+			{
+				"adminConsentDescription": "access_as_user",
+				"adminConsentDisplayName": "access_as_user",
+				"id": "379a2df9-b590-43ef-a858-568afd92be7e",
+				"isEnabled": true,
+				"type": "User",
+				"userConsentDescription": null,
+				"userConsentDisplayName": null,
+				"value": "access_as_user"
+			}
+		],
+		"preAuthorizedApplications": [
+			{
+				"appId": "f104fe0a-6b8a-446b-a623-cfbd7c7e2b11",
+				"delegatedPermissionIds": [
+					"379a2df9-b590-43ef-a858-568afd92be7e"
+				]
+			}
+		]
+	},
+	"appRoles": [],
+	"info": {
+		"logoUrl": null,
+		"marketingUrl": null,
+		"privacyStatementUrl": null,
+		"supportUrl": null,
+		"termsOfServiceUrl": null
+	},
+	"keyCredentials": [],
+	"parentalControlSettings": {
+		"countriesBlockedForMinors": [],
+		"legalAgeGroupRule": "Allow"
+	},
+	"passwordCredentials": [
+		{
+			"customKeyIdentifier": null,
+			"displayName": "Password uploaded on Sat Sep 19 2026",
+			"endDateTime": "2027-03-18T20:09:12.175Z",
+			"hint": "TW-",
+			"keyId": "a59a6c16-e9e8-4772-a7cb-16a798e4982e",
+			"secretText": null,
+			"startDateTime": "2026-09-19T20:09:12.175Z"
+		}
+	],
+	"publicClient": {
+		"redirectUris": []
+	},
+	"requiredResourceAccess": [
+		{
+			"resourceAppId": "00000003-0000-0000-c000-000000000000",
+			"resourceAccess": [
+				{
+					"id": "7427e0e9-2fba-42fe-b0c0-848c9e6a8182",
+					"type": "Scope"
+				},
+				{
+					"id": "37f7f235-527c-4136-accd-4a02d197296e",
+					"type": "Scope"
+				},
+				{
+					"id": "14dad69e-099b-42c9-810b-d002981feec1",
+					"type": "Scope"
+				},
+				{
+					"id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+					"type": "Scope"
+				}
+			]
+		}
+	],
+	"verifiedPublisher": {
+		"displayName": null,
+		"verifiedPublisherId": null,
+		"addedDateTime": null
+	},
+	"web": {
+		"homePageUrl": null,
+		"logoutUrl": null,
+		"redirectUris": [
+			"https://token.botframework.com/.auth/web/redirect"
+		],
+		"implicitGrantSettings": {
+			"enableAccessTokenIssuance": false,
+			"enableIdTokenIssuance": false
+		},
+		"redirectUriSettings": [
+			{
+				"uri": "https://token.botframework.com/.auth/web/redirect",
+				"index": null
+			}
+		]
+	},
+	"servicePrincipalLockConfiguration": {
+		"isEnabled": true,
+		"allProperties": true,
+		"credentialsWithUsageVerify": true,
+		"credentialsWithUsageSign": true,
+		"identifierUris": false,
+		"tokenEncryptionKeyId": true
+	},
+	"spa": {
+		"redirectUris": []
+	}
+}

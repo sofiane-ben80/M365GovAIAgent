@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.agent.Agent">
+  <componenttype>9</componenttype>
+  <description>Handles owner-scoped portfolios and authorized exact-site reviews for active owners or GovernanceAdmin callers.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Owner Operations</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

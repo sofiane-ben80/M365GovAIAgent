@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_admin_01.topic.SiteDetail">
+  <componenttype>9</componenttype>
+  <description>Site detail scaffold with triage explanation placeholders and action-entry points.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Site Detail</name>
+  <parentbotid>
+    <schemaname>copilots_gov_admin_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

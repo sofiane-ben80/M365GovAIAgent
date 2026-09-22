@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_admin_01.topic.NotAttestedSites">
+  <componenttype>9</componenttype>
+  <description>Returns sites whose attestation is missing, expired, or otherwise needs admin review.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Not Attested Sites</name>
+  <parentbotid>
+    <schemaname>copilots_gov_admin_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

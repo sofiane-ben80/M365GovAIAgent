@@ -32,8 +32,8 @@ This runbook assumes list schema is already initialized by scripts.
 ## 2. Prerequisites
 
 1. Run scripts in dev tenant:
-   - scripts/Initialize-GovernanceLists.ps1
-   - scripts/Update-SampleData.ps1
+   - ../archive/legacy-2026-09-19/scripts/Initialize-GovernanceLists.ps1
+   - ../archive/legacy-2026-09-19/scripts/Update-SampleData.ps1
 2. Confirm SharePoint connection exists in Copilot Studio for:
    - https://mngenvmcap733570.sharepoint.com/sites/M365Governance
 3. Confirm user can pass owner authorization checks and that flow/connector identities have required SharePoint write permissions.

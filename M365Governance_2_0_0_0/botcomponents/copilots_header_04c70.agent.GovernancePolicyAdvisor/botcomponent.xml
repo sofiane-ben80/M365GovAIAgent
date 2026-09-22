@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.agent.GovernancePolicyAdvisor">
+  <componenttype>9</componenttype>
+  <description>Use for governance maturity, policy gaps, operating models, RACI, roadmaps, and draft governance artifacts. Do not use for live security evidence, identity review, Copilot readiness, or site operations.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>Governance Policy Advisor</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AgentChat_DisplayName" xml:space="preserve"><value>Governor365 Agent Chat</value></data>
+  <data name="AgentChat_Description" xml:space="preserve"><value>Embeds the Governor365 Copilot Studio agent in a canvas app.</value></data>
+  <data name="TokenEndpoint_DisplayName" xml:space="preserve"><value>Token endpoint</value></data>
+  <data name="TokenEndpoint_Description" xml:space="preserve"><value>Copilot Studio Mobile App channel token endpoint.</value></data>
+  <data name="SsoClientId_DisplayName" xml:space="preserve"><value>SSO client ID</value></data>
+  <data name="SsoClientId_Description" xml:space="preserve"><value>Application client ID for the PCF single-page application registration.</value></data>
+  <data name="SsoTenantId_DisplayName" xml:space="preserve"><value>SSO tenant ID</value></data>
+  <data name="SsoTenantId_Description" xml:space="preserve"><value>Microsoft Entra tenant ID used to acquire the token-exchange token.</value></data>
+  <data name="SsoRedirectUri_DisplayName" xml:space="preserve"><value>SSO redirect URI</value></data>
+  <data name="SsoRedirectUri_Description" xml:space="preserve"><value>Registered SPA redirect URI for this Canvas app.</value></data>
+  <data name="SsoLoginHint_DisplayName" xml:space="preserve"><value>SSO login hint</value></data>
+  <data name="SsoLoginHint_Description" xml:space="preserve"><value>User principal name used to silently select the signed-in Power Apps account.</value></data>
+  <data name="ContextJson_DisplayName" xml:space="preserve"><value>Context JSON</value></data>
+  <data name="ContextJson_Description" xml:space="preserve"><value>Versioned JSON object describing the current canvas app context.</value></data>
+  <data name="ContextVersion_DisplayName" xml:space="preserve"><value>Context version</value></data>
+  <data name="ContextVersion_Description" xml:space="preserve"><value>Increment this value when the app context changes.</value></data>
+  <data name="PromptText_DisplayName" xml:space="preserve"><value>Prompt text</value></data>
+  <data name="PromptText_Description" xml:space="preserve"><value>Bounded prompt sent by a deliberate canvas app interaction.</value></data>
+  <data name="PromptVersion_DisplayName" xml:space="preserve"><value>Prompt version</value></data>
+  <data name="PromptVersion_Description" xml:space="preserve"><value>Increment this value to send the current prompt text once.</value></data>
+  <data name="UserId_DisplayName" xml:space="preserve"><value>User ID</value></data>
+  <data name="UserId_Description" xml:space="preserve"><value>Stable non-secret identifier for the signed-in user.</value></data>
+  <data name="UserDisplayName_DisplayName" xml:space="preserve"><value>User display name</value></data>
+  <data name="UserDisplayName_Description" xml:space="preserve"><value>Display name shown in Web Chat.</value></data>
+  <data name="Locale_DisplayName" xml:space="preserve"><value>Locale</value></data>
+  <data name="Locale_Description" xml:space="preserve"><value>Web Chat locale such as en-US.</value></data>
+  <data name="Title_DisplayName" xml:space="preserve"><value>Title</value></data>
+  <data name="Title_Description" xml:space="preserve"><value>Accessible chat panel title.</value></data>
+  <data name="ConnectionStatus_DisplayName" xml:space="preserve"><value>Connection status</value></data>
+  <data name="ConnectionStatus_Description" xml:space="preserve"><value>Current connection status: connecting, connected, or error.</value></data>
+  <data name="ConversationId_DisplayName" xml:space="preserve"><value>Conversation ID</value></data>
+  <data name="ConversationId_Description" xml:space="preserve"><value>Current Direct Line conversation identifier.</value></data>
+  <data name="LastActionName_DisplayName" xml:space="preserve"><value>Last action name</value></data>
+  <data name="LastActionName_Description" xml:space="preserve"><value>Name of the latest validated canvas action emitted by the agent.</value></data>
+  <data name="LastActionJson_DisplayName" xml:space="preserve"><value>Last action JSON</value></data>
+  <data name="LastActionJson_Description" xml:space="preserve"><value>Validated JSON payload for the latest canvas action.</value></data>
+  <data name="LastError_DisplayName" xml:space="preserve"><value>Last error</value></data>
+  <data name="LastError_Description" xml:space="preserve"><value>User-safe connection or protocol error.</value></data>
+  <data name="OnAgentAction_DisplayName" xml:space="preserve"><value>On agent action</value></data>
+  <data name="OnAgentAction_Description" xml:space="preserve"><value>Power Fx behavior invoked when the agent emits a validated canvas action.</value></data>
+  <data name="OnConnectionStatusChanged_DisplayName" xml:space="preserve"><value>On connection status changed</value></data>
+  <data name="OnConnectionStatusChanged_Description" xml:space="preserve"><value>Power Fx behavior invoked when the Direct Line connection state changes.</value></data>
+</root>

@@ -32,8 +32,8 @@ Out of scope:
 ## 2. Preconditions
 
 1. Run schema/data scripts in dev tenant:
-   - scripts/Initialize-GovernanceLists.ps1
-   - scripts/Update-SampleData.ps1
+   - ../archive/legacy-2026-09-19/scripts/Initialize-GovernanceLists.ps1
+   - ../archive/legacy-2026-09-19/scripts/Update-SampleData.ps1
 2. Certify topic connector nodes are wired in Copilot Studio using:
    - docs/08-CopilotStudio-OwnerTopic-Wiring.md
    - copilot/flows/certify-site-topic-spec.txt

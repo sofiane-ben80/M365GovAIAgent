@@ -1,94 +1,146 @@
-mcs.metadata:
-  componentName: Site Detail
-  description: Site detail scaffold with triage explanation placeholders and action-entry points.
 kind: AdaptiveDialog
 beginDialog:
   kind: OnRecognizedIntent
   id: main
   intent:
     displayName: Site Detail
-    includeInOnSelectIntent: false
     triggerQueries:
       - site details
       - show site details
-      - tell me about this site
       - explain this site
-      - site information
-      - site status
-
   actions:
-    - kind: SetVariable
-      id: setVariable_DetailCallerUpn
-      variable: Topic.CallerUPN
-      value: =System.User.PrincipalName
-
-    - kind: SetVariable
-      id: setVariable_Init_SelectedSiteUrl
-      variable: Topic.SelectedSiteUrl
-      value: ""
-
-    - kind: SetVariable
-      id: setVariable_Init_SelectedSiteTitle
-      variable: Topic.SelectedSiteTitle
-      value: ""
-
-    - kind: SetVariable
-      id: setVariable_Init_SiteType
-      variable: Topic.SiteType
-      value: ""
-
-    - kind: SetVariable
-      id: setVariable_Init_InventoryStatus
-      variable: Topic.InventoryStatus
-      value: ""
-
+    - kind: Question
+      id: question_SiteId
+      alwaysPrompt: true
+      variable: init:Topic.SiteId
+      prompt: Enter the Governor365 Dataverse site ID.
+      entity: StringPrebuiltEntity
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_GetSiteDetail
+      input:
+        binding:
+          text: =System.User.PrincipalName
+          text_1: =Topic.SiteId
+      output:
+        binding:
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          status: Topic.ResultStatus
+          success: Topic.Success
+      flowId: 4190243f-b9b3-f111-aaac-000d3a367627
     - kind: ConditionGroup
-      id: conditionGroup_HasSiteUrl
+      id: conditionGroup_SiteDetailResult
       conditions:
-        - id: conditionItem_HasSiteUrl
-          condition: =!IsBlank(Topic.SelectedSiteUrl)
+        - id: conditionItem_SiteDetailFailed
+          condition: =Topic.Success <> true
           actions:
             - kind: SendActivity
-              id: sendActivity_DetailLoading
-              activity: "Loading site details..."
-
-            - kind: SetVariable
-              id: setVariable_PopulateSiteTitle
-              variable: Topic.SelectedSiteTitle
-              value: "Contoso Marketing Hub"
-
-            - kind: SetVariable
-              id: setVariable_PopulateSiteType
-              variable: Topic.SiteType
-              value: "Team Site"
-
-            - kind: SetVariable
-              id: setVariable_PopulateInventoryStatus
-              variable: Topic.InventoryStatus
-              value: "Active"
-
-            - kind: SendActivity
-              id: sendActivity_SiteDetailCard
-              activity: |
-                **Contoso Marketing Hub**
-                **📍 Site Information:**
-                - URL: https://tenant.sharepoint.com/sites/contoso-marketing
-                - Type: Team Site
-                - Created: 2023-01-15
-                - Office: Marketing
-                - Site Storage: 245 MB
-                **👥 Ownership:**
-                - Owners: john.smith@contoso.com; jane.doe@contoso.com
-                - Owner Count: 2
-                - Last Modified: 2026-07-20
-                **Inventory Status:**
-                - Status: Active
-                - Last Activity: 2026-07-20
-
-                Available requests: archive, deletion review, or governance support.
+              id: sendActivity_SiteDetailFailed
+              activity: "{Topic.ResultMessage} Status: {Topic.ResultStatus}. Correlation ID: {Topic.CorrelationId}"
 
       elseActions:
         - kind: SendActivity
-          id: sendActivity_AskForSiteUrl
-          activity: "Which site would you like more information about? You can say the site name or URL, or go back to My Sites to select one."
-
+          id: sendActivity_SiteDetailResult
+          activity:
+            attachments:
+              - kind: AdaptiveCardTemplate
+                cardContent: |-
+                  =With(
+                    { site: ParseJSON(Topic.DataJson) },
+                    {
+                      '$schema': "http://adaptivecards.io/schemas/adaptive-card.json",
+                      type: "AdaptiveCard",
+                      version: "1.5",
+                      body: Table(
+                        {
+                          type: "TextBlock",
+                          text: Text(site.sb_name),
+                          size: "Large",
+                          weight: "Bolder",
+                          wrap: true
+                        },
+                        {
+                          type: "TextBlock",
+                          text: Coalesce(Text(site.sb_siteurl), "URL not available"),
+                          color: "Accent",
+                          spacing: "None",
+                          wrap: true
+                        },
+                        {
+                          type: "FactSet",
+                          facts: Table(
+                            {
+                              title: "Site type",
+                              value: Switch(
+                                Text(site.sb_sitetype),
+                                "100000000", "Group",
+                                "100000001", "Communication",
+                                "100000002", "Classic",
+                                "100000003", "Other",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Lifecycle",
+                              value: Switch(
+                                Text(site.sb_lifecyclestatus),
+                                "100000000", "Active",
+                                "100000001", "Read only",
+                                "100000002", "Archived",
+                                "100000003", "Deleted",
+                                "100000004", "Unknown",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Owners",
+                              value: Coalesce(Text(site.sb_effectiveownercount), "0")
+                            },
+                            {
+                              title: "Compliance",
+                              value: Switch(
+                                Text(site.sb_compliancestatus),
+                                "100000000", "Compliant",
+                                "100000001", "Non-compliant",
+                                "100000002", "Unknown",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Last activity",
+                              value: Coalesce(Text(site.sb_lastactivityat), "Not available")
+                            },
+                            {
+                              title: "Recommended action",
+                              value: Switch(
+                                Text(site.sb_recommendedaction),
+                                "100000000", "None",
+                                "100000001", "Certify",
+                                "100000002", "Archive",
+                                "100000003", "Deletion review",
+                                "100000004", "Assign owners",
+                                "Not available"
+                              )
+                            },
+                            {
+                              title: "Reason",
+                              value: Coalesce(Text(site.sb_triagereason), "Not available")
+                            }
+                          )
+                        },
+                        {
+                          type: "ActionSet",
+                          actions: Table(
+                            {
+                              type: "Action.OpenUrl",
+                              title: "Open site",
+                              url: Text(site.sb_siteurl)
+                            }
+                          )
+                        }
+                      )
+                    }
+                  )
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_SiteDetail

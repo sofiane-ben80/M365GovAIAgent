@@ -68,6 +68,15 @@ The target runtime uses no more than two generative orchestration levels:
 2. the destination domain agent orchestrates only its own children, topics,
    knowledge, and tools.
 
+Owner and Admin are connected agents rather than child agents because they are
+independently published operational bots with their own topics, tools, and
+security boundaries. A Copilot Studio child agent lives inside its parent and
+shares the parent's deployment; deterministic child workflows can require
+AdaptiveDialog topics in that parent. Using child agents here would therefore
+conflict with the requirement that Governor M365 contain no operational topics
+or flow calls. Child agents remain appropriate only within a destination
+domain.
+
 Domain agents do not call peer domain agents. Cross-domain assessments read
 authorized normalized findings through the evidence broker.
 

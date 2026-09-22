@@ -1,0 +1,171 @@
+[
+  {
+    "CdsFCBContext": "{\"FileType\":true,\"ImageExternalStorage\":true}",
+    "EntitySetName": "sb_governanceroleassignments",
+    "IsHidden": false,
+    "IsSampleData": false,
+    "IsWritable": true,
+    "LogicalName": "sb_governanceroleassignment",
+    "MaxGetRowsCount": 500,
+    "Name": "Governance Role Assignments",
+    "NativeCDSDataSourceInfoNameMapping": {
+      "createdby": "Created By",
+      "createdon": "Created On",
+      "createdonbehalfby": "Created By (Delegate)",
+      "importsequencenumber": "Import Sequence Number",
+      "modifiedby": "Modified By",
+      "modifiedon": "Modified On",
+      "modifiedonbehalfby": "Modified By (Delegate)",
+      "organizationid": "Organization Id",
+      "overriddencreatedon": "Record Created On",
+      "sb_assignmentsource": "Assignment Source",
+      "sb_displayname": "Display Name",
+      "sb_governanceroleassignment_AsyncOperations": "System Jobs",
+      "sb_governanceroleassignment_BulkDeleteFailures": "Bulk Delete Failures",
+      "sb_governanceroleassignment_MailboxTrackingFolders": "Mailbox Auto Tracking Folders",
+      "sb_governanceroleassignment_PrincipalObjectAttributeAccesses": "Field Sharing",
+      "sb_governanceroleassignment_ProcessSession": "Process Sessions",
+      "sb_governanceroleassignment_SyncErrors": "Sync Errors",
+      "sb_governanceroleassignmentid": "Governance Role Assignment",
+      "sb_grantedat": "Granted At",
+      "sb_grantedbyobjectid": "Granted By Object ID",
+      "sb_grantedbyupn": "Granted By UPN",
+      "sb_isactive": "Is Active",
+      "sb_lastvalidatedat": "Last Validated At",
+      "sb_name": "Name",
+      "sb_principalobjectid": "Principal Object ID",
+      "sb_principalupn": "Principal UPN",
+      "sb_reason": "Reason",
+      "sb_role": "Role",
+      "sb_sourcegroupobjectid": "Source Group Object ID",
+      "sb_validfrom": "Valid From",
+      "sb_validuntil": "Valid Until",
+      "statecode": "Status",
+      "statuscode": "Status Reason",
+      "timezoneruleversionnumber": "Time Zone Rule Version Number",
+      "utcconversiontimezonecode": "UTC Conversion Time Zone Code",
+      "versionnumber": "Version Number"
+    },
+    "PreferredName": "Governance Role Assignments",
+    "Type": "NativeCDSDataSourceInfo"
+  },
+  {
+    "DisplayName": "Governance Role Assignments (Views)",
+    "Name": "_sb_governanceroleassignment_views",
+    "RelatedEntityName": "Governance Role Assignments",
+    "TrimmedViewName": true,
+    "Type": "ViewInfo",
+    "ViewInfoNameMapping": {
+      "078b6946-5f69-443c-97e0-2e109b36032c": "Active Governance Role Assignments",
+      "173af152-2a65-48ac-ab29-adfd52c76a88": "Governance Role Assignment Lookup View",
+      "b3a11e5c-b178-43f7-ba1f-a890d755d393": "Governance Role Assignment Associated View",
+      "cdd3c09e-1088-4615-9139-e8a1de6001ca": "Inactive Governance Role Assignments",
+      "e6841c21-e502-4e29-afdc-e3222ae68307": "Governance Role Assignment Advanced Find View"
+    }
+  },
+  {
+    "DisplayName": "Assignment Source (Governance Role Assignments)",
+    "Name": "sb_governanceroleassignment_sb_assignmentsource",
+    "OptionSetInfoNameMapping": {
+      "126390000": "ApprovedRequest",
+      "126390001": "EntraGroupSync",
+      "126390002": "Migration",
+      "126390003": "BreakGlass"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_assignmentsource",
+        "OptionSetReferenceEntityName": "Governance Role Assignments"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_assignmentsource",
+    "RelatedEntityName": "Governance Role Assignments",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Is Active (Governance Role Assignments)",
+    "Name": "sb_governanceroleassignment_sb_isactive",
+    "OptionSetInfoNameMapping": {
+      "0": "No",
+      "1": "Yes"
+    },
+    "OptionSetIsBooleanValued": true,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_isactive",
+        "OptionSetReferenceEntityName": "Governance Role Assignments"
+      }
+    },
+    "OptionSetTypeKey": "BooleanType",
+    "RelatedColumnInvariantName": "sb_isactive",
+    "RelatedEntityName": "Governance Role Assignments",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Role (Governance Role Assignments)",
+    "Name": "sb_governanceroleassignment_sb_role",
+    "OptionSetInfoNameMapping": {
+      "126390000": "GovernanceAdmin",
+      "126390001": "GovernanceAuditor",
+      "126390002": "GovernanceOperator",
+      "126390003": "RequestApprover",
+      "126390004": "SupportAgent"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "sb_role",
+        "OptionSetReferenceEntityName": "Governance Role Assignments"
+      }
+    },
+    "OptionSetTypeKey": "PicklistType",
+    "RelatedColumnInvariantName": "sb_role",
+    "RelatedEntityName": "Governance Role Assignments",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Status (Governance Role Assignments)",
+    "Name": "sb_governanceroleassignment_statecode",
+    "OptionSetInfoNameMapping": {
+      "0": "Active",
+      "1": "Inactive"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "statecode",
+        "OptionSetReferenceEntityName": "Governance Role Assignments"
+      }
+    },
+    "OptionSetTypeKey": "StateType",
+    "RelatedColumnInvariantName": "statecode",
+    "RelatedEntityName": "Governance Role Assignments",
+    "Type": "OptionSetInfo"
+  },
+  {
+    "DisplayName": "Status Reason (Governance Role Assignments)",
+    "Name": "sb_governanceroleassignment_statuscode",
+    "OptionSetInfoNameMapping": {
+      "1": "Active",
+      "2": "Inactive"
+    },
+    "OptionSetIsBooleanValued": false,
+    "OptionSetIsGlobal": false,
+    "OptionSetReference": {
+      "OptionSetReferenceItem0": {
+        "OptionSetReferenceColumnName": "statuscode",
+        "OptionSetReferenceEntityName": "Governance Role Assignments"
+      }
+    },
+    "OptionSetTypeKey": "StatusType",
+    "RelatedColumnInvariantName": "statuscode",
+    "RelatedEntityName": "Governance Role Assignments",
+    "Type": "OptionSetInfo"
+  }
+]

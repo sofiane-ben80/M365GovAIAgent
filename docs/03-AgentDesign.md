@@ -12,23 +12,37 @@
 
 ```
 M365 Governance Agent (Orchestrator)
-├── Site Owner Sub-Agent
-├── Admin Sub-Agent
-├── Triage Sub-Agent
-└── Action Sub-Agent
+├── Owner Operations (local child)
+│   └── My Sites topic
+├── Admin Operations (local child)
+│   └── Admin Dashboard topic
+├── Governance Policy Advisor (local child)
+├── Copilot Readiness Advisor (local child)
+├── Data Protection Advisor (local child)
+├── Identity Governance Advisor (local child)
+└── Security & Compliance Assurance (local child)
 ```
 
-Each agent is a discrete entity in the Copilot Studio solution (`M365Governance`). The Orchestrator is the **published, Teams-connected** agent. Sub-agents are invoked internally via agent-to-agent handoff.
+The User/Owner and Admin agents have separate security and tool boundaries.
+The optional orchestrator is a thin Teams-connected launcher and does not gain
+privilege from routing. Domain subagents are invoked within the destination
+agent's bounded context.
 
-Current export note (2026-07-27):
-- The exported `.mcs.yml` files currently show message-based routing guidance (for example, "Open Governance Owner Agent...") in several topics.
-- Concrete Copilot Studio "Transfer to agent" nodes are still a pending UI wiring step and may not appear in source exports yet.
-- Treat cross-agent routing in source as design intent unless a transfer node is verified in Copilot Studio UI.
-
-Deployment profile update (2026-07-06):
-- Recommended production entry is two published agents (Owner + Admin)
-- Orchestrator remains optional as a launcher during migration/pilot
-- Shared Triage and Action contracts remain unchanged
+Implementation update (2026-09-21):
+- Governor M365 uses manual Entra authentication for the embedded Canvas PCF
+  channel and has zero active `InvokeConnectedAgentTaskAction` components.
+- Seven local child agents are enabled beneath Governor M365. They share the
+  parent's manual authentication, conversation, and publication lifecycle.
+- Owner portfolio and administrator dashboard capabilities are implemented as
+  child-owned topics so the manually authenticated Canvas identity is not lost
+  across an unsupported connected-agent authentication boundary.
+- The five specialist advisor records and the Owner/Admin agents remain
+  separately published for reuse, but Governor does not invoke those records
+  as connected agents.
+- Every operational flow continues to authorize the caller independently.
+- See [22-Agent-Orchestration-Architecture.md](22-Agent-Orchestration-Architecture.md)
+  and [29-Agent-Architecture-Review.md](29-Agent-Architecture-Review.md) for
+  the decision rationale and current-state assessment.
 
 ---
 
@@ -38,15 +52,18 @@ Deployment profile update (2026-07-06):
 | Field | Value |
 |-------|-------|
 | **Name** | M365 Governance Agent |
-| **Role** | Optional launcher entry point and router |
-| **Copilot Studio Type** | Top-level agent (optional, transitional) |
+| **Role** | Handoff-only supervisor and Canvas-facing entry point |
+| **Copilot Studio Type** | Top-level parent agent with seven local children |
 | **Solution Name** | M365Governance |
 | **Prefix** | `sb` |
 
 ### 2.2 Responsibilities
 - Greet the user and establish context
-- Route to the correct published entry agent based on user intent
-- Pass caller context (UPN) into handoff
+- Route to the correct local child based on user intent
+- Preserve signed-in system context during delegation; do not accept caller
+  identity from prose
+- Offer the Admin destination only from a minimized, server-validated
+  capability result, while still requiring the Admin Agent to reverify access
 - Handle fallback / out-of-scope utterances gracefully
 
 ### 2.3 Topics
@@ -54,8 +71,8 @@ Deployment profile update (2026-07-06):
 | Topic | Trigger Phrases | Behavior |
 |-------|----------------|---------|
 | **Greeting / Start** | Conversation start | Greet user by name and present launcher menu (Owner Agent / Admin Agent) |
-| **Owner Route** | "show my sites", "what sites do I own", "my sharepoint sites" | Handoff → Governance Owner Agent |
-| **Admin Route** | "admin view", "show all sites", "orphaned sites", "not attested", "tenant overview" | Handoff → Governance Admin Agent |
+| **Owner Route** | "show my sites", "what sites do I own", "my sharepoint sites" | Handoff → Owner Operations child |
+| **Admin Route** | "admin view", "show all sites", "orphaned sites", "not attested", "tenant overview" | Handoff → Admin Operations child |
 | **Help** | "help", "what can you do", "menu" | Show capabilities card |
 | **Fallback** | Any unmatched input | Clarify intent; offer menu |
 
@@ -64,32 +81,40 @@ Deployment profile update (2026-07-06):
 You are the M365 Governance Agent for [Organization Name]. You help SharePoint site owners 
 and tenant administrators manage site compliance, including recertification, archival, and deletion.
 
-You are a launcher and router for two dedicated published agents:
-- Governance Owner Agent
-- Governance Admin Agent
+You are a handoff-only supervisor for seven local child agents:
+- Owner Operations
+- Admin Operations
+- Governance Policy Advisor
+- Copilot Readiness Advisor
+- Data Protection Advisor
+- Identity Governance Advisor
+- Security & Compliance Assurance
 
-Do not execute owner/admin workflows directly. Route quickly and pass caller UPN.
+Do not execute domain work directly. Route quickly. Children and tools derive
+caller identity from System.User.PrincipalName.
 ```
 
 ### 2.5 Connections / Actions
 | Connection | Purpose |
 |------------|---------|
-| Copilot Studio handoff actions | Route conversation to Owner/Admin published agents |
+| Copilot Studio child-agent handoffs | Route conversation to the matching local child |
 
 ---
 
-## 3. Site Owner Sub-Agent
+## 3. Governance User & Owner Agent
 
 ### 3.1 Identity & Purpose
 | Field | Value |
 |-------|-------|
-| **Name** | Site Owner Agent |
-| **Role** | Site owner experience — view, understand, and act on owned sites |
+| **Name** | Governance User & Owner Agent |
+| **Role** | General governance help plus view, understand, and act on sites owned by the signed-in user |
 | **Copilot Studio Type** | Published entry agent |
 | **Invoked By** | Teams user directly, or Orchestrator launcher |
 
 ### 3.2 Responsibilities
 - Call the owner-scoped Power Automate tool backed by Dataverse
+- Provide general guidance and support request entry when the caller owns no
+  governed site
 - Present results as a card or table in Teams
 - Support filtering: show all / show only non-compliant / show by action type
 - Invoke Triage Agent to explain why a specific site is flagged
@@ -128,7 +153,7 @@ Each site entry in the response presents:
 
 ---
 
-## 4. Admin Sub-Agent
+## 4. Governance Admin Agent
 
 ### 4.1 Identity & Purpose
 | Field | Value |
@@ -208,7 +233,8 @@ Each site entry in the response presents:
 
 ### 5.3 Triage Logic
 
-#### Phase 1 Rules (matching existing `fixInput.ps1` logic)
+#### Phase 1 Rules (matching archived
+`../archive/legacy-2026-09-19/fixInput.ps1` logic)
 
 ```
 RULE 1 — ASSIGN-OWNERS (highest priority)

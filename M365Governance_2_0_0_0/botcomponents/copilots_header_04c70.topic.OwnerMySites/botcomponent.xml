@@ -1,0 +1,14 @@
+<botcomponent schemaname="copilots_header_04c70.topic.OwnerMySites">
+  <componenttype>9</componenttype>
+  <description>Child-owned owner-scoped site list topic using the signed-in identity and authorized Dataverse flow.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>My Sites</name>
+  <parentbotcomponentid>
+    <schemaname>copilots_header_04c70.agent.Agent</schemaname>
+  </parentbotcomponentid>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

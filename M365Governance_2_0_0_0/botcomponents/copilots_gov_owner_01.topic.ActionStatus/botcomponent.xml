@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_owner_01.topic.ActionStatus">
+  <componenttype>9</componenttype>
+  <description>Action Agent scaffold for checking the result of a previous governance action.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Action Status</name>
+  <parentbotid>
+    <schemaname>copilots_gov_owner_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

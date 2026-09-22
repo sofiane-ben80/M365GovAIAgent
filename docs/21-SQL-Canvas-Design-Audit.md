@@ -24,7 +24,8 @@ The live database had drifted from the filter-only design:
 - The owner table primary key was `(GovernID, OwnerUpn)` and its secondary index used the same order. There was no owner-leading access path.
 - Bureau activity and creation browse indexes were absent, and the bureau title index did not have the intended key order.
 
-`canvas-app/sql/004-align-filter-only-access.sql` was applied successfully. After remediation:
+`../archive/legacy-2026-09-19/canvas-app/sql/004-align-filter-only-access.sql`
+was applied successfully. After remediation:
 
 - No site RLS policy, predicate function, or user-bureau mapping table remains.
 - The app user can read 86 all-site rows and 49 directly owned rows through the view.

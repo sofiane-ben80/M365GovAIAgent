@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.topic.AdminDashboard">
+  <componenttype>9</componenttype>
+  <description>Returns the tenant-wide governance summary for confirmed admins without a connected-agent hop.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>Admin Dashboard</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>1</statecode>
+  <statuscode>2</statuscode>
+</botcomponent>

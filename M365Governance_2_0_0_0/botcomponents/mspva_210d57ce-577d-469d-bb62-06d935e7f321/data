@@ -1,0 +1,8 @@
+kind: EvaluationData
+rows:
+  - source: Imported
+    expectedOutput: Use the Governance Owner Agent and ask for the site ID, supporting evidence, and explicit CONFIRM before submitting a certification request.
+    input: Certify my site.
+
+extensionData:
+  displayOrder: "1789908703011"

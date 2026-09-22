@@ -18,13 +18,15 @@
 | Orchestrator/advisors | Exported/design assets | Retain role-aware multi-agent model | Reusable | Rebind evidence broker |
 | Site inventory | SharePoint lists and Azure SQL artifacts | Governance Site table | Target designed | Create table and migrate |
 | Owner mapping | Delimited strings plus SQL normalization | Site Owner Assignment table | Target designed | Migrate normalized assignments |
+| Application roles | SharePoint admin-role list / Entra group design | Governance Role Assignment table keyed by immutable Entra object ID | Target designed | Create table, migrate approved roles, restrict writes, rebind verification |
 | Action requests | SharePoint action log and SQL request design | Request + append-only Event tables | Target designed | Create flows and migrate history |
 | Policy settings | SharePoint config list | Governance Policy Setting | Target designed | Import settings |
 | Inventory automation | PowerShell/SQL import assets | Power Automate scan/work-item flows | Target designed | Build and reconcile |
 | Agent read tools | SharePoint/SQL flow contracts | Dataverse tool flows | Target designed | Implement documented contracts |
 | Approvals | Design assets | Power Automate Approvals | Target designed | Implement request processor |
 | Notifications | Power Automate specs | Dataverse-backed Power Automate flows | Reusable | Rebind and add delivery table |
-| Canvas app | SQL-backed package | Dataverse-backed Power App | Existing POC | Rebind and delegation test |
+| Canvas dashboard | SQL-backed 1.0 package with reusable browse/detail UX | Required Dataverse-backed owner/admin Power App in the 2.0 solution | Reusable POC | Modernize data model and UX, secure owner/admin access, validate delegation |
+| Experience distribution | Separate agent and Power App artifacts | Organizational Teams experience with dashboard tab, agent entry, and bidirectional deep links | Target designed | Package for Teams; validate Microsoft 365 Copilot/app-launcher compatibility and fallback links |
 | ALM | Mixed packages/Bicep/scripts | Power Platform managed solution | Target designed | Consolidate solution assets |
 
 ## Requirement traceability
@@ -45,10 +47,13 @@
    managed solution export.
 2. Current agent tools still require tenant-side rebinding to the new Dataverse
    Power Automate flows.
-3. The Canvas app package remains a legacy SQL proof of concept.
+3. The required Canvas dashboard remains a legacy SQL proof of concept and is
+   not yet included as a Dataverse-backed 2.0 solution component.
 4. The scheduled scan/work-item and request processor flows must be built and
    tested in the target environment.
-5. Legacy-to-Dataverse reconciliation and cutover evidence does not yet exist.
+5. Teams packaging, agent/app deep links, and Microsoft 365 entry-point
+   validation have not been completed.
+6. Legacy-to-Dataverse reconciliation and cutover evidence does not yet exist.
 
 These gaps are explicit so the target design is not confused with current
 deployment state.

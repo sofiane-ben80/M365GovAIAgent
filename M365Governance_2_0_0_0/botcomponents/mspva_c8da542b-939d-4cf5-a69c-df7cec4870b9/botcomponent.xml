@@ -1,0 +1,15 @@
+<botcomponent schemaname="mspva_c8da542b-939d-4cf5-a69c-df7cec4870b9">
+  <category>Testing</category>
+  <componenttype>19</componenttype>
+  <description>Show sites owned by another.user@contoso.com.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Show sites owned by another.user@contoso.com.</name>
+  <parentbotcomponentid>
+    <schemaname>mspva_8469fb50-afd5-499a-b329-c28ef8245030</schemaname>
+  </parentbotcomponentid>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

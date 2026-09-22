@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_owner_01.gpt.default">
+  <componenttype>15</componenttype>
+  <description>Owner-scoped governance agent. Shows sites owned by the caller and allows certify, archive, and delete-request actions.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Governance Owner Agent</name>
+  <parentbotid>
+    <schemaname>copilots_gov_owner_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

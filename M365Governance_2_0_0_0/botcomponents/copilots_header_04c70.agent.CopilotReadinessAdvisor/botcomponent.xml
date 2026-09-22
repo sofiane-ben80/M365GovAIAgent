@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.agent.CopilotReadinessAdvisor">
+  <componenttype>9</componenttype>
+  <description>Use for Microsoft 365 Copilot government-cloud readiness, prerequisites, capability verification, rollout planning, and service-change impact.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>Copilot Readiness Advisor</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

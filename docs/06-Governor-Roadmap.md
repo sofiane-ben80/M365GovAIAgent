@@ -30,6 +30,12 @@ Add **Governance Intake**, **Integration Assurance**, **Agent Assurance**, **Gov
 
 Microsoft's current Copilot Studio guidance recommends child agents for focused tasks that share a parent's team, settings, authentication, deployment, and reuse boundary. Connected agents are appropriate when teams, settings, publication, ALM, channels, or reuse differ. Microsoft also warns that multi-agent designs add latency and governance/test surface.
 
+The September 20, 2026 architecture review classifies Governance Owner Agent
+and Governance Admin Agent as connected agents. Although they are operational
+domains, they are independently published bots with separate topics, tools,
+and security scopes. Keeping them connected is required for Governor M365 to
+remain a handoff-only launcher with no operational topics or flow calls.
+
 For Governor:
 
 - Use **connected agents** for Policy, Readiness, Data Protection, Identity, Integration, and Security because their audiences and authorization/data planes differ.

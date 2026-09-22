@@ -1,0 +1,15 @@
+<botcomponent schemaname="mspva_831e96c4-6992-456e-a0f2-11fb57f6d764">
+  <category>Testing</category>
+  <componenttype>19</componenttype>
+  <description>Show my sites.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Show my sites.</name>
+  <parentbotcomponentid>
+    <schemaname>mspva_8469fb50-afd5-499a-b329-c28ef8245030</schemaname>
+  </parentbotcomponentid>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

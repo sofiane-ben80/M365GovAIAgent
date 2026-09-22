@@ -728,7 +728,7 @@ ELSE IF admin clicks "View Non-Compliant":
 ELSE IF admin clicks "Generate Weekly Report":
   → Trigger Admin Digest flow
 ELSE IF admin clicks "Manual Rescan":
-  → Run Invoke-GovernanceScan.ps1 (if available)
+  → Run ../archive/legacy-2026-09-19/scripts/Invoke-GovernanceScan.ps1 (if needed)
 ```
 
 **Data Updates:** None (read-only)

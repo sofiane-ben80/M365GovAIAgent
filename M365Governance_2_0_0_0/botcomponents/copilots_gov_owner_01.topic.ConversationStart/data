@@ -1,0 +1,32 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnConversationStart
+  id: main
+  actions:
+    - kind: SetVariable
+      id: setVariable_ConversationStartCallerUpn
+      variable: init:Topic.CallerUPN
+      value: =System.User.PrincipalName
+
+    - kind: SendActivity
+      id: sendMessage_M0LuhV
+      activity:
+        text:
+          - Hi {System.User.DisplayName}, I am {System.Bot.Name}. I help you manage governance for sites you own.
+        speak:
+          - Hello {System.User.DisplayName}. I help you manage governance for sites you own.
+
+    - kind: SendActivity
+      id: sendActivity_OwnerMenu
+      activity: |
+        You can ask for:
+        - show my sites
+        - sites needing attention
+        - certify a site
+        - request archival
+        - flag for deletion
+
+        What would you like to do first?
+
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_ConversationStart

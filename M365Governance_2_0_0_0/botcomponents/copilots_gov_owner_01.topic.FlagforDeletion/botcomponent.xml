@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_owner_01.topic.FlagforDeletion">
+  <componenttype>9</componenttype>
+  <description>Owner deletion-flag scaffold with explicit risk confirmation requirement.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Flag for Deletion</name>
+  <parentbotid>
+    <schemaname>copilots_gov_owner_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

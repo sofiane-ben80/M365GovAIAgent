@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_admin_01.topic.OrphanedSites">
+  <componenttype>9</componenttype>
+  <description>Returns sites with no owners so admins can decide whether to assign, archive, or delete.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Orphaned Sites</name>
+  <parentbotid>
+    <schemaname>copilots_gov_admin_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

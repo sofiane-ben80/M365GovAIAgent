@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_admin_01.topic.RequestArchival">
+  <componenttype>9</componenttype>
+  <description>Owner archival request scaffold with explicit confirmation and audit-log intent.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Request Archival</name>
+  <parentbotid>
+    <schemaname>copilots_gov_admin_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

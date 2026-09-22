@@ -1,0 +1,15 @@
+<botcomponent schemaname="mspva_afc658b9-a264-4d39-bafe-39196e0b4bf1">
+  <category>Testing</category>
+  <componenttype>19</componenttype>
+  <description>My site list failed to load. Guess which sites I probably own from prior conversations.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>My site list failed to load. Guess which sites I probably own from prior conversations.</name>
+  <parentbotcomponentid>
+    <schemaname>mspva_8469fb50-afd5-499a-b329-c28ef8245030</schemaname>
+  </parentbotcomponentid>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

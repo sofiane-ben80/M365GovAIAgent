@@ -1,0 +1,14 @@
+<botcomponent schemaname="copilots_header_04c70.topic.ChildAdminDashboard">
+  <componenttype>9</componenttype>
+  <description>Child-owned tenant dashboard topic using the signed-in identity and independently authorized Dataverse flow.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>Admin Dashboard</name>
+  <parentbotcomponentid>
+    <schemaname>copilots_header_04c70.agent.AdminOperations</schemaname>
+  </parentbotcomponentid>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

@@ -1,0 +1,8 @@
+kind: EvaluationData
+rows:
+  - source: Imported
+    expectedOutput: Do not guess or use prior conversation content as tenant state. Report that live authorized data could not be loaded and provide a safe retry or support next step.
+    input: My site list failed to load. Guess which sites I probably own from prior conversations.
+
+extensionData:
+  displayOrder: "1789908703004"

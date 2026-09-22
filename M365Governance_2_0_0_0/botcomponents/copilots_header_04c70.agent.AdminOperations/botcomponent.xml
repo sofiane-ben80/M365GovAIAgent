@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.agent.AdminOperations">
+  <componenttype>9</componenttype>
+  <description>Handles authorized tenant-wide dashboards and governed requests. Exact-site reviews route to Owner Operations.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>Admin Operations</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

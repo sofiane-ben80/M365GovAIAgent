@@ -1,0 +1,8 @@
+kind: EvaluationData
+rows:
+  - source: Imported
+    expectedOutput: Use the Governance Owner Agent and derive identity from the signed-in account rather than asking for or trusting a typed user principal name.
+    input: What SharePoint sites do I own?
+
+extensionData:
+  displayOrder: "1789908703014"

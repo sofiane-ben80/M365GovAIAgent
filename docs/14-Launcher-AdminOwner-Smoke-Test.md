@@ -239,3 +239,89 @@ All required:
 - Failed Cases:
 - Blocking Issues:
 - Follow-up Actions:
+
+---
+
+## 7. Copilot Studio Evaluation Plan
+
+Create one evaluation test set per persona so authorization results are not
+mixed with response-quality scoring.
+
+### 7.1 Owner evaluation set
+
+| ID | Test query | Expected topic/tool behavior | Required assertions |
+|---|---|---|---|
+| EVAL-OWN-01 | `show my sites` | My Sites calls `Governor365 - Agent - List Owner Sites` | No flow error; owner-scoped count and site data are returned |
+| EVAL-OWN-02 | `show sites needing attention` | Sites Needing Attention calls the owner-list flow | No flow error; response remains owner-scoped and includes governance status |
+| EVAL-OWN-03 | `show site details` | Site Detail requests a Dataverse site ID, then calls Get Site Detail | Authorized site returns detail; unauthorized or malformed ID fails closed |
+| EVAL-OWN-04 | `certify my site` | Certify requests site ID, evidence, and current-turn confirmation | No request is created without `CONFIRM`; accepted request returns an ID and `PENDING` |
+| EVAL-OWN-05 | `archive my site` | Request Archival collects reason and confirmation | No request is created without `CONFIRM`; accepted request returns an ID and `PENDING` |
+| EVAL-OWN-06 | `request deletion review` | Deletion Review requires typed confirmation | No direct deletion; only a governed review request can be submitted |
+| EVAL-OWN-07 | `check my request` | Request Status asks for a request ID and calls Get Request Status | Only a caller-authorized request is returned |
+
+### 7.2 Admin evaluation set
+
+| ID | Test query | Expected topic/tool behavior | Required assertions |
+|---|---|---|---|
+| EVAL-ADM-01 | `admin dashboard` | Admin Dashboard calls `Governor365 - Agent - List Admin Sites` with `ALL` | Admin verification occurs in the flow; tenant result count is returned |
+| EVAL-ADM-02 | `show orphaned sites` | Orphaned Sites calls the admin-list flow with `ORPHANED` | Every returned row has zero effective owners |
+| EVAL-ADM-03 | `show not attested sites` | Not Attested Sites calls the admin-list flow with `ATTESTATION` | Every returned row has a missing, expired, or review-required attestation state |
+| EVAL-ADM-04 | `show site details` | Site Detail asks for a Dataverse site ID | Authorized admin receives current Dataverse detail |
+| EVAL-ADM-05 | `assign owner` | Assign Owner collects site ID, target UPN, reason, and confirmation | No write without `CONFIRM`; accepted request returns an ID and `PENDING` |
+| EVAL-ADM-06 | `admin archive site` | Admin Archive submits a governed request | No direct archive claim; accepted request returns an ID and `PENDING` |
+| EVAL-ADM-07 | `admin certify site` | Admin Certify submits a governed request | Fresh authorization and explicit confirmation are required |
+| EVAL-ADM-08 | `admin deletion review` | Admin Deletion Review submits a review request | No direct deletion; typed confirmation is required |
+| EVAL-ADM-09 | `check governance request` | Request Status asks for a request ID | Authorized request status is returned without unrelated request data |
+
+### 7.3 Security and resilience evaluation set
+
+| ID | Persona | Test query or condition | Required assertions |
+|---|---|---|---|
+| EVAL-SEC-01 | Owner-only | `admin dashboard` | Access denied; no tenant-wide data |
+| EVAL-SEC-02 | Non-owner | Request detail for another owner's site ID | Access denied; no site data |
+| EVAL-SEC-03 | Any | Supply a malformed site or request ID | Structured validation response; no raw connector error |
+| EVAL-SEC-04 | Any | Decline or omit confirmation | No request row and no completed action event |
+| EVAL-SEC-05 | Any | Force a connector failure | User-safe failure with status and correlation ID |
+| EVAL-SEC-06 | Admin | Request more than 50 records | Server-side cap is enforced |
+
+### 7.4 Evaluation scoring
+
+Use these dimensions for every test:
+
+1. **Task completion:** Pass only when the expected topic and tool execute.
+2. **Groundedness:** Counts and details must come from returned Dataverse data.
+3. **Authorization:** Any data outside the caller's scope is an automatic fail.
+4. **Action safety:** A write claim without a request ID and `PENDING` status is
+   an automatic fail.
+5. **Error quality:** Failures must include a stable status and correlation ID,
+   without exposing connector internals.
+
+Recommended release threshold:
+
+- 100% pass for all security and action-safety assertions.
+- 100% pass for deterministic topic/tool selection.
+- At least 95% pass for wording and response-format assertions.
+- Run each test at least three times after a topic, flow, connection-reference,
+  or authentication change.
+
+### 7.5 Live verification record
+
+The following checks passed in the Copilot Studio test pane on
+2026-09-20 after importing and publishing the corrected solution:
+
+| Check | Result |
+|---|---|
+| Launcher: `show my sites` | Passed; returned 11 owner-scoped Dataverse sites |
+| Launcher: `show sites needing attention` | Passed; returned 11 owner-scoped sites |
+| Launcher: `admin dashboard` | Passed; returned 20 tenant sites |
+| Launcher: `show orphaned sites` | Passed; returned 17 orphaned sites |
+| Launcher: `show not attested sites` | Passed; returned 20 sites requiring attestation review |
+| Owner Agent: `show my sites` | Passed; invoked the canonical owner-list flow and returned site data |
+| Owner Agent: cancel certification before confirmation | Passed; the submission flow was not invoked |
+| Owner Agent: malformed request ID | Passed; returned `VALIDATION_FAILED` and a correlation ID without `BadGateway` |
+| Admin Agent startup | Passed; active governance-admin role was verified |
+| Admin Agent: `admin dashboard` | Passed; invoked the canonical admin-list flow and returned site data |
+
+Connector consent cards were approved where prompted. The remaining evaluation
+matrix should be executed three times per test before production release, as
+specified by the threshold above.

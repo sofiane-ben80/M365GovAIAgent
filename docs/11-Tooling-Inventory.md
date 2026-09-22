@@ -32,8 +32,8 @@ The solution does not need a standalone app service for phase 1. The required to
 
 | Tool | Type | Purpose | Inputs | Outputs | Depends On |
 |------|------|---------|--------|---------|------------|
-| Check-AdminRole | Power Automate flow | Determines whether the caller belongs to the configured Governance Admin group | callerUPN | isAdmin boolean | Environment variables, Microsoft Graph |
-| Orchestrator Start / Greeting | Copilot Studio topic | Resolves persona and routes to owner or admin branch | caller identity | persona branch | Check-AdminRole |
+| Check-AdminRole | Power Automate flow | Resolves the system-derived caller to immutable Entra object ID and requires one active, in-window GovernanceAdmin assignment | callerUPN from system context | isAdmin boolean | Office 365 Users, Governance Role Assignment |
+| Orchestrator routing | Copilot Studio orchestration | Classifies intent and hands work to one child without making authorization decisions | authenticated conversation context | child handoff | Child descriptions |
 
 ### 2.2 Data Refresh
 
@@ -51,7 +51,7 @@ The solution does not need a standalone app service for phase 1. The required to
 |------|------|---------|--------|---------|------------|
 | My Sites | Copilot Studio topic | Returns only the caller's sites | callerUPN | site list card | SharePoint connector |
 | Sites Needing Attention | Copilot Studio topic | Returns non-compliant caller-owned sites | callerUPN | at-risk list card | SharePoint connector, triage data |
-| Site Detail | Copilot Studio topic | Shows full site context and recommendation | selected site | detail card | Triage sub-agent, SharePoint connector |
+| Site Review | Owner Operations child topic + `Governor365 - Agent - Get Site Detail` | Retrieves one live Governance Site by ID after exact active-owner or GovernanceAdmin authorization, then presents evidence, risk, the stored policy recommendation, and prioritized remediation | site ID from Canvas or chat; caller UPN from system context | evidence-based review card | Office 365 Users, Governance Role Assignment, Site Owner Assignment, Dataverse |
 | Certify Site | Copilot Studio topic | Self-service recertification | site context, callerUPN | updated site row + audit log | Action Callback Flow, SharePoint connector (read) |
 | Request Archival | Copilot Studio topic | Owner requests archival | site context, callerUPN | action log entry | Action Callback Flow, SharePoint connector (read) |
 | Flag for Deletion | Copilot Studio topic | Owner requests deletion review | site context, callerUPN, confirmation token | action log entry | Action Callback Flow, SharePoint connector (read) |
@@ -60,7 +60,7 @@ The solution does not need a standalone app service for phase 1. The required to
 
 | Tool | Type | Purpose | Inputs | Outputs | Depends On |
 |------|------|---------|--------|---------|------------|
-| Admin Dashboard | Copilot Studio topic | Tenant-wide governance summary | callerUPN | summary card | SharePoint connector |
+| Admin Dashboard | Copilot Studio topic | Tenant-wide governance summary after per-request application-role authorization | callerUPN from system context | summary card | Office 365 Users, Governance Role Assignment, Dataverse |
 | Orphaned Sites | Copilot Studio topic | Lists sites with no effective owners | callerUPN | orphaned list card | SharePoint connector |
 | Not Attested Sites | Copilot Studio topic | Lists expired or missing-attestation sites | callerUPN | attestation review card | SharePoint connector |
 | Action Status | Copilot Studio topic | Returns latest action state for caller | callerUPN / site context | status card | Governance Action Log |

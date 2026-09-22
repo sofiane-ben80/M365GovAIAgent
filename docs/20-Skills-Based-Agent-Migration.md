@@ -36,7 +36,7 @@ Skills do not replace tools. A skill tells the agent when and how to call a tool
 | Skill | Owner | Admin | Required tool contracts |
 | --- | :---: | :---: | --- |
 | `owner-site-portfolio` | Yes | No | ListOwnerSites, GetSite |
-| `verify-governance-admin` | No | Yes | CheckAdminRole |
+| `verify-governance-admin` | No | Yes | CheckAdminRole backed by Governance Role Assignment |
 | `admin-governance-review` | No | Yes | GetAdminDashboard, ListAdminSites, GetSite |
 | `site-governance-assessment` | Yes | Yes | GetGovernanceConfig |
 | `certify-governance-site` | Yes | Yes | GetSite, ActionCallback |
@@ -69,7 +69,7 @@ Tool descriptions must say when to use them, inputs must be typed, and every dat
 ## 5. Build Procedure
 
 1. In Copilot Studio, create an agent with the **new agent experience / GitHub Copilot harness**.
-2. Create **Governance Owner Agent** and paste the description and instructions from `copilot/new-agents/governance-owner-agent.md`.
+2. Create **Governance User & Owner Agent** and paste the description and instructions from `copilot/new-agents/governance-owner-agent.md`.
 3. On **Build > Skills > Upload a skill**, upload the five Owner skills listed in that file.
 4. Add and configure the Owner tool contracts. Use the signed-in user's connection or a secured service identity as policy requires.
 5. Repeat for **Governance Admin Agent** using `copilot/new-agents/governance-admin-agent.md` and its seven skills.

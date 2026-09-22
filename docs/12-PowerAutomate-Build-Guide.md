@@ -8,7 +8,7 @@
 - Create every production flow inside the Governor365 solution.
 - Use connection references for Dataverse, Microsoft Teams, Approvals,
   Microsoft 365 Users, SharePoint, and approved HTTP/custom connectors.
-- Use environment variables for tenant ID, governance admin group ID, base
+- Use environment variables for tenant ID, optional role-source group IDs, base
   URLs, batch size, notification schedule, and feature flags.
 - Use child flows for reusable authorization, response, event, and error logic.
 - Return structured failures; never turn connector errors into empty successful
@@ -18,6 +18,23 @@
 
 ## 2. Flow catalog
 
+The current 2.0 release contains **11 distinct cloud flows**. The package also
+contains **22 unique flow-bound agent topics/components** and 23 topic-to-flow
+relationships; `OwnerSiteReview` accounts for two relationships because it
+invokes both site-detail and request-submission flows. These are references
+from agent topics to reusable flows, not additional cloud flows. Do not use
+either agent-binding count as the flow inventory.
+
+The catalog below is the target design. Five cataloged flows remain design-only
+and are not in the current export: `Inventory - Process Work Item`,
+`Inventory - Finalize Scan`, `Notify - Owner Digest`, `Notify - Admin Summary`,
+and `Notify - Card Response`. The current package also retains
+`GovernanceAgent-CheckAdminRole` for an existing agent binding and packages the
+implemented request processor as `Governor365 - Request - Process Pending`.
+Consequently, the target-catalog row count is not expected to equal the current
+package count until the remaining automation is implemented and the retained
+compatibility flow is retired.
+
 | Flow | Trigger | Purpose |
 |---|---|---|
 | `Governor365 - Agent - List Owner Sites` | Copilot Studio | Return only sites assigned to signed-in owner |
@@ -25,7 +42,8 @@
 | `Governor365 - Agent - List Admin Sites` | Copilot Studio | Return tenant views after admin verification |
 | `Governor365 - Agent - Submit Request` | Copilot Studio | Authorize and create governed action request |
 | `Governor365 - Agent - Get Request Status` | Copilot Studio | Return caller-authorized request status |
-| `Governor365 - Child - Verify Admin` | Child flow | Verify configured Entra group membership |
+| `Governor365 - Child - Get Caller Capabilities` | Child flow | Resolve immutable caller identity and return minimized general/owner/admin capabilities |
+| `Governor365 - Child - Verify Admin` | Child flow | Verify one active GovernanceAdmin Dataverse role assignment |
 | `Governor365 - Child - Append Action Event` | Child flow | Create immutable audit event |
 | `Governor365 - Inventory - Start Scan` | Recurrence/manual | Create scan run and enumerate source pages |
 | `Governor365 - Inventory - Process Work Item` | Dataverse row added | Process bounded inventory batch |
@@ -89,8 +107,8 @@ and preserve the correlation ID.
    archive, deletion, or owner update has already occurred.
 
 Detailed agent contracts live in
-`flows/list-owner-sites-dataverse-flow.txt` and
-`flows/submit-governance-request-dataverse-flow.txt`.
+`copilot/flows/list-owner-sites-dataverse-flow.txt` and
+`copilot/flows/submit-governance-request-dataverse-flow.txt`.
 
 ## 6. Request processor
 
@@ -110,7 +128,7 @@ Detailed agent contracts live in
 ## 7. Inventory orchestration
 
 The production implementation is the three-flow contract in
-`flows/inventory-dataverse-flow.txt`. Use
+`copilot/flows/inventory-dataverse-flow.txt`. Use
 `scripts/Invoke-DataverseGovernanceScan.ps1` only for bootstrap, migration
 comparison, manual reconciliation, or break-glass recovery. It writes the same
 Dataverse keys and scan-run boundary but is not the recurring production
@@ -164,6 +182,10 @@ Prerequisites:
 5. Sign in with Az.Accounts or Azure CLI for a Dataverse token, or supply a
    short-lived secure string with `-DataverseAccessToken`.
 
+The scanner persists the PnP interactive login in the operating system's secure
+token cache so that scanning each site does not require another prompt. Use
+`Disconnect-PnPOnline -ClearPersistedLogin` to remove that cached login.
+
 Example:
 
 ```powershell
@@ -207,12 +229,26 @@ Configure run-after explicitly for failed, timed-out, and skipped actions.
 Operational details go to flow history and protected audit fields, not to the
 agent response.
 
+### Caller capability and role verification
+
+1. Resolve system-provided caller identity to an immutable Entra object ID.
+2. Determine owner capability from active Site Owner Assignment rows.
+3. Determine privileged capabilities from exact active Governance Role
+   Assignment rows whose validity window includes the current time.
+4. Return only minimized booleans and permitted destination names to the
+   orchestrator or Canvas app. Do not return the full role table.
+5. Every destination tool repeats its own authorization check; capability
+   discovery is navigation, not authorization.
+6. Zero role rows denies privileged access. Duplicate, unreadable, or invalid
+   rows fail closed and return a correlation ID.
+
 ## 10. Acceptance tests
 
 1. Exact owner sees only active assigned sites.
 2. Another user's UPN, a partial UPN, and model-provided identity cannot expose
    records.
-3. Admin operations fail closed when group verification fails.
+3. Admin operations fail closed when the role assignment is absent, inactive,
+   expired, duplicated, or cannot be read.
 4. Duplicate submissions with the same idempotency key produce one request.
 5. Delete review requires typed confirmation and approval.
 6. Every request state transition has one corresponding action event.

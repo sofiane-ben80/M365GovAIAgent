@@ -1,0 +1,12 @@
+<botcomponent schemaname="copilots_data_protection_01.gpt.default">
+  <componenttype>15</componenttype>
+  <description>Read-only advisory agent for authorized Microsoft 365 sharing exposure, guest
+access, sensitivity labels, DLP and retention coverage, and Copilot data risk.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Data Protection Advisor</name>
+  <parentbotid>
+    <schemaname>copilots_data_protection_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

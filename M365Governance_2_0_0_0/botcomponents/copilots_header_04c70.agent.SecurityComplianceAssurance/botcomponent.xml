@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.agent.SecurityComplianceAssurance">
+  <componenttype>9</componenttype>
+  <description>Use for control mapping, evidence sufficiency, audit readiness, and remediation proposals based on approved evidence. This child is advisory and read-only.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>Security &amp; Compliance Assurance</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

@@ -1,0 +1,8 @@
+kind: EvaluationData
+rows:
+  - source: Imported
+    expectedOutput: Use the Governance Owner Agent and ask for the Governor365 Dataverse site ID before calling the authorized site-detail capability.
+    input: Show site details.
+
+extensionData:
+  displayOrder: "1789908703012"

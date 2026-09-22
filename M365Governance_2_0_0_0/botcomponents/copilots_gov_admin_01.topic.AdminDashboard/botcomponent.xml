@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_gov_admin_01.topic.AdminDashboard">
+  <componenttype>9</componenttype>
+  <description>Returns the tenant-wide governance summary for confirmed admins.</description>
+  <iscustomizable>0</iscustomizable>
+  <name>Admin Dashboard</name>
+  <parentbotid>
+    <schemaname>copilots_gov_admin_01</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

@@ -1,0 +1,13 @@
+<environmentvariabledefinition schemaname="sb_SharePointAdminUrl">
+  <description default="Environment-specific SharePoint administration URL used by approved inventory operations.">
+    <label description="Environment-specific SharePoint administration URL used by approved inventory operations." languagecode="1033" />
+  </description>
+  <displayname default="SharePoint Admin URL">
+    <label description="SharePoint Admin URL" languagecode="1033" />
+  </displayname>
+  <introducedversion>2.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

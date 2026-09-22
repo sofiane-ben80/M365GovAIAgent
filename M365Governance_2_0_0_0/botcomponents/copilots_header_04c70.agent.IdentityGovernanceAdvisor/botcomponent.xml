@@ -1,0 +1,11 @@
+<botcomponent schemaname="copilots_header_04c70.agent.IdentityGovernanceAdvisor">
+  <componenttype>9</componenttype>
+  <description>Use for privileged roles, PIM, access reviews, least privilege, RACI, and separation-of-duty analysis. This child is advisory and read-only.</description>
+  <iscustomizable>1</iscustomizable>
+  <name>Identity Governance Advisor</name>
+  <parentbotid>
+    <schemaname>copilots_header_04c70</schemaname>
+  </parentbotid>
+  <statecode>0</statecode>
+  <statuscode>1</statuscode>
+</botcomponent>

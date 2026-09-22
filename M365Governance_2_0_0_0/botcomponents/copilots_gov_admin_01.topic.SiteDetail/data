@@ -1,0 +1,37 @@
+kind: AdaptiveDialog
+beginDialog:
+  kind: OnRecognizedIntent
+  id: main
+  intent:
+    displayName: Site Detail
+    triggerQueries:
+      - site details
+      - show site details
+      - review site by ID
+      - administrator governance review
+  actions:
+    - kind: Question
+      id: question_SiteId
+      alwaysPrompt: false
+      variable: init:Topic.SiteId
+      prompt: Which Governor365 Dataverse site ID should I review?
+      entity: StringPrebuiltEntity
+    - kind: InvokeFlowAction
+      id: invokeFlowAction_GetSiteDetail
+      input:
+        binding:
+          text: =System.User.PrincipalName
+          text_1: =Topic.SiteId
+      output:
+        binding:
+          correlationid: Topic.CorrelationId
+          datajson: Topic.DataJson
+          message: Topic.ResultMessage
+          status: Topic.ResultStatus
+          success: Topic.Success
+      flowId: 4190243f-b9b3-f111-aaac-000d3a367627
+    - kind: SendActivity
+      id: sendActivity_SiteDetailResult
+      activity: "{Topic.ResultMessage} Status: {Topic.ResultStatus}. Data: {Topic.DataJson} Correlation ID: {Topic.CorrelationId}"
+    - kind: CancelAllDialogs
+      id: cancelAllDialogs_SiteDetail
