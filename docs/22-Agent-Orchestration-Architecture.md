@@ -9,41 +9,43 @@ judges, governance stakeholders, and contributors.
 
 ```mermaid
 flowchart TB
-    Users["Site owners and governance admins"] --> Orchestrator["M365 Governance Agent<br/>orchestrator / launcher"]
-    Orchestrator -->|child handoff| Owner["Owner Operations child"]
-    Orchestrator -->|child handoff| Admin["Admin Operations child"]
-    Orchestrator -->|child handoff| Advisors["Five read-only advisor children"]
+    Users["Site owners, governance admins,<br/>auditors, and makers"]
+    Apps["Canvas app<br/>owner + admin dashboards"]
+    PCF["Governor365.AgentChat PCF<br/>Direct Line + Entra token exchange"]
+    Teams["Teams / published agent entry<br/>cards, notifications, deep links"]
+    Governor["Governor M365<br/>manual Entra authentication<br/>routing-only supervisor"]
 
-    Owner --> Tools["Power Automate agent tools"]
+    Users --> Apps --> PCF --> Governor
+    Users --> Teams --> Governor
+
+    Governor -->|local-child handoff| Owner["Owner Operations<br/>portfolio, exact-site review,<br/>governed actions, status"]
+    Governor -->|local-child handoff| Admin["Admin Operations<br/>tenant dashboard, exact-site review,<br/>privileged owner assignment"]
+    Governor -->|local-child handoff| Advisors["Five read-only advisors<br/>policy, readiness, protection,<br/>identity, assurance"]
+
+    Owner --> Tools["7 agent tool flows<br/>authorized read + request contracts"]
     Admin --> Tools
-    Advisors --> Broker["Power Automate evidence broker"]
-    Broker --> Tools
+    Advisors --> Tools
+    Tools --> Controls["2 authorization/audit flows"]
+    Tools --> Processor["Request - Process Pending<br/>active recurring processor"]
+    Controls --> DV["Microsoft Dataverse<br/>10-table system of record"]
+    Processor --> DV
+    Processor --> Services["Office 365 Users, Approvals,<br/>SharePoint / Graph, Teams"]
+    DV --> Apps
+    Services --> Teams
 
-    Tools --> DV["Microsoft Dataverse"]
-    Tools --> Approvals["Power Automate Approvals"]
-    Tools --> M365["Microsoft Graph and SharePoint APIs"]
-    DV --> Notifications["Power Automate notifications"]
-    Notifications --> Teams["Teams and Adaptive Cards"]
-    Teams --> Users
-
-    Teams --> Apps["Power Apps dashboard"]
-    Apps --> DV
-    Orchestrator -. deep link .-> Apps
-    Apps --> PCF["Agent Chat PCF"]
-    PCF -->|short-lived Direct Line token| Orchestrator
-    Inventory["Power Automate inventory flows"] --> M365
-    Inventory --> DV
+    Inventory["Inventory - Start Scan<br/>packaged, intentionally inactive"] -.-> DV
+    Roadmap["Design-only: inventory worker/finalizer<br/>owner digest, admin summary, card response"] -.-> Inventory
 ```
 
 ## Responsibilities
 
 | Agent or service | Primary purpose | Typical outcomes |
 |---|---|---|
-| M365 Governance Agent | Single entry point, intent classification, and bounded handoff | Consistent discovery and routing |
-| Owner Operations child | Signed-in owner's governed portfolio | Site views, explanations, support, and disposition requests |
-| Admin Operations child | Admin-verified tenant operations | Risk review, owner assignment, approvals, and follow-up |
+| Governor M365 | Single manually authenticated entry point, intent classification, and bounded local-child handoff | Consistent discovery and routing without connected-agent authentication mismatch |
+| Owner Operations child | Signed-in owner's governed portfolio and exact-site operations | Site views, governed-action requests, explanations, support, and request status |
+| Admin Operations child | Admin-verified tenant operations and exact-site operations | Risk review, governed-action requests, privileged owner assignment, and follow-up |
 | Five advisor children | Narrow policy/readiness/protection/identity/assurance analysis | Evidence-based findings and recommendations |
-| Power Automate tools | Identity validation and stable transactional contracts | Authorized queries, requests, status, and errors |
+| Power Automate tools | Identity validation and stable transactional contracts | Authorized queries, requests, status, immutable events, and fail-closed errors |
 | Dataverse | Operational system of record | Sites, owners, policy, requests, events, scans, evidence |
 | Power Apps | Required delegable operational dashboard | Owner and admin views, filters, details, requests, and exceptions over the same Dataverse state |
 | Agent Chat PCF | Side-by-side Canvas and Copilot Studio experience | Web Chat rendering, versioned UI context, and allowlisted Canvas events over Direct Line |
@@ -109,6 +111,26 @@ stored through each owned topic's `parentbotcomponentid`. After published
 Canvas parity tests passed for both operational children, the original root
 `My Sites` and `Admin Dashboard` copies were disabled and retained only for
 time-bounded rollback.
+
+The current release contains 11 distinct cloud flows. Twenty-two unique
+flow-bound agent components create 23 topic-to-flow relationships because the
+`OwnerSiteReview` topic invokes both `Get Site Detail` and `Submit Request`.
+Those component and relationship counts are references to reusable flows, not
+additional Power Automate flows.
+
+The implemented governed-action menu contains Certify, Archive, Deletion
+review, Assign owners, and Cancel. The four write choices collect a business
+reason and current-turn confirmation before calling the authorization-enforcing
+Submit Request flow. Deletion review additionally requires typed `CONFIRM`;
+owner assignment collects the target owner's work email and requires a current
+GovernanceAdmin role. Cancel performs no write. A successful submission creates
+a Governance Action Request and Submitted event; it does not claim that the
+underlying Microsoft 365 operation has completed.
+
+`Inventory - Start Scan` is packaged but intentionally inactive until its
+worker and finalizer are implemented. Those two flows and the Owner Digest,
+Admin Summary, and Card Response flows remain design-only roadmap automation
+and are not part of the 11-flow release inventory.
 
 ## How orchestration works
 

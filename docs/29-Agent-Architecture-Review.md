@@ -88,7 +88,7 @@ M365.
 - The package includes the matching bot-component/workflow relationships.
 - The connected-agent guard reports zero active routes.
 - The package-integrity guard reports zero missing dependencies and validates
-  21 flow-bound components.
+  22 flow-bound components and 23 topic-to-flow relationships.
 
 ## Goal-by-goal assessment
 

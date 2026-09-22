@@ -1,110 +1,186 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
-  <title id="title">M365 Governance multi-agent architecture</title>
-  <desc id="desc">A Power Platform-native M365 Governance orchestrator routes users to Owner, Admin, and specialist agents. Power Automate connects them to Dataverse and governed Microsoft 365 APIs.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1280" viewBox="0 0 1800 1280" role="img" aria-labelledby="title desc">
+  <title id="title">Governor365 Power Platform architecture</title>
+  <desc id="desc">Governor365 2.0 architecture showing Canvas and Teams channels, the manually authenticated Governor M365 parent, seven local child agents, implemented owner and administrator actions, eleven Power Automate flows, ten Dataverse tables, Microsoft 365 services, and managed-solution deployment.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
       <path d="M0,0 L0,6 L9,3 z" fill="#605e5c"/>
     </marker>
+    <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#5b2c83"/>
+    </marker>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
-      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity=".15"/>
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity=".13"/>
     </filter>
     <style>
-      .title{font:700 38px 'Segoe UI',Arial,sans-serif;fill:#242424}.subtitle{font:400 20px 'Segoe UI',Arial,sans-serif;fill:#605e5c}
-      .box{rx:16;filter:url(#shadow);stroke-width:2}.h{font:700 20px 'Segoe UI',Arial,sans-serif}.t{font:400 15px 'Segoe UI',Arial,sans-serif}
-      .light{fill:#fff}.dark{fill:#242424}.line{fill:none;stroke:#605e5c;stroke-width:2.5;marker-end:url(#arrow)}
-      .section{font:700 17px 'Segoe UI',Arial,sans-serif;letter-spacing:1.5px;fill:#605e5c}
+      .title{font:700 36px 'Segoe UI',Arial,sans-serif;fill:#242424}
+      .subtitle{font:400 18px 'Segoe UI',Arial,sans-serif;fill:#605e5c}
+      .section{font:700 15px 'Segoe UI',Arial,sans-serif;letter-spacing:1.4px;fill:#605e5c}
+      .h{font:700 19px 'Segoe UI',Arial,sans-serif}
+      .h2{font:700 16px 'Segoe UI',Arial,sans-serif}
+      .t{font:400 14px 'Segoe UI',Arial,sans-serif}
+      .small{font:400 12px 'Segoe UI',Arial,sans-serif}
+      .metric{font:700 13px 'Segoe UI',Arial,sans-serif}
+      .light{fill:#fff}.dark{fill:#242424}.muted{fill:#605e5c}
+      .box{rx:14;filter:url(#shadow);stroke-width:2}
+      .line{fill:none;stroke:#605e5c;stroke-width:2.2;marker-end:url(#arrow)}
+      .purpleLine{fill:none;stroke:#5b2c83;stroke-width:2.5;marker-end:url(#arrowPurple)}
+      .dash{stroke-dasharray:7 6}
     </style>
   </defs>
-  <rect width="1600" height="1000" fill="#faf9f8"/>
-  <text x="70" y="62" class="title">M365 Governance AI Agent Architecture</text>
-  <text x="70" y="96" class="subtitle">Copilot Studio, Dataverse, Power Automate, Power Apps, and Teams</text>
 
-  <text x="70" y="145" class="section">EXPERIENCE &amp; ORCHESTRATION</text>
-  <rect x="70" y="170" width="270" height="112" class="box" fill="#fff" stroke="#8a8886"/>
-  <text x="205" y="207" class="h dark" text-anchor="middle">Users</text>
-  <text x="205" y="236" class="t dark" text-anchor="middle">Site owners</text>
-  <text x="205" y="260" class="t dark" text-anchor="middle">Governance administrators</text>
+  <rect width="1800" height="1280" fill="#faf9f8"/>
+  <text id="diagramTitle" x="60" y="52" class="title">Governor365 Power Platform Architecture</text>
+  <text x="60" y="82" class="subtitle">Release 2.0 &#8226; authenticated local-child orchestration &#8226; governed Microsoft 365 actions</text>
+  <rect x="1510" y="30" width="230" height="48" rx="24" fill="#e8def8" stroke="#5b2c83" stroke-width="1.5"/>
+  <text x="1625" y="59" class="metric" fill="#35134f" text-anchor="middle">MANAGED SOLUTION READY</text>
 
-  <rect x="470" y="150" width="440" height="152" class="box" fill="#5b2c83" stroke="#35134f"/>
-  <text x="690" y="194" class="h light" text-anchor="middle">M365 Governance Agent</text>
-  <text x="690" y="224" class="t light" text-anchor="middle">Orchestrator / launcher</text>
-  <text x="690" y="252" class="t light" text-anchor="middle">Intent classification • role-aware routing</text>
-  <text x="690" y="276" class="t light" text-anchor="middle">Consolidated conversational response</text>
+  <text x="60" y="126" class="section">EXPERIENCE, IDENTITY &amp; ORCHESTRATION</text>
 
-  <rect x="1040" y="170" width="310" height="112" class="box" fill="#704c9f" stroke="#35134f"/>
-  <text x="1195" y="211" class="h light" text-anchor="middle">Triage &amp; routing</text>
-  <text x="1195" y="241" class="t light" text-anchor="middle">Selects operational agent</text>
-  <text x="1195" y="265" class="t light" text-anchor="middle">or specialist advisor</text>
-  <path d="M340 226 H470" class="line"/><path d="M910 226 H1040" class="line"/>
+  <rect x="60" y="150" width="235" height="130" class="box" fill="#fff" stroke="#8a8886"/>
+  <text x="177" y="184" class="h dark" text-anchor="middle">Users</text>
+  <text x="177" y="212" class="t dark" text-anchor="middle">Site owners</text>
+  <text x="177" y="235" class="t dark" text-anchor="middle">Governance admins</text>
+  <text x="177" y="258" class="t dark" text-anchor="middle">Auditors and makers</text>
 
-  <text x="70" y="352" class="section">OPERATIONAL AGENTS</text>
-  <rect x="70" y="378" width="365" height="150" class="box" fill="#0078d4" stroke="#004f8b"/>
-  <text x="252" y="418" class="h light" text-anchor="middle">Governance Owner Agent</text>
-  <text x="252" y="451" class="t light" text-anchor="middle">Portfolio • assessment • explanations</text>
-  <text x="252" y="477" class="t light" text-anchor="middle">Support • action tracking</text>
-  <text x="252" y="503" class="t light" text-anchor="middle">Disposition requests</text>
+  <rect x="345" y="140" width="300" height="150" class="box" fill="#fff" stroke="#0078d4"/>
+  <text x="495" y="174" class="h dark" text-anchor="middle">Canvas app + Agent Chat PCF</text>
+  <text x="495" y="203" class="t dark" text-anchor="middle">Owner and admin dashboards</text>
+  <text x="495" y="227" class="t dark" text-anchor="middle">Selected-site context + allowlisted events</text>
+  <text x="495" y="251" class="t dark" text-anchor="middle">Direct Line + Entra token exchange</text>
+  <text x="495" y="274" class="small muted" text-anchor="middle">Silent SSO with interactive fallback</text>
 
-  <rect x="470" y="378" width="365" height="150" class="box" fill="#0078d4" stroke="#004f8b"/>
-  <text x="652" y="418" class="h light" text-anchor="middle">Governance Admin Agent</text>
-  <text x="652" y="451" class="t light" text-anchor="middle">Admin verification • tenant review</text>
-  <text x="652" y="477" class="t light" text-anchor="middle">Certification decisions</text>
-  <text x="652" y="503" class="t light" text-anchor="middle">Action status and follow-up</text>
+  <rect x="705" y="130" width="420" height="170" class="box" fill="#5b2c83" stroke="#35134f"/>
+  <text x="915" y="169" class="h light" text-anchor="middle">Governor M365</text>
+  <text x="915" y="197" class="t light" text-anchor="middle">Single Canvas-facing supervisor</text>
+  <text x="915" y="222" class="t light" text-anchor="middle">Manual Microsoft Entra authentication</text>
+  <text x="915" y="247" class="t light" text-anchor="middle">Intent classification &#8226; local-child handoff</text>
+  <text x="915" y="272" class="t light" text-anchor="middle">Minimized context &#8226; coordinated response</text>
 
-  <rect x="270" y="565" width="365" height="104" class="box" fill="#d9efff" stroke="#0078d4"/>
-  <text x="452" y="604" class="h dark" text-anchor="middle">Reusable governance skills</text>
-  <text x="452" y="634" class="t dark" text-anchor="middle">Consistent, bounded capabilities</text>
-  <rect x="670" y="565" width="365" height="104" class="box" fill="#d9efff" stroke="#0078d4"/>
-  <text x="852" y="604" class="h dark" text-anchor="middle">Governance action service</text>
-  <text x="852" y="634" class="t dark" text-anchor="middle">Requests • callbacks • audit status</text>
+  <rect x="1185" y="140" width="280" height="150" class="box" fill="#fff" stroke="#6264a7"/>
+  <text x="1325" y="177" class="h dark" text-anchor="middle">Teams / published entry</text>
+  <text x="1325" y="205" class="t dark" text-anchor="middle">Agent access and dashboard tab</text>
+  <text x="1325" y="229" class="t dark" text-anchor="middle">Adaptive Cards and deep links</text>
+  <text x="1325" y="253" class="t dark" text-anchor="middle">Notifications and follow-up</text>
+  <text x="1325" y="276" class="small muted" text-anchor="middle">Environment-specific channel setup</text>
 
-  <path d="M1130 282 C1070 335 370 320 252 378" class="line"/>
-  <path d="M1195 282 C1130 350 760 325 652 378" class="line"/>
-  <path d="M252 528 C260 555 370 550 420 565" class="line"/>
-  <path d="M652 528 C620 552 530 550 485 565" class="line"/>
-  <path d="M300 528 C390 555 735 535 800 565" class="line"/>
-  <path d="M700 528 C720 545 800 548 830 565" class="line"/>
+  <rect x="1515" y="140" width="225" height="150" rx="14" fill="#f3f2f1" stroke="#8a8886" stroke-width="1.5" stroke-dasharray="7 6"/>
+  <text x="1627" y="174" class="h2 dark" text-anchor="middle">Independent records</text>
+  <text x="1627" y="202" class="small dark" text-anchor="middle">Owner, Admin, and advisors</text>
+  <text x="1627" y="224" class="small dark" text-anchor="middle">remain separately published</text>
+  <text x="1627" y="252" class="small muted" text-anchor="middle">Not connected to Governor</text>
+  <text x="1627" y="272" class="small muted" text-anchor="middle">(0 connected-agent routes)</text>
 
-  <text x="900" y="352" class="section">SPECIALIST ADVISORS</text>
-  <rect x="900" y="378" width="260" height="80" class="box" fill="#008575" stroke="#005b50"/>
-  <text x="1030" y="412" class="h light" text-anchor="middle">Policy Advisor</text><text x="1030" y="438" class="t light" text-anchor="middle">Policy interpretation</text>
-  <rect x="1185" y="378" width="300" height="80" class="box" fill="#008575" stroke="#005b50"/>
-  <text x="1335" y="412" class="h light" text-anchor="middle">Readiness Advisor</text><text x="1335" y="438" class="t light" text-anchor="middle">Copilot readiness</text>
-  <rect x="900" y="480" width="260" height="80" class="box" fill="#008575" stroke="#005b50"/>
-  <text x="1030" y="514" class="h light" text-anchor="middle">Data Protection</text><text x="1030" y="540" class="t light" text-anchor="middle">Classification and sharing</text>
-  <rect x="1185" y="480" width="300" height="80" class="box" fill="#008575" stroke="#005b50"/>
-  <text x="1335" y="514" class="h light" text-anchor="middle">Identity Governance</text><text x="1335" y="540" class="t light" text-anchor="middle">Roles, access, ownership</text>
-  <rect x="1040" y="582" width="330" height="80" class="box" fill="#008575" stroke="#005b50"/>
-  <text x="1205" y="616" class="h light" text-anchor="middle">Security &amp; Compliance</text><text x="1205" y="642" class="t light" text-anchor="middle">Control assurance</text>
+  <path d="M295 215 H345" class="line"/>
+  <path d="M645 215 H705" class="purpleLine"/>
+  <path d="M1185 215 H1125" class="purpleLine"/>
+  <path d="M1465 215 H1515" class="line dash"/>
 
-  <path d="M1240 282 C1260 330 1090 340 1030 378" class="line"/>
-  <path d="M1260 282 C1320 325 1330 335 1335 378" class="line"/>
-  <path d="M1260 282 C1350 370 1130 430 1050 480" class="line"/>
-  <path d="M1270 282 C1410 360 1370 420 1335 480" class="line"/>
-  <path d="M1220 282 V582" class="line"/>
+  <text x="60" y="346" class="section">SEVEN ENABLED LOCAL CHILD AGENTS</text>
 
-  <rect x="70" y="758" width="310" height="112" class="box" fill="#fff" stroke="#605e5c"/>
-  <text x="225" y="798" class="h dark" text-anchor="middle">Evidence &amp; tool broker</text>
-  <text x="225" y="828" class="t dark" text-anchor="middle">Normalized, approved access</text>
-  <text x="225" y="852" class="t dark" text-anchor="middle">for specialist agents</text>
-  <rect x="455" y="758" width="310" height="112" class="box" fill="#fff" stroke="#605e5c"/>
-  <text x="610" y="798" class="h dark" text-anchor="middle">Power Automate</text>
-  <text x="610" y="828" class="t dark" text-anchor="middle">Flows and connectors</text>
-  <text x="610" y="852" class="t dark" text-anchor="middle">Approved action contracts</text>
-  <rect x="840" y="758" width="310" height="112" class="box" fill="#fff" stroke="#605e5c"/>
-  <text x="995" y="798" class="h dark" text-anchor="middle">Microsoft Dataverse</text>
-  <text x="995" y="828" class="t dark" text-anchor="middle">Sites • owners • requests</text>
-  <text x="995" y="852" class="t dark" text-anchor="middle">Policy • evidence • audit events</text>
-  <rect x="1225" y="758" width="300" height="112" class="box" fill="#fff" stroke="#605e5c"/>
-  <text x="1375" y="798" class="h dark" text-anchor="middle">Structured response</text>
-  <text x="1375" y="828" class="t dark" text-anchor="middle">Adaptive Cards</text>
-  <text x="1375" y="852" class="t dark" text-anchor="middle">Traceable recommendations</text>
+  <rect x="60" y="370" width="485" height="174" class="box" fill="#0078d4" stroke="#004f8b"/>
+  <text x="302" y="407" class="h light" text-anchor="middle">Owner Operations child</text>
+  <text x="302" y="436" class="t light" text-anchor="middle">My Sites portfolio &#8226; exact-site review</text>
+  <text x="302" y="462" class="t light" text-anchor="middle">Governed action menu &#8226; request status</text>
+  <rect x="88" y="484" width="429" height="40" rx="8" fill="#005fa9"/>
+  <text x="302" y="509" class="small light" text-anchor="middle">Authorization is rechecked inside every destination flow</text>
 
-  <path d="M452 669 V688 H610 V758" class="line"/>
-  <path d="M852 669 V708 H650 V758" class="line"/>
-  <path d="M380 814 H455" class="line"/><path d="M765 814 H840" class="line"/><path d="M1150 814 H1225" class="line"/>
-  <rect x="55" y="700" width="540" height="48" fill="#faf9f8"/>
-  <text x="70" y="733" class="section">SHARED GOVERNED EVIDENCE &amp; AUTOMATION</text>
+  <rect x="585" y="370" width="485" height="174" class="box" fill="#0078d4" stroke="#004f8b"/>
+  <text x="827" y="407" class="h light" text-anchor="middle">Admin Operations child</text>
+  <text x="827" y="436" class="t light" text-anchor="middle">Tenant dashboard &#8226; exact-site review</text>
+  <text x="827" y="462" class="t light" text-anchor="middle">Governed actions &#8226; privileged owner assignment</text>
+  <rect x="613" y="484" width="429" height="40" rx="8" fill="#005fa9"/>
+  <text x="827" y="509" class="small light" text-anchor="middle">GovernanceAdmin role is resolved from immutable Entra identity</text>
 
-  <rect x="70" y="920" width="1455" height="44" rx="10" fill="#edebe9"/>
-  <text x="797" y="948" class="t dark" text-anchor="middle">Human accountability • role-aware access • reusable actions • governed evidence • auditable outcomes</text>
+  <rect x="1110" y="370" width="630" height="174" class="box" fill="#008575" stroke="#005b50"/>
+  <text x="1425" y="407" class="h light" text-anchor="middle">Five read-only advisor children</text>
+  <text x="1425" y="438" class="t light" text-anchor="middle">Governance Policy &#8226; Copilot Readiness</text>
+  <text x="1425" y="465" class="t light" text-anchor="middle">Data Protection &#8226; Identity Governance</text>
+  <text x="1425" y="492" class="t light" text-anchor="middle">Security &amp; Compliance Assurance</text>
+  <text x="1425" y="519" class="small light" text-anchor="middle">Bounded analysis with evidence-freshness guardrails</text>
+
+  <path d="M915 300 V356 H302 V370" class="purpleLine"/>
+  <path d="M915 300 V370" class="purpleLine"/>
+  <path d="M915 300 V356 H1425 V370" class="purpleLine"/>
+
+  <text x="60" y="590" class="section">IMPLEMENTED GOVERNANCE FEATURES</text>
+
+  <rect x="60" y="612" width="760" height="130" class="box" fill="#e5f1fb" stroke="#0078d4"/>
+  <text x="440" y="646" class="h dark" text-anchor="middle">Exact-site review and governed-action submission</text>
+  <text x="440" y="676" class="t dark" text-anchor="middle">Certify &#8226; Archive &#8226; Deletion review &#8226; Assign owners (admin only) &#8226; Cancel</text>
+  <text x="440" y="702" class="t dark" text-anchor="middle">Business reason + current-turn confirmation; deletion requires typed CONFIRM</text>
+  <text x="440" y="726" class="small muted" text-anchor="middle">Submission creates a request and Submitted event; it never claims the M365 operation is complete</text>
+
+  <rect x="860" y="612" width="425" height="130" class="box" fill="#fff4ce" stroke="#c19c00"/>
+  <text x="1072" y="646" class="h dark" text-anchor="middle">Request lifecycle</text>
+  <text x="1072" y="676" class="t dark" text-anchor="middle">Authorization &#8594; request &#8594; event trail</text>
+  <text x="1072" y="702" class="t dark" text-anchor="middle">Approval/connector gates &#8594; processing</text>
+  <text x="1072" y="726" class="small muted" text-anchor="middle">Fail closed when required dependencies are unavailable</text>
+
+  <rect x="1325" y="612" width="415" height="130" class="box" fill="#e8def8" stroke="#5b2c83"/>
+  <text x="1532" y="646" class="h dark" text-anchor="middle">Role-aware read experiences</text>
+  <text x="1532" y="676" class="t dark" text-anchor="middle">Owner portfolio &#8226; admin dashboard</text>
+  <text x="1532" y="702" class="t dark" text-anchor="middle">Caller-authorized request status</text>
+  <text x="1532" y="726" class="small muted" text-anchor="middle">Canvas context is a hint, never authorization</text>
+
+  <path d="M302 544 V600 H440 V612" class="line"/>
+  <path d="M827 544 V600 H440 V612" class="line"/>
+  <path d="M827 544 V600 H1532 V612" class="line"/>
+
+  <text x="60" y="790" class="section">POWER AUTOMATE &#8212; 11 DISTINCT CLOUD FLOWS IN RELEASE 2.0</text>
+
+  <rect x="60" y="812" width="610" height="160" class="box" fill="#fff" stroke="#0078d4"/>
+  <text x="365" y="846" class="h dark" text-anchor="middle">7 agent tool flows</text>
+  <text x="90" y="877" class="t dark">List Owner Sites &#8226; List Admin Sites &#8226; Get Site Detail</text>
+  <text x="90" y="903" class="t dark">Submit Request &#8226; Get Request Status</text>
+  <text x="90" y="929" class="t dark">Get Caller Capabilities &#8226; Verify Admin</text>
+  <text x="90" y="954" class="small muted">22 flow-bound components; 23 topic-to-flow relationships reuse these flows</text>
+
+  <rect x="705" y="812" width="360" height="160" class="box" fill="#fff" stroke="#0078d4"/>
+  <text x="885" y="846" class="h dark" text-anchor="middle">2 authorization/audit flows</text>
+  <text x="885" y="881" class="t dark" text-anchor="middle">Check Admin Role</text>
+  <text x="885" y="907" class="t dark" text-anchor="middle">Append Action Event</text>
+  <text x="885" y="942" class="small muted" text-anchor="middle">Reusable fail-closed controls</text>
+
+  <rect x="1100" y="812" width="310" height="160" class="box" fill="#dff6dd" stroke="#107c10"/>
+  <text x="1255" y="846" class="h dark" text-anchor="middle">1 active processor</text>
+  <text x="1255" y="881" class="t dark" text-anchor="middle">Request - Process Pending</text>
+  <text x="1255" y="907" class="t dark" text-anchor="middle">Certification + gated actions</text>
+  <text x="1255" y="942" class="small muted" text-anchor="middle">Recurring workflow is active</text>
+
+  <rect x="1445" y="812" width="295" height="160" rx="14" fill="#f3f2f1" stroke="#8a8886" stroke-width="2" stroke-dasharray="7 6"/>
+  <text x="1592" y="846" class="h dark" text-anchor="middle">1 inactive starter</text>
+  <text x="1592" y="881" class="t dark" text-anchor="middle">Inventory - Start Scan</text>
+  <text x="1592" y="907" class="t dark" text-anchor="middle">Packaged but intentionally off</text>
+  <text x="1592" y="942" class="small muted" text-anchor="middle">Awaiting worker + finalizer</text>
+
+  <path d="M440 742 V802 H365 V812" class="line"/>
+  <path d="M1072 742 V802 H1255 V812" class="line"/>
+
+  <text x="60" y="1018" class="section">SYSTEM OF RECORD, MICROSOFT 365 SERVICES &amp; ROADMAP</text>
+
+  <rect x="60" y="1040" width="745" height="142" class="box" fill="#fff" stroke="#605e5c"/>
+  <text x="432" y="1074" class="h dark" text-anchor="middle">Microsoft Dataverse &#8226; 10 tables</text>
+  <text x="90" y="1104" class="t dark">Governance Site &#8226; Site Owner Assignment &#8226; Governance Role Assignment</text>
+  <text x="90" y="1130" class="t dark">Action Request &#8226; Action Event &#8226; Policy Setting &#8226; Evidence Snapshot</text>
+  <text x="90" y="1156" class="t dark">Scan Run &#8226; Scan Work Item &#8226; Notification Delivery</text>
+
+  <rect x="845" y="1040" width="400" height="142" class="box" fill="#fff" stroke="#6264a7"/>
+  <text x="1045" y="1074" class="h dark" text-anchor="middle">Microsoft 365 services</text>
+  <text x="1045" y="1105" class="t dark" text-anchor="middle">Office 365 Users &#8226; Approvals</text>
+  <text x="1045" y="1131" class="t dark" text-anchor="middle">SharePoint / Microsoft Graph</text>
+  <text x="1045" y="1157" class="t dark" text-anchor="middle">Teams and Adaptive Cards</text>
+
+  <rect x="1285" y="1040" width="455" height="142" rx="14" fill="#f3f2f1" stroke="#8a8886" stroke-width="1.5" stroke-dasharray="7 6"/>
+  <text x="1512" y="1074" class="h dark" text-anchor="middle">Design-only roadmap automation</text>
+  <text x="1512" y="1105" class="t dark" text-anchor="middle">Inventory worker + finalizer</text>
+  <text x="1512" y="1131" class="t dark" text-anchor="middle">Owner digest + admin summary</text>
+  <text x="1512" y="1157" class="t dark" text-anchor="middle">Adaptive Card response</text>
+
+  <path d="M365 972 V1030 H432 V1040" class="line"/>
+  <path d="M885 972 V1030 H650 V1040" class="line"/>
+  <path d="M1255 972 V1030 H1045 V1040" class="line"/>
+  <path d="M1592 972 V1040" class="line dash"/>
+
+  <rect x="60" y="1210" width="1680" height="46" rx="10" fill="#edebe9"/>
+  <text x="900" y="1239" class="metric dark" text-anchor="middle">ONE MANAGED SOLUTION: 1 Canvas app &#8226; 1 PCF control &#8226; 8 agents &#8226; 105 bot components &#8226; 11 flows &#8226; 10 tables &#8226; 6 connection references &#8226; 11 environment variables</text>
 </svg>
